@@ -1,7 +1,7 @@
 import io
 from PyQt5 import QtCore
 import datetime
-from core import Core
+from .core import Core
 
 
 class Logger(Core):

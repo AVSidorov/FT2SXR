@@ -1,6 +1,6 @@
 import sys
 from PyQt5 import QtWidgets, QtCore
-from ADCUI_design import UI_ADC_widget
+from .ADCUI_design import UI_ADC_widget
 
 
 class ADCUI_widget (QtWidgets.QWidget, UI_ADC_widget):
@@ -16,7 +16,7 @@ class ADCUI_widget (QtWidgets.QWidget, UI_ADC_widget):
         self.enable_pushButton.clicked.connect(self.enable_all)
 
     def enable_all(self):
-        self.channel0.emit(b'btnckiked')
+        self.channel0.emit(b'btn clicked')
         if self.enable_flag == 0:
             self.enable_pushButton.setStyleSheet("color: red")
             self.enable_pushButton.text()
