@@ -1,0 +1,4 @@
+[25.02.2022 14:14:57] <core.Core object at 0x000001E0C910CD30> btnckiked
+[25.02.2022 14:14:58] <core.Core object at 0x000001E0C910CD30> btnckiked
+[25.02.2022 14:14:58] <core.Core object at 0x000001E0C910CD30> btnckiked
+[25.02.2022 14:14:58] <core.Core object at 0x000001E0C910CD30> btnckiked

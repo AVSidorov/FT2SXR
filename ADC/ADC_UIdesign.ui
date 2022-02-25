@@ -1,0 +1,574 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>ADC_wiget</class>
+ <widget class="QWidget" name="ADC_wiget">
+  <property name="windowModality">
+   <enum>Qt::NonModal</enum>
+  </property>
+  <property name="enabled">
+   <bool>true</bool>
+  </property>
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>430</width>
+    <height>460</height>
+   </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="windowTitle">
+   <string>ADC</string>
+  </property>
+  <widget class="QGroupBox" name="groupBox">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>10</y>
+     <width>411</width>
+     <height>91</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Включение каналов АЦП</string>
+   </property>
+   <property name="flat">
+    <bool>false</bool>
+   </property>
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <widget class="QCheckBox" name="ch6_checkBox">
+    <property name="geometry">
+     <rect>
+      <x>204</x>
+      <y>50</y>
+      <width>63</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Канал 6</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="ch7_checkBox">
+    <property name="geometry">
+     <rect>
+      <x>295</x>
+      <y>24</y>
+      <width>63</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Канал 7</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="ch8_checkBox">
+    <property name="geometry">
+     <rect>
+      <x>295</x>
+      <y>50</y>
+      <width>63</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Канал 8</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="ch4_checkBox">
+    <property name="geometry">
+     <rect>
+      <x>112</x>
+      <y>50</y>
+      <width>63</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Канал 4</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="ch3_checkBox">
+    <property name="geometry">
+     <rect>
+      <x>112</x>
+      <y>24</y>
+      <width>63</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Канал 3</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="ch2_checkBox">
+    <property name="geometry">
+     <rect>
+      <x>21</x>
+      <y>50</y>
+      <width>63</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Канал 2</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="ch1_checkBox">
+    <property name="geometry">
+     <rect>
+      <x>21</x>
+      <y>24</y>
+      <width>63</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Канал 1</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="ch5_checkBox">
+    <property name="geometry">
+     <rect>
+      <x>204</x>
+      <y>24</y>
+      <width>63</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Канал 5</string>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QGroupBox" name="groupBox_2">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>110</y>
+     <width>411</width>
+     <height>341</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Параметры</string>
+   </property>
+   <layout class="QGridLayout" name="gridLayout_2">
+    <item row="0" column="0">
+     <widget class="QLabel" name="frec_label">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="text">
+       <string>Частота дисретизации</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="1">
+     <widget class="QLabel" name="frec_val_label">
+      <property name="text">
+       <string>40...250 МГц</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="2">
+     <widget class="QSpinBox" name="frec_spinBox">
+      <property name="minimum">
+       <number>40</number>
+      </property>
+      <property name="maximum">
+       <number>250</number>
+      </property>
+      <property name="value">
+       <number>40</number>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="0">
+     <widget class="QLabel" name="sourse_label">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="text">
+       <string>Источник запуска</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="2">
+     <widget class="QComboBox" name="sourse_comboBox">
+      <item>
+       <property name="text">
+        <string>Manual</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>PX5</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>SIn</string>
+       </property>
+      </item>
+     </widget>
+    </item>
+    <item row="2" column="0">
+     <widget class="QLabel" name="delay_label">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::NoFrame</enum>
+      </property>
+      <property name="lineWidth">
+       <number>1</number>
+      </property>
+      <property name="text">
+       <string>Задержка</string>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="1">
+     <widget class="QLabel" name="delay_val_label">
+      <property name="text">
+       <string>from to</string>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="2">
+     <widget class="QSpinBox" name="delay_spinBox"/>
+    </item>
+    <item row="3" column="0">
+     <widget class="QLabel" name="interval_label">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="text">
+       <string>Интервал измерений</string>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="1">
+     <widget class="QLabel" name="label">
+      <property name="text">
+       <string>from to</string>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="2">
+     <widget class="QSpinBox" name="interval_spinBox"/>
+    </item>
+    <item row="4" column="0">
+     <widget class="QLabel" name="bias1_label">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="text">
+       <string>Смещение нуля 1</string>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="1">
+     <widget class="QLabel" name="bias_val_label_1">
+      <property name="text">
+       <string>-80...100</string>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="2">
+     <widget class="QDoubleSpinBox" name="bias1_doubleSpinBox">
+      <property name="decimals">
+       <number>2</number>
+      </property>
+      <property name="minimum">
+       <double>-80.000000000000000</double>
+      </property>
+      <property name="maximum">
+       <double>100.000000000000000</double>
+      </property>
+      <property name="singleStep">
+       <double>0.010000000000000</double>
+      </property>
+     </widget>
+    </item>
+    <item row="5" column="0">
+     <widget class="QLabel" name="bias2_label">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="text">
+       <string>Смещение нуля 2</string>
+      </property>
+     </widget>
+    </item>
+    <item row="5" column="1">
+     <widget class="QLabel" name="bias_val_label_2">
+      <property name="text">
+       <string>-80...100</string>
+      </property>
+     </widget>
+    </item>
+    <item row="5" column="2">
+     <widget class="QDoubleSpinBox" name="bias2_doubleSpinBox">
+      <property name="decimals">
+       <number>2</number>
+      </property>
+      <property name="minimum">
+       <double>-80.000000000000000</double>
+      </property>
+      <property name="maximum">
+       <double>100.000000000000000</double>
+      </property>
+      <property name="singleStep">
+       <double>0.010000000000000</double>
+      </property>
+     </widget>
+    </item>
+    <item row="6" column="0">
+     <widget class="QLabel" name="bias3_label">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="text">
+       <string>Смещение нуля 3</string>
+      </property>
+     </widget>
+    </item>
+    <item row="6" column="1">
+     <widget class="QLabel" name="bias_val_label_3">
+      <property name="text">
+       <string>-80...100</string>
+      </property>
+     </widget>
+    </item>
+    <item row="6" column="2">
+     <widget class="QDoubleSpinBox" name="bias3_doubleSpinBox">
+      <property name="decimals">
+       <number>2</number>
+      </property>
+      <property name="minimum">
+       <double>-80.000000000000000</double>
+      </property>
+      <property name="maximum">
+       <double>100.000000000000000</double>
+      </property>
+      <property name="singleStep">
+       <double>0.010000000000000</double>
+      </property>
+     </widget>
+    </item>
+    <item row="7" column="0">
+     <widget class="QLabel" name="bias4_label">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="text">
+       <string>Смещение нуля 4</string>
+      </property>
+     </widget>
+    </item>
+    <item row="7" column="1">
+     <widget class="QLabel" name="bias_val_label_4">
+      <property name="text">
+       <string>-80...100</string>
+      </property>
+     </widget>
+    </item>
+    <item row="7" column="2">
+     <widget class="QDoubleSpinBox" name="bias4_doubleSpinBox">
+      <property name="decimals">
+       <number>2</number>
+      </property>
+      <property name="minimum">
+       <double>-80.000000000000000</double>
+      </property>
+      <property name="maximum">
+       <double>100.000000000000000</double>
+      </property>
+      <property name="singleStep">
+       <double>0.010000000000000</double>
+      </property>
+     </widget>
+    </item>
+    <item row="8" column="0">
+     <widget class="QLabel" name="bias5_label">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="text">
+       <string>Смещение нуля 5</string>
+      </property>
+     </widget>
+    </item>
+    <item row="8" column="1">
+     <widget class="QLabel" name="bias_val_label_5">
+      <property name="text">
+       <string>-80...100</string>
+      </property>
+     </widget>
+    </item>
+    <item row="8" column="2">
+     <widget class="QDoubleSpinBox" name="bias5_doubleSpinBox">
+      <property name="decimals">
+       <number>2</number>
+      </property>
+      <property name="minimum">
+       <double>-80.000000000000000</double>
+      </property>
+      <property name="maximum">
+       <double>100.000000000000000</double>
+      </property>
+      <property name="singleStep">
+       <double>0.010000000000000</double>
+      </property>
+     </widget>
+    </item>
+    <item row="9" column="0">
+     <widget class="QLabel" name="bias6_label">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="text">
+       <string>Смещение нуля 6</string>
+      </property>
+     </widget>
+    </item>
+    <item row="9" column="1">
+     <widget class="QLabel" name="bias_val_label_6">
+      <property name="text">
+       <string>-80...100</string>
+      </property>
+     </widget>
+    </item>
+    <item row="9" column="2">
+     <widget class="QDoubleSpinBox" name="bias6_doubleSpinBox">
+      <property name="decimals">
+       <number>2</number>
+      </property>
+      <property name="minimum">
+       <double>-80.000000000000000</double>
+      </property>
+      <property name="maximum">
+       <double>100.000000000000000</double>
+      </property>
+      <property name="singleStep">
+       <double>0.010000000000000</double>
+      </property>
+     </widget>
+    </item>
+    <item row="10" column="0">
+     <widget class="QLabel" name="bias7_label">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="text">
+       <string>Смещение нуля 7</string>
+      </property>
+     </widget>
+    </item>
+    <item row="10" column="1">
+     <widget class="QLabel" name="bias_val_label_7">
+      <property name="text">
+       <string>-80...100</string>
+      </property>
+     </widget>
+    </item>
+    <item row="10" column="2">
+     <widget class="QDoubleSpinBox" name="bias7_doubleSpinBox">
+      <property name="decimals">
+       <number>2</number>
+      </property>
+      <property name="minimum">
+       <double>-80.000000000000000</double>
+      </property>
+      <property name="maximum">
+       <double>100.000000000000000</double>
+      </property>
+      <property name="singleStep">
+       <double>0.010000000000000</double>
+      </property>
+     </widget>
+    </item>
+    <item row="11" column="0">
+     <widget class="QLabel" name="bias8_label">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="text">
+       <string>Смещение нуля 8</string>
+      </property>
+     </widget>
+    </item>
+    <item row="11" column="1">
+     <widget class="QLabel" name="bias_val_label_8">
+      <property name="text">
+       <string>-80...100</string>
+      </property>
+     </widget>
+    </item>
+    <item row="11" column="2">
+     <widget class="QDoubleSpinBox" name="bias8_doubleSpinBox">
+      <property name="decimals">
+       <number>2</number>
+      </property>
+      <property name="minimum">
+       <double>-80.000000000000000</double>
+      </property>
+      <property name="maximum">
+       <double>100.000000000000000</double>
+      </property>
+      <property name="singleStep">
+       <double>0.010000000000000</double>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

@@ -1,28 +1,32 @@
 import sys
 import signal
+from PyQt5 import QtWidgets
 
-from PyQt5.QtCore import QCoreApplication
-from console import Console
+# from console import Console
+from ADC.ADCUI import ADCUI_widget
 from logger import Logger
 from core import Core
 
 
 def main():
     signal.signal(signal.SIGINT, signal.SIG_DFL)
-    app = QCoreApplication(sys.argv)
+    app = QtWidgets.QApplication(sys.argv)
 
     core = Core(app)
 
-    console = Console(app)
-    console.channel0.connect(core.channel0)
+    ex = ADCUI_widget()
+    ex.channel0.connect(core.channel0)
+   # console = Console(app)
+   # console.channel0.connect(core.channel0)
 
     logger = Logger('log.txt', app)
     core.channel0.connect(logger.channel0_slot)
 
-    echo = Logger(sys.stdout, app)
-    core.channel0.connect(echo.channel0_slot)
 
-    core.channel0.connect(console.channel0_slot)
-    console.run()
+    # echo = Logger(sys.stdout, app)
+    # core.channel0.connect(echo.channel0_slot)
 
-    app.exec()
+    # core.channel0.connect(console.channel0_slot)
+    # console.run()
+    ex.show()
+    sys.exit(app.exec_())
