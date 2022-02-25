@@ -1,4 +1,4 @@
-from ADC.ADCUI import ADCUI_widget
+from ui.ADCUI import ADCUI_widget
 from core.core import Core
 from core.logger import Logger
 from PyQt5 import QtWidgets

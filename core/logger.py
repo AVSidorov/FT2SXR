@@ -2,7 +2,7 @@ import io
 from PyQt5 import QtCore
 import datetime
 from .core import Core
-
+from .sxr_protocol_pb2 import packet
 
 class Logger(Core):
     def __init__(self, out=None, parent=None):
@@ -12,8 +12,10 @@ class Logger(Core):
 
     @QtCore.pyqtSlot(bytes)
     def channel0_slot(self, data: bytes):
-        data = data.decode()
-        data = f'[{datetime.datetime.now().strftime("%d.%m.%Y %H:%M:%S")}] {self.sender()} '+data
+        pck = packet()
+        pck.ParseFromString(data)
+
+        data = f'[{datetime.datetime.now().strftime("%d.%m.%Y %H:%M:%S")}] To: {pck.address} From: {pck.sender} Command: {pck.command} with data {pck.data.decode()}'
         if data[-1] != '\n':
             data += '\n'
 

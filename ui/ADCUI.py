@@ -1,6 +1,7 @@
 import sys
 from PyQt5 import QtWidgets, QtCore
 from .ADCUI_design import UI_ADC_widget
+from core.sxr_protocol_pb2 import packet
 
 
 class ADCUI_widget (QtWidgets.QWidget, UI_ADC_widget):
@@ -16,7 +17,14 @@ class ADCUI_widget (QtWidgets.QWidget, UI_ADC_widget):
         self.enable_pushButton.clicked.connect(self.enable_all)
 
     def enable_all(self):
-        self.channel0.emit(b'btn clicked')
+        pck = packet()
+        pck.address = 0
+        pck.sender = 1
+        pck.command = 0
+        pck.version = '0.1'
+        if pck.IsInitialized():
+            self.channel0.emit(pck.SerializeToString())
+
         if self.enable_flag == 0:
             self.enable_pushButton.setStyleSheet("color: red")
             self.enable_pushButton.text()
