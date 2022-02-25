@@ -1,0 +1,3 @@
+[25.02.2022 15:57:01] <core.core.Core object at 0x000001F1B7587550> btn clicked
+[25.02.2022 15:57:02] <core.core.Core object at 0x000001F1B7587550> btn clicked
+[25.02.2022 15:57:04] <core.core.Core object at 0x000001F1B7587550> btn clicked
