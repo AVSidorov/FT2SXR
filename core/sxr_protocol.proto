@@ -1,0 +1,11 @@
+syntax = "proto2";
+
+package sxr_protocol;
+
+message packet{
+  required fixed32 address = 1;
+  required fixed32 sender = 2;
+  required fixed32 command = 3;
+  optional bytes data = 4;
+  optional string version = 5;
+}
