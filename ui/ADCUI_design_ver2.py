@@ -16,7 +16,7 @@ class Ui_ADC_widget(object):
         ADC_widget.setObjectName("ADC_widget")
         ADC_widget.setWindowModality(QtCore.Qt.NonModal)
         ADC_widget.setEnabled(True)
-        ADC_widget.resize(403, 290)
+        ADC_widget.resize(400, 290)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)

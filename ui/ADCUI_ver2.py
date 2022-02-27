@@ -1,5 +1,5 @@
 import sys
-from PyQt5 import QtWidgets, QtCore
+from PyQt5 import QtWidgets
 from ADCUI_design_ver2 import Ui_ADC_widget
 
 
@@ -9,6 +9,7 @@ class ADCUI_widget (QtWidgets.QWidget, Ui_ADC_widget):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
+        ADCUI_widget.setFixedSize(self, 400, 290)
 
         # ADC values
         self.channels_status = [0, 0, 0, 0, 0, 0, 0, 0]  # 0/1 or True/False
@@ -80,11 +81,9 @@ class ADCUI_widget (QtWidgets.QWidget, Ui_ADC_widget):
 
     def setdelay(self):
         self.delay = self.delay_spinBox.value()
-        print(self.delay)
 
     def setinterval(self):
         self.interval = self.interval_spinBox.value()
-        print(self.interval)
 
     def showchannel(self):
         if self.ch_comboBox.currentText() != '':
