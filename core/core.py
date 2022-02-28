@@ -15,5 +15,5 @@ class Core(QtCore.QObject):
         pass
 
     @QtCore.pyqtSlot(bytes)
-    def channel1_slot(self, data: bytes):
+    def channel2_slot(self, data: bytes):
         pass
