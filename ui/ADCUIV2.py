@@ -1,15 +1,15 @@
 import sys
 from PyQt5 import QtWidgets
-from ADCUI_design_ver2 import Ui_ADC_widget
+from ADCUIDesignV2 import Ui_ADCWidgetDesign
 
 
-class ADCUI_widget (QtWidgets.QWidget, Ui_ADC_widget):
+class ADCUIWidget (QtWidgets.QWidget, Ui_ADCWidgetDesign):
     # channel0 = QtCore.pyqtSignal(bytes)
 
     def __init__(self):
         super().__init__()
         self.setupUi(self)
-        ADCUI_widget.setFixedSize(self, 400, 290)
+        ADCUIWidget.setFixedSize(self, 400, 290)
 
         # ADC values
         self.channels_status = [0, 0, 0, 0, 0, 0, 0, 0]  # 0/1 or True/False
@@ -96,7 +96,7 @@ class ADCUI_widget (QtWidgets.QWidget, Ui_ADC_widget):
 
 def main():
     app = QtWidgets.QApplication(sys.argv)
-    ex = ADCUI_widget()
+    ex = ADCUIWidget()
     ex.show()
     sys.exit(app.exec_())
 

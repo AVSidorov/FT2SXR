@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>ADC_widget</class>
- <widget class="QWidget" name="ADC_widget">
+ <class>ADCWidgetDesign</class>
+ <widget class="QWidget" name="ADCWidgetDesign">
   <property name="windowModality">
    <enum>Qt::NonModal</enum>
   </property>

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'ADC_UIdesign_v3.ui'
+# Form implementation generated from reading ui file 'ADCUIDesignV2.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.4
 #
@@ -11,19 +11,19 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 
-class Ui_ADC_widget(object):
-    def setupUi(self, ADC_widget):
-        ADC_widget.setObjectName("ADC_widget")
-        ADC_widget.setWindowModality(QtCore.Qt.NonModal)
-        ADC_widget.setEnabled(True)
-        ADC_widget.resize(400, 290)
+class Ui_ADCWidgetDesign(object):
+    def setupUi(self, ADCWidgetDesign):
+        ADCWidgetDesign.setObjectName("ADCWidgetDesign")
+        ADCWidgetDesign.setWindowModality(QtCore.Qt.NonModal)
+        ADCWidgetDesign.setEnabled(True)
+        ADCWidgetDesign.resize(400, 290)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(ADC_widget.sizePolicy().hasHeightForWidth())
-        ADC_widget.setSizePolicy(sizePolicy)
-        ADC_widget.setAutoFillBackground(False)
-        self.groupBox = QtWidgets.QGroupBox(ADC_widget)
+        sizePolicy.setHeightForWidth(ADCWidgetDesign.sizePolicy().hasHeightForWidth())
+        ADCWidgetDesign.setSizePolicy(sizePolicy)
+        ADCWidgetDesign.setAutoFillBackground(False)
+        self.groupBox = QtWidgets.QGroupBox(ADCWidgetDesign)
         self.groupBox.setGeometry(QtCore.QRect(10, 10, 381, 91))
         self.groupBox.setFlat(False)
         self.groupBox.setCheckable(False)
@@ -54,7 +54,7 @@ class Ui_ADC_widget(object):
         self.ch8_checkBox = QtWidgets.QCheckBox(self.groupBox)
         self.ch8_checkBox.setObjectName("ch8_checkBox")
         self.gridLayout.addWidget(self.ch8_checkBox, 1, 3, 1, 1)
-        self.groupBox_2 = QtWidgets.QGroupBox(ADC_widget)
+        self.groupBox_2 = QtWidgets.QGroupBox(ADCWidgetDesign)
         self.groupBox_2.setGeometry(QtCore.QRect(10, 110, 381, 171))
         self.groupBox_2.setObjectName("groupBox_2")
         self.gridLayout_2 = QtWidgets.QGridLayout(self.groupBox_2)
@@ -149,8 +149,8 @@ class Ui_ADC_widget(object):
         self.source_label.setObjectName("source_label")
         self.gridLayout_2.addWidget(self.source_label, 1, 0, 1, 1)
 
-        self.retranslateUi(ADC_widget)
-        QtCore.QMetaObject.connectSlotsByName(ADC_widget)
+        self.retranslateUi(ADCWidgetDesign)
+        QtCore.QMetaObject.connectSlotsByName(ADCWidgetDesign)
 
     def retranslateUi(self, ADC_widget):
         _translate = QtCore.QCoreApplication.translate
