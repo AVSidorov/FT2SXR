@@ -30,6 +30,10 @@ class Board:
                 n += 1
         return n
 
+    def set_active(self, index=0, value: bool = True):
+        if all((index >= 0, index < len(self.channels))):
+            self.channels[index] = value
+
 
 class ADC(Core):
     def __init__(self, parent=None, nboards=1):
@@ -37,31 +41,34 @@ class ADC(Core):
         self.address = 1
 
         self.boards = [Board() for _ in range(nboards)]
-        self.ClockSource = {'off': '0',
-                             'internal': '1',
-                             'external': '0x81',
-                             'base': '0x85'}
-        self.BaseClockValue = 100000000
-        self.SamplingRate = 50000000
-        self.DataFormat = 0
-        self.StartSource = {'CH0': '0',
-                            'EXTSTART': '2',
-                            'SOFTSTART': '3'}
+
         self.connected = False
         self.ssh = None
         self.ssh_timeout = 0.5
         self.dump = 'data_0.bin'
-        self.wdir = ''
+        self.wdir = os.path.abspath('./')
         self.scp = None
         self.config = None
 
         config = configparser.ConfigParser(inline_comment_prefixes=(';', '//'))
         config.optionxform = str
-        self.config = config
 
+        # read config from directory of launch
+        if os.path.exists(os.path.join(self.wdir, 'adc.ini')):
+            config.read(os.path.join(self.wdir, 'adc.ini'), "utf-8")
+            self.config = config
+            mask = 0
+            if 'device0_fm814x250m0' in config:
+                if 'ChannelMask' in config['device0_fm814x250m0']:
+                    mask = int(config['device0_fm814x250m0']['ChannelMask'], 16)
+            for ch in self.boards[0].channels:
+                ch.on = bool(mask & 1)
+                mask >>= 1
+
+        # make directory whit current date, to store adc memory dumps and  cfg.ini for sending
         td = datetime.date.today()
         wdir = format(td.year-2000, '02d')+format(td.month,'02d')+format(td.day, '02d')
-        wdir = os.path.abspath(wdir)
+        wdir = os.path.join(self.wdir, wdir)
 
         if not(os.path.exists(wdir)):
             os.mkdir(wdir)
@@ -78,15 +85,10 @@ class ADC(Core):
             self.ssh = ssh
             ssh.send('cd /home/embedded/examples\n')
             self.ssh_output(0.5)
+
             scp = SCPClient(client.get_transport())
-            scp.get('/home/embedded/examples/exam_adc.ini', wdir)
-            while not (os.path.exists(os.path.join(wdir, 'exam_adc.ini'))):
-                pass
             self.scp = scp
-
-            config.read(os.path.join(wdir, 'exam_adc.ini'), "utf-8")
-
-            self.config = config
+            self.send_config()
         except:
             self.connected = False
 
