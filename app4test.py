@@ -1,4 +1,4 @@
-from ui.ADCUI import ADCUIWidget
+from ui.MainWindow import MainWindow
 from core.core import Core
 from core.logger import Logger
 from PyQt5 import QtWidgets
@@ -10,13 +10,14 @@ def main():
 
     core = Core(app)
 
-    ex = ADCUIWidget()
-    ex.channel0.connect(core.channel0)
+    mw = MainWindow()
+    mw.channel0.connect(core.channel0)
+    core.channel0.connect(mw.channel0_slot)
 
     logger = Logger('log.txt', app)
     core.channel0.connect(logger.channel0_slot)
 
-    ex.show()
+    mw.show()
     sys.exit(app.exec_())
 
 
