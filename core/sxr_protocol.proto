@@ -2,10 +2,69 @@ syntax = "proto2";
 
 package sxr_protocol;
 
-message packet{
+message MainPacket{
   required fixed32 address = 1;
   required fixed32 sender = 2;
   required fixed32 command = 3;
   optional bytes data = 4;
   optional string version = 5;
+}
+
+message AdcStatus{
+  optional string name = 1;
+  optional bool enabled = 2 [default = false];
+  optional bool connected = 3 [default = false];
+  optional fixed32 sampling_rate = 4;
+  optional float inter_channel_delay = 41;
+  optional float inter_sample_delay = 42;
+  optional fixed32 samples = 5;
+
+  enum EnumStartSource{
+    option allow_alias = true;
+    SOFTSTART = 0;
+    INTSTART = 0;
+    EXTSTART = 1;
+    IN0 = 2;
+    STARTTHR = 2;
+  }
+  optional EnumStartSource start = 6 [default = SOFTSTART];
+  optional float start_threshold = 61;
+  optional bool start_inversion = 62;
+  optional bytes start_mode= 63;
+
+  optional EnumStartSource stop = 7 [default = SOFTSTART];
+  optional float stop_threshold = 71;
+  optional bool stop_inversion = 72;
+  optional bytes stop_mode= 73;
+
+  enum EnumClockSource{
+    CLOCKOFF = 0;
+    CLOCKINT = 1;
+    CLOCKEXT = 2;
+  }
+  optional EnumClockSource clock_source = 8 [default = CLOCKINT];
+
+  enum EnumMemory{
+    MEMHOST = 0; //PC etc.
+    MEMINT = 1;  //Internal ADC Memory
+    MEMFIFO = 3;
+  }
+  optional EnumMemory memory_type = 9;
+
+  message BoardStatus{
+    optional string name = 1;
+    optional bool enabled = 2;
+    optional bytes channel_mask = 3;
+
+    message ChannelStatus{
+      optional string name = 1;
+      optional bool enabled = 2 [default = false];
+      optional float gain = 3 [default = 1.0];
+      optional float bias = 4 [default = 0.0];
+    }
+    repeated ChannelStatus channel_status = 4;
+
+  }
+  repeated BoardStatus board_status = 10;
+
 }

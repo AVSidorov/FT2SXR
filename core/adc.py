@@ -7,7 +7,7 @@ import configparser
 import os
 import numpy as np
 from .core import Core
-from .sxr_protocol_pb2 import packet
+from .sxr_protocol_pb2 import MainPacket
 
 
 class Channel:
@@ -29,7 +29,6 @@ class Board:
             if ch.on:
                 n += 1
         return n
-
 
 
 class ADC(Core):
@@ -134,7 +133,7 @@ class ADC(Core):
                 ch.data = np.ndarray((0,))
 
     def channel0_slot(self, data: bytes):
-        pck = packet()
+        pck = MainPacket()
         pck.ParseFromString(data)
         if pck.address == self.address:
             if pck.command == 0:

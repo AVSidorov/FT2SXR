@@ -1,7 +1,7 @@
 import sys
 from PyQt5 import QtWidgets, QtCore
 from ui.ADCUIDesign import Ui_ADCWidgetDesign
-from core.sxr_protocol_pb2 import packet
+from core.sxr_protocol_pb2 import MainPacket
 
 
 class ADCUIWidget (QtWidgets.QWidget, Ui_ADCWidgetDesign):
@@ -72,7 +72,7 @@ class ADCUIWidget (QtWidgets.QWidget, Ui_ADCWidgetDesign):
         self.bias_doubleSpinBox.setEnabled(self.enable_all_channels_flag)
         self.ch_comboBox.setEnabled(self.enable_all_channels_flag)
 
-        pck = packet()
+        pck = MainPacket()
         pck.address = 0
         pck.sender = 1
         pck.command = 0
