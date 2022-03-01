@@ -237,7 +237,7 @@ class ADC(Core):
             if bias is not None:
                 if len(status.board_status[0].channel_status) < ch_n+1:
                     status.board_status[0].channel_status.add()
-                status.board_status[0].enabled = bool(self.boards[0].channels[ch_n].on)
+                status.board_status[0].channel_status[ch_n].enabled = self.boards[0].channels[ch_n].on
                 status.board_status[0].channel_status[ch_n].bias = float(bias)
 
         if response is None:
