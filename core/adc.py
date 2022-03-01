@@ -7,7 +7,8 @@ import configparser
 import os
 import numpy as np
 from .core import Core
-from .sxr_protocol_pb2 import MainPacket
+from .sxr_protocol_pb2 import MainPacket, AdcStatus
+from .sxr_protocol import packet_init
 
 
 class Channel:
@@ -57,10 +58,13 @@ class ADC(Core):
         if os.path.exists(os.path.join(self.wdir, 'adc.ini')):
             config.read(os.path.join(self.wdir, 'adc.ini'), "utf-8")
             self.config = config
-            mask = 0
-            if 'device0_fm814x250m0' in config:
-                if 'ChannelMask' in config['device0_fm814x250m0']:
-                    mask = int(config['device0_fm814x250m0']['ChannelMask'], 16)
+
+            mask = self.get_cfg_item('device0_fm814x250m0', 'ChannelMask')
+            if mask is not None:
+                mask = int(mask, 16)
+            else:
+                mask = 0
+
             for ch in self.boards[0].channels:
                 ch.on = bool(mask & 1)
                 mask >>= 1
@@ -135,12 +139,54 @@ class ADC(Core):
                 ch.data = np.ndarray((0,))
 
     def channel0_slot(self, data: bytes):
-        pck = MainPacket()
-        pck.ParseFromString(data)
-        if pck.address == self.address:
-            if pck.command == 0:
-                self.start()
+        request = MainPacket()
+        request.ParseFromString(data)
+        if request.address == self.address:
+            response = packet_init(request.sender, self.address)
+            response.command = request.command
 
+            if request.command == 0:
+                self.status_message(response)
 
+    def status_message(self, response=None):
+        status = AdcStatus()
 
+        name = self.get_cfg_item('Option', 'AdcServiceName')
+        if name is not None:
+            status.name = name
+
+        status.connected = self.connected
+
+        rate = self.get_cfg_item('device0_fm814x250m0', 'SamplingRate')
+        if rate is not None:
+            status.sampling_rate = int(rate)
+
+        samples = self.get_cfg_item('Option', 'SamplesPerChannel')
+        if samples is not None:
+            status.samples = int(samples)
+
+        start = self.get_cfg_item('device0_fm814x250m0', 'StartSource')
+        if start is not None:
+            if int(start) == 0:
+                status.start = AdcStatus.IN0
+            elif int(start) == 2:
+                status.start = AdcStatus.EXTSTART
+            elif int(start) == 3:
+                status.start = AdcStatus.SOFTSTART
+
+        if response is None:
+            return status.SerializeToString()
+        else:
+            response.data = status.SerializeToString()
+            if response.IsInitialized():
+                self.channel0.emit(response.SerializeToString())
+
+    def get_cfg_item(self, sec, key):
+        if sec in self.config:
+            if key in self.config[sec]:
+                return self.config[sec][key]
+            else:
+                return None
+        else:
+            return None
 

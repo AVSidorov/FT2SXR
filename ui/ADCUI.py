@@ -1,7 +1,8 @@
 import sys
 from PyQt5 import QtWidgets, QtCore
 from ui.ADCUIDesign import Ui_ADCWidgetDesign
-from core.sxr_protocol_pb2 import MainPacket
+from core.sxr_protocol_pb2 import MainPacket, AdcStatus
+from core.sxr_protocol import packet_init
 
 
 class ADCUIWidget (QtWidgets.QWidget, Ui_ADCWidgetDesign):
@@ -11,6 +12,8 @@ class ADCUIWidget (QtWidgets.QWidget, Ui_ADCWidgetDesign):
         super().__init__(parent=parent)
         self.setupUi(self)
         ADCUIWidget.setFixedSize(self, 400, 290)
+
+        self.address = 11
 
         # ADC values
         self.channels_status = [0, 0, 0, 0, 0, 0, 0, 0]  # 0/1 or True/False
@@ -72,10 +75,8 @@ class ADCUIWidget (QtWidgets.QWidget, Ui_ADCWidgetDesign):
         self.bias_doubleSpinBox.setEnabled(self.enable_all_channels_flag)
         self.ch_comboBox.setEnabled(self.enable_all_channels_flag)
 
-        pck = MainPacket()
-        pck.address = 0
-        pck.sender = 1
-        pck.command = 0
+        pck = packet_init(1, self.address)
+        pck.command = 2
         pck.version = '0.1'
         if pck.IsInitialized():
             self.channel0.emit(pck.SerializeToString())

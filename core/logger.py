@@ -15,7 +15,7 @@ class Logger(Core):
         pck = MainPacket()
         pck.ParseFromString(data)
 
-        data = f'[{datetime.datetime.now().strftime("%d.%m.%Y %H:%M:%S")}] To: {pck.address} From: {pck.sender} Command: {pck.command} with data {pck.data.decode()}'
+        data = f'[{datetime.datetime.now().strftime("%d.%m.%Y %H:%M:%S")}] To: {pck.address} From: {pck.sender} Command: {pck.command}'
         if data[-1] != '\n':
             data += '\n'
 
