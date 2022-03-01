@@ -83,6 +83,12 @@ class ADC(Core):
 
             self.boards[0].channel_mask = mask
 
+            for ch_n in range(len(self.boards[0].channels)):
+                bias = self.get_cfg_item('device0_fm814x250m0', f'Bias{ch_n}')
+                if bias is not None:
+                    self.boards[0].channels[ch_n].bias = float(bias)
+
+
         # make directory whit current date, to store adc memory dumps and  cfg.ini for sending
         td = datetime.date.today()
         wdir = format(td.year-2000, '02d')+format(td.month,'02d')+format(td.day, '02d')
@@ -161,6 +167,8 @@ class ADC(Core):
 
             if request.command == 0:
                 self.status_message(response)
+            elif request.command == 1:
+                self.status_to_config(response.data)
 
     def status_message(self, response=None):
         status = AdcStatus()
@@ -218,8 +226,18 @@ class ADC(Core):
 
         ch_mask = self.get_cfg_item('device0_fm814x250m0', 'ChannelMask')
         if ch_mask is not None:
-            status.board_status.add()
+            if len(status.board_status) < 1:
+                status.board_status.add()
             status.board_status[0].channel_mask = self.boards[0].channel_mask.to_bytes(1, 'big')
+
+        for ch_n in range(len(self.boards[0].channels)):
+            bias = self.get_cfg_item('device0_fm814x250m0', f'Bias{ch_n}')
+            if len(status.board_status) < 1:
+                status.board_status.add()
+            if bias is not None:
+                if len(status.board_status[0].channel_status) < ch_n+1:
+                    status.board_status[0].channel_status.add()
+                status.board_status[0].channel_status[ch_n].bias = float(bias)
 
         if response is None:
             return status.SerializeToString()
@@ -238,4 +256,36 @@ class ADC(Core):
             return None
 
     def status_to_config(self, status):
-        pass
+        if isinstance(status, bytes):
+            status = AdcStatus()
+            status.ParseFromString(status)
+
+        self.config['Option']['DaqIntoMemory'] = str(status.memory_type)
+        self.config['Option']['SamplesPerChannel'] = str(status.samples)
+        self.config['Option']['MemSamplesPerChan'] = str(status.samples)
+
+        self.config['device0_fm814x250m0']['ChannelMask'] = f'0x{int().from_bytes(status.board_status[0].channel_mask, "big"):02X}'
+        self.boards[0].channel_mask = int().from_bytes(status.board_status[0].channel_mask, "big")
+
+        if status.clock_source == status.CLOCKOFF:
+            self.config['device0_fm814x250m0']['ClockSource'] = '0x0'
+        elif status.clock_source == status.CLOCKINT:
+            self.config['device0_fm814x250m0']['ClockSource'] = '0x1'
+        elif status.clock_source == status.CLOCKEXT:
+            self.config['device0_fm814x250m0']['ClockSource'] = '0x81'
+        self.config['device0_fm814x250m0']['SamplingRate'] = str(status.sampling_rate)
+
+        if len(status.board_status) > 0:
+            n_ch = -1
+            for ch_status in status.board_status[0].channel_status:
+                n_ch += 1
+                self.config['device0_fm814x250m0'][f'Bias{n_ch}'] = f'{ch_status.bias:4.2f}'
+                self.boards[0].channels[n_ch].bias = ch_status.bias
+
+        if status.start == status.SOFTSTART:
+            self.config['device0_fm814x250m0']['StartSource'] = '3'
+        elif status.start == status.EXTSTART:
+            self.config['device0_fm814x250m0']['StartSource'] = '2'
+        elif status.start == status.IN0:
+            self.config['device0_fm814x250m0']['StartSource'] = '0'
+
