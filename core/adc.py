@@ -31,6 +31,22 @@ class Board:
                 n += 1
         return n
 
+    @property
+    def channel_mask(self):
+        bit = 1
+        mask = 0
+        for ch in self.channels:
+            if ch.on:
+                mask += bit
+            bit <<= 1
+        return mask
+
+    @channel_mask.setter
+    def channel_mask(self, mask):
+        for ch in self.channels:
+            ch.on = bool(mask & 1)
+            mask >>= 1
+
     def set_active(self, index=0, value: bool = True):
         if all((index >= 0, index < len(self.channels))):
             self.channels[index] = value
@@ -65,9 +81,7 @@ class ADC(Core):
             else:
                 mask = 0
 
-            for ch in self.boards[0].channels:
-                ch.on = bool(mask & 1)
-                mask >>= 1
+            self.boards[0].channel_mask = mask
 
         # make directory whit current date, to store adc memory dumps and  cfg.ini for sending
         td = datetime.date.today()
@@ -174,6 +188,39 @@ class ADC(Core):
             elif int(start) == 3:
                 status.start = AdcStatus.SOFTSTART
 
+        stop = self.get_cfg_item('device0_fm814x250m0', 'StopSource')
+        if stop is not None:
+            if int(stop) == 0:
+                status.stop = AdcStatus.SOFTSTART
+
+        stop = self.get_cfg_item('device0_fm814x250m0', 'StopSource')
+        if stop is not None:
+            if int(stop) == 0:
+                status.stop = AdcStatus.SOFTSTART
+
+        clock = self.get_cfg_item('device0_fm814x250m0', 'ClockSource')
+        if clock is not None:
+            if int(clock, 16) == 0:
+                status.clock_source = AdcStatus.CLOCKOFF
+            elif int(clock, 16) == 1:
+                status.clock_source = AdcStatus.CLOCKINT
+            elif int(clock, 16) == 2:
+                status.clock_source = AdcStatus.CLOCKEXT
+
+        memory = self.get_cfg_item('Option', 'DaqIntoMemory')
+        if memory is not None:
+            if int(memory) == 0:
+                status.memory_type = AdcStatus.MEMHOST
+            elif int(memory) == 1:
+                status.memory_type = AdcStatus.MEMINT
+            elif int(memory) == 2:
+                status.memory_type = AdcStatus.MEMFIFO
+
+        ch_mask = self.get_cfg_item('device0_fm814x250m0', 'ChannelMask')
+        if ch_mask is not None:
+            status.board_status.add()
+            status.board_status[0].channel_mask = self.boards[0].channel_mask.to_bytes(1, 'big')
+
         if response is None:
             return status.SerializeToString()
         else:
@@ -190,3 +237,5 @@ class ADC(Core):
         else:
             return None
 
+    def status_to_config(self, status):
+        pass
