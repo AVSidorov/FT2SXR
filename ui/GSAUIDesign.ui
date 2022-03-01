@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>300</width>
-    <height>50</height>
+    <height>85</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -19,14 +19,17 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <widget class="QWidget" name="layoutWidget">
+  <widget class="QGroupBox" name="groupBox">
    <property name="geometry">
     <rect>
      <x>10</x>
      <y>10</y>
      <width>281</width>
-     <height>31</height>
+     <height>61</height>
     </rect>
+   </property>
+   <property name="title">
+    <string>ГСА</string>
    </property>
    <layout class="QGridLayout" name="gridLayout">
     <item row="0" column="0">
@@ -37,6 +40,13 @@
      </widget>
     </item>
     <item row="0" column="1">
+     <widget class="QLabel" name="amplitude_var_label">
+      <property name="text">
+       <string>from to</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="2">
      <widget class="QDoubleSpinBox" name="amplitude_doubleSpinBox"/>
     </item>
    </layout>
