@@ -46,6 +46,24 @@ class ADCUIWidget (QtWidgets.QWidget, Ui_ADCWidgetDesign):
         self.ch_comboBox.currentTextChanged.connect(self.showchannel)
         self.bias_doubleSpinBox.valueChanged.connect(self.setbias)
 
+    @QtCore.pyqtSlot(bytes)
+    def channel0_slot(self, data: bytes):
+        request = MainPacket()
+        request.ParseFromString(data)
+        if request.address == self.address:
+            if request.command in (0, 1):
+                self.get_state_from_status(request.data)
+
+    def get_state_from_status(self, status):
+        if isinstance(status, bytes):
+            data = status
+            status = AdcStatus()
+            status.ParseFromString(data)
+
+        if len(status.board_status) > 0:
+            for ch_n in range(len(status.board_status[0].channel_status)):
+                eval(f'self.ch{ch_n+1}_checkBox.setChecked(status.board_status[0].channel_status[ch_n].enabled)')
+
     def enable_ch(self):
         self.channels_status[0] = bool(self.ch1_checkBox.checkState())
         self.channels_status[1] = bool(self.ch2_checkBox.checkState())
