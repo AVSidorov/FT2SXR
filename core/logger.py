@@ -4,6 +4,7 @@ import datetime
 from .core import Core
 from .sxr_protocol_pb2 import MainPacket
 
+
 class Logger(Core):
     def __init__(self, out=None, parent=None):
         super().__init__(parent)
@@ -15,7 +16,7 @@ class Logger(Core):
         pck = MainPacket()
         pck.ParseFromString(data)
 
-        data = f'[{datetime.datetime.now().strftime("%d.%m.%Y %H:%M:%S")}] To: {pck.address} From: {pck.sender} Command: {pck.command}'
+        data = f'[{datetime.datetime.now().strftime("%d.%m.%Y %H:%M:%S")}] To: {pck.address} From: {pck.sender} Command: {pck.command} data length={len(pck.data)}'
         if data[-1] != '\n':
             data += '\n'
 
