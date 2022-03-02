@@ -43,11 +43,13 @@ class ADCUIWidget (QtWidgets.QWidget, Ui_ADCWidgetDesign):
         request.ParseFromString(data)
         if request.sender == 1:  # 1 is reserved address for ADC
             if request.command in (0, 1):
-                self.status2ui(request.data)
+                self.blockSignals(True)
+                self.status = request.data
+                self.status2ui()
+                self.blockSignals(False)
 
-    def status2ui(self, status=None):
-        if status is None:
-            status = self.status
+    def status2ui(self):
+        status = self.status
 
         if status is None:
             return
@@ -71,14 +73,20 @@ class ADCUIWidget (QtWidgets.QWidget, Ui_ADCWidgetDesign):
                     self.ch_comboBox.addItem(str(ch_n+1))
                     self.show_channel()
 
+        self.frec_spinBox.blockSignals(True)
         self.frec_spinBox.setValue(int(status.sampling_rate/1e6))
+        self.frec_spinBox.blockSignals(False)
 
+        self.ch_comboBox.blockSignals(True)
         if status.start == status.SOFTSTART:
             self.source_comboBox.setCurrentIndex(0)
         elif status.start == status.EXTSTART:
             self.source_comboBox.setCurrentIndex(1)
+        self.ch_comboBox.blockSignals(False)
 
-        self.interval_spinBox.setValue(int(self.status.samples / status.sampling_rate * 1e3))
+        self.interval_spinBox.blockSignals(True)
+        self.interval_spinBox.setValue(int(status.samples / status.sampling_rate * 1e3))
+        self.interval_spinBox.blockSignals(False)
 
         if self.ch_comboBox.count() > 0:
             if last_ch is not None:
@@ -94,6 +102,7 @@ class ADCUIWidget (QtWidgets.QWidget, Ui_ADCWidgetDesign):
         if len(self.status.board_status) < 1:
             self.status.board_status.add()
 
+        self.status.board_status[0].channel_mask = b''
         for ch_n in range(8):
             if len(self.status.board_status[0].channel_status) < ch_n+1:
                 self.status.board_status[0].channel_status.add()
@@ -115,8 +124,10 @@ class ADCUIWidget (QtWidgets.QWidget, Ui_ADCWidgetDesign):
 
         request = packet_init(1, self.address)
         request.command = 1
-        request.data = self.status.SerializeToString()
-        self.channel0.emit(request.SerializeToString())
+        if self.status.IsInitialized():
+            request.data = self.status.SerializeToString()
+        if request.IsInitialized():
+            self.channel0.emit(request.SerializeToString())
 
     def show_channel(self):
         if self.status is None:
