@@ -168,7 +168,8 @@ class ADC(Core):
             if request.command == 0:
                 self.status_message(response)
             elif request.command == 1:
-                self.status_to_config(response.data)
+                self.status_to_config(request.data)
+                self.status_message(response)
 
     def status_message(self, response=None):
         status = AdcStatus()
@@ -266,8 +267,14 @@ class ADC(Core):
         self.config['Option']['SamplesPerChannel'] = str(status.samples)
         self.config['Option']['MemSamplesPerChan'] = str(status.samples)
 
-        self.config['device0_fm814x250m0']['ChannelMask'] = f'0x{int().from_bytes(status.board_status[0].channel_mask, "big"):02X}'
-        self.boards[0].channel_mask = int().from_bytes(status.board_status[0].channel_mask, "big")
+        if len(status.board_status) > 0:
+            if len(status.board_status[0].channel_mask) > 0:
+                self.config['device0_fm814x250m0']['ChannelMask'] = f'0x{int().from_bytes(status.board_status[0].channel_mask, "big"):02X}'
+                self.boards[0].channel_mask = int().from_bytes(status.board_status[0].channel_mask, "big")
+            else:
+                for ch, ch_ in zip(status.board_status[0].channel_status, self.boards[0].channels):
+                    ch_.on = ch.enabled
+                self.config['device0_fm814x250m0']['ChannelMask'] = f'0x{self.boards[0].channel_mask:02X}'
 
         if status.clock_source == status.CLOCKOFF:
             self.config['device0_fm814x250m0']['ClockSource'] = '0x0'

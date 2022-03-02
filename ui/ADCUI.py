@@ -15,109 +15,138 @@ class ADCUIWidget (QtWidgets.QWidget, Ui_ADCWidgetDesign):
 
         self.address = 11
 
-        # ADC values
-        self.channels_status = [0, 0, 0, 0, 0, 0, 0, 0]  # 0/1 or True/False
-        self.biases = [0., 0., 0., 0., 0., 0., 0., 0.]
-        self.frequency = 0
-        self.source = ''
+        self.status = AdcStatus()  # Object - message for storage ADC state
+        self.status.board_status.add()
+        for _ in range(8):
+            self.status.board_status[0].channel_status.add()
+
         self.delay = 0
         self.interval = 0
 
-        # service data
-        self.active_channels = [1, 2, 3, 4, 5, 6, 7, 8]
-        self.enable_all_channels_flag = 0
-        self.current_channel = 1
-
-        self.enable_ch()
-
         # signals
-        self.ch1_checkBox.clicked.connect(self.enable_ch)
-        self.ch2_checkBox.clicked.connect(self.enable_ch)
-        self.ch3_checkBox.clicked.connect(self.enable_ch)
-        self.ch4_checkBox.clicked.connect(self.enable_ch)
-        self.ch5_checkBox.clicked.connect(self.enable_ch)
-        self.ch6_checkBox.clicked.connect(self.enable_ch)
-        self.ch7_checkBox.clicked.connect(self.enable_ch)
-        self.ch8_checkBox.clicked.connect(self.enable_ch)
-        self.frec_spinBox.valueChanged.connect(self.setfreq)
-        self.source_comboBox.currentTextChanged.connect(self.setsource)
-        self.delay_spinBox.valueChanged.connect(self.setdelay)
-        self.interval_spinBox.valueChanged.connect(self.setinterval)
-        self.ch_comboBox.currentTextChanged.connect(self.showchannel)
-        self.bias_doubleSpinBox.valueChanged.connect(self.setbias)
+        for ch_n in range(1, 9):
+            eval(f'self.ch{ch_n}_checkBox.clicked.connect(self.ui2status)')
+        self.frec_spinBox.valueChanged.connect(self.ui2status)
+        self.source_comboBox.currentIndexChanged.connect(self.ui2status)
+        self.delay_spinBox.valueChanged.connect(self.ui2status)
+        self.interval_spinBox.valueChanged.connect(self.ui2status)
+        self.bias_doubleSpinBox.valueChanged.connect(self.ui2status)
+
+        self.ch_comboBox.currentTextChanged.connect(self.show_channel)
+
+        self.ui2status()
+        self.status2ui()
 
     @QtCore.pyqtSlot(bytes)
     def channel0_slot(self, data: bytes):
         request = MainPacket()
         request.ParseFromString(data)
-        if request.address == self.address:
+        if request.sender == 1:  # 1 is reserved address for ADC
             if request.command in (0, 1):
-                self.get_state_from_status(request.data)
+                self.blockSignals(True)
+                self.status = request.data
+                self.status2ui()
+                self.blockSignals(False)
 
-    def get_state_from_status(self, status):
+    def status2ui(self):
+        status = self.status
+
+        if status is None:
+            return
+
         if isinstance(status, bytes):
             data = status
             status = AdcStatus()
             status.ParseFromString(data)
 
+        self.status = status
+
+        last_ch = None
         if len(status.board_status) > 0:
+            # store ch_comboBox state
+            if self.ch_comboBox.count() > 0:
+                last_ch = self.ch_comboBox.currentText()
+            self.ch_comboBox.clear()
             for ch_n in range(len(status.board_status[0].channel_status)):
                 eval(f'self.ch{ch_n+1}_checkBox.setChecked(status.board_status[0].channel_status[ch_n].enabled)')
+                if status.board_status[0].channel_status[ch_n].enabled:
+                    self.ch_comboBox.addItem(str(ch_n+1))
+                    self.show_channel()
 
-    def enable_ch(self):
-        self.channels_status[0] = bool(self.ch1_checkBox.checkState())
-        self.channels_status[1] = bool(self.ch2_checkBox.checkState())
-        self.channels_status[2] = bool(self.ch3_checkBox.checkState())
-        self.channels_status[3] = bool(self.ch4_checkBox.checkState())
-        self.channels_status[4] = bool(self.ch5_checkBox.checkState())
-        self.channels_status[5] = bool(self.ch6_checkBox.checkState())
-        self.channels_status[6] = bool(self.ch7_checkBox.checkState())
-        self.channels_status[7] = bool(self.ch8_checkBox.checkState())
+        self.frec_spinBox.blockSignals(True)
+        self.frec_spinBox.setValue(int(status.sampling_rate/1e6))
+        self.frec_spinBox.blockSignals(False)
 
-        # make drop-down list
-        self.active_channels = []
-        for i in range(len(self.channels_status)):
-            if self.channels_status[i]:
-                self.active_channels.append(i + 1)
-        self.ch_comboBox.clear()
-        for i in range(len(self.active_channels)):
-            self.ch_comboBox.addItem(str(self.active_channels[i]))
+        self.ch_comboBox.blockSignals(True)
+        if status.start == status.SOFTSTART:
+            self.source_comboBox.setCurrentIndex(0)
+        elif status.start == status.EXTSTART:
+            self.source_comboBox.setCurrentIndex(1)
+        self.ch_comboBox.blockSignals(False)
 
-        # disable all fields
-        self.enable_all_channels_flag = False if sum(self.channels_status) == 0 else True
+        self.interval_spinBox.blockSignals(True)
+        self.interval_spinBox.setValue(int(status.samples / status.sampling_rate * 1e3))
+        self.interval_spinBox.blockSignals(False)
 
-        self.frec_spinBox.setEnabled(self.enable_all_channels_flag)
-        self.source_comboBox.setEnabled(self.enable_all_channels_flag)
-        self.delay_spinBox.setEnabled(self.enable_all_channels_flag)
-        self.interval_spinBox.setEnabled(self.enable_all_channels_flag)
-        self.bias_doubleSpinBox.setEnabled(self.enable_all_channels_flag)
-        self.ch_comboBox.setEnabled(self.enable_all_channels_flag)
+        if self.ch_comboBox.count() > 0:
+            if last_ch is not None:
+                ind = self.ch_comboBox.findText(last_ch)
+                if ind > -1:
+                    self.ch_comboBox.setCurrentIndex(ind)
+                else:
+                    self.ch_comboBox.setCurrentIndex(0)
+            else:
+                self.ch_comboBox.setCurrentIndex(0)
 
-        pck = packet_init(1, self.address)
-        pck.command = 2
-        pck.version = '0.1'
-        if pck.IsInitialized():
-            self.channel0.emit(pck.SerializeToString())
+    def ui2status(self):
+        if len(self.status.board_status) < 1:
+            self.status.board_status.add()
 
-    def setfreq(self):
-        self.frequency = int(self.frec_spinBox.value())
+        self.status.board_status[0].channel_mask = b''
+        for ch_n in range(8):
+            if len(self.status.board_status[0].channel_status) < ch_n+1:
+                self.status.board_status[0].channel_status.add()
+            exec(f'self.status.board_status[0].channel_status[ch_n].enabled = self.ch{ch_n+1}_checkBox.isChecked()')
 
-    def setsource(self):
-        self.source = self.source_comboBox.currentText()
+        self.status.sampling_rate = self.frec_spinBox.value() * int(1e6)
 
-    def setdelay(self):
-        self.delay = self.delay_spinBox.value()
+        if self.source_comboBox.currentIndex() == 0:
+            self.status.start = self.status.SOFTSTART
+        elif self.source_comboBox.currentIndex() == 1:
+            self.status.start = self.status.EXTSTART
 
-    def setinterval(self):
-        self.interval = self.interval_spinBox.value()
+        self.status.samples = int(self.interval_spinBox.value()/1e3 * self.status.sampling_rate)
 
-    def showchannel(self):
-        if self.ch_comboBox.currentText() != '':
-            self.current_channel = int(self.ch_comboBox.currentText())
-        self.bias_doubleSpinBox.setValue(self.biases[self.current_channel - 1])
+        if self.ch_comboBox.count() > 0:
+            self.status.board_status[0].channel_status[int(self.ch_comboBox.currentText())-1].bias = self.bias_doubleSpinBox.value()
 
-    def setbias(self):
-        self.biases[self.current_channel - 1] = self.bias_doubleSpinBox.value()
+        self.status2ui()
+
+        request = packet_init(1, self.address)
+        request.command = 1
+        if self.status.IsInitialized():
+            request.data = self.status.SerializeToString()
+        if request.IsInitialized():
+            self.channel0.emit(request.SerializeToString())
+
+    def show_channel(self):
+        if self.status is None:
+            self.status = AdcStatus()
+
+        if not isinstance(self.status, AdcStatus):
+            self.status = AdcStatus()
+
+        if len(self.status.board_status) < 1:
+            self.status.board_status.add()
+
+        for ch_n in range(8):
+            if len(self.status.board_status[0].channel_status) < ch_n+1:
+                self.status.board_status[0].channel_status.add()
+
+        if self.ch_comboBox.count() > 0:
+            self.bias_doubleSpinBox.blockSignals(True)
+            self.bias_doubleSpinBox.setValue(self.status.board_status[0].channel_status[int(self.ch_comboBox.currentText())-1].bias)
+            self.bias_doubleSpinBox.blockSignals(False)
 
 
 def main():
