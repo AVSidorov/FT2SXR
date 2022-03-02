@@ -168,7 +168,8 @@ class ADC(Core):
             if request.command == 0:
                 self.status_message(response)
             elif request.command == 1:
-                self.status_to_config(response.data)
+                self.status_to_config(request.data)
+                self.status_message(response)
 
     def status_message(self, response=None):
         status = AdcStatus()
