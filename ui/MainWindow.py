@@ -15,6 +15,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         super().__init__(parent)
         self.setupUi(self)
         self.actionADC.triggered.connect(self.action_adc_set)
+        self.buttonStart.clicked.connect(self.start_adc)
 
     def action_adc_set(self):
         adcSettings = ADCUIWidget(self)
@@ -25,6 +26,12 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         win.show()
         request = packet_init(1, adcSettings.address)
         request.command = 0
+        if request.IsInitialized():
+            self.channel0.emit(request.SerializeToString())
+
+    def start_adc(self):
+        request = packet_init(1, 0)
+        request.command = 2
         if request.IsInitialized():
             self.channel0.emit(request.SerializeToString())
 

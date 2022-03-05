@@ -38,7 +38,7 @@
       <x>10</x>
       <y>10</y>
       <width>781</width>
-      <height>541</height>
+      <height>381</height>
      </rect>
     </property>
     <property name="sizePolicy">
@@ -46,6 +46,19 @@
       <horstretch>0</horstretch>
       <verstretch>0</verstretch>
      </sizepolicy>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="buttonStart">
+    <property name="geometry">
+     <rect>
+      <x>50</x>
+      <y>430</y>
+      <width>121</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Start</string>
     </property>
    </widget>
   </widget>

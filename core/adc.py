@@ -145,7 +145,7 @@ class ADC(Core):
             self.scp.get('/home/embedded/examples/data_0.bin', self.wdir)
             while not(os.path.exists(os.path.join(self.wdir, self.file_base+'.bin'))):
                 pass
-            dump = np.fromfile(os.path.join(self.wdir, self.file_base + '.bin'), dtype=np.int16)
+            # dump = np.fromfile(os.path.join(self.wdir, self.file_base + '.bin'), dtype=np.int16)
         else:
             dump = np.round(np.random.normal(0, 1, int(1e5))*10)
 
@@ -170,6 +170,9 @@ class ADC(Core):
             elif request.command == 1:
                 self.status_to_config(request.data)
                 self.status_message(response)
+            elif request.command == 2:
+                self.send_config()
+                self.start()
 
     def status_message(self, response=None):
         status = AdcStatus()
