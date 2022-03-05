@@ -63,4 +63,4 @@ class Ui_MiniX2WidgetDesign(object):
         self.current_var_label.setText(_translate("MiniX2WidgetDesign", "from to"))
         self.groupBox_2.setTitle(_translate("MiniX2WidgetDesign", "Mini-X2"))
         self.enable_label.setText(_translate("MiniX2WidgetDesign", "Запуск"))
-        self.enable_pushButton.setText(_translate("MiniX2WidgetDesign", "Disabled"))
+        self.enable_pushButton.setText(_translate("MiniX2WidgetDesign", "Disable"))

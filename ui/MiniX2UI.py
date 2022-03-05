@@ -23,11 +23,11 @@ class MiniX2Widget(QtWidgets.QWidget, Ui_MiniX2WidgetDesign):
     def setenabled(self):
         if self.enabled == 0:
             self.enabled = 1
-            self.enable_pushButton.setText('Enabled')
+            self.enable_pushButton.setText('Enable')
             self.enable_pushButton.setStyleSheet('color: red')
         else:
             self.enabled = 0
-            self.enable_pushButton.setText('Disabled')
+            self.enable_pushButton.setText('Disable')
             self.enable_pushButton.setStyleSheet('color: black')
 
     def setvoltage(self):

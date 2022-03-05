@@ -1,0 +1,344 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>PX5WidgetDesign</class>
+ <widget class="QWidget" name="PX5WidgetDesign">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>300</width>
+    <height>310</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>PX-5</string>
+  </property>
+  <widget class="QGroupBox" name="groupBox">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>10</y>
+     <width>281</width>
+     <height>56</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Включение или отключение управления</string>
+   </property>
+   <layout class="QGridLayout" name="gridLayout">
+    <item row="0" column="0">
+     <widget class="QLabel" name="enable_label">
+      <property name="text">
+       <string>Запуск PX-5</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="1">
+     <widget class="QPushButton" name="enable_pushButton">
+      <property name="text">
+       <string>Enable</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QToolBox" name="settings_toolBox">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>70</y>
+     <width>281</width>
+     <height>231</height>
+    </rect>
+   </property>
+   <property name="frameShape">
+    <enum>QFrame::NoFrame</enum>
+   </property>
+   <property name="frameShadow">
+    <enum>QFrame::Plain</enum>
+   </property>
+   <property name="currentIndex">
+    <number>2</number>
+   </property>
+   <widget class="QWidget" name="start_page">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>0</y>
+      <width>281</width>
+      <height>150</height>
+     </rect>
+    </property>
+    <attribute name="label">
+     <string>Режим запуска </string>
+    </attribute>
+    <layout class="QGridLayout" name="gridLayout_2">
+     <item row="0" column="0">
+      <widget class="QLabel" name="startsouece_label">
+       <property name="text">
+        <string>Источник запуска</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QComboBox" name="startsource_comboBox">
+       <item>
+        <property name="text">
+         <string>Токамак</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>АЦП</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="tomeasure_label">
+       <property name="text">
+        <string>Измерение импульса</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QComboBox" name="tomeasure_comboBox">
+       <item>
+        <property name="text">
+         <string>Амплитуда</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Интервал</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item row="2" column="0">
+      <widget class="QLabel" name="spectrsource_label">
+       <property name="text">
+        <string>Источник спектра</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="QComboBox" name="spectrsource_comboBox">
+       <item>
+        <property name="text">
+         <string comment="AAAAAAA" extracomment="BBBBBBBB">NORM</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>FAST</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>PUR</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>RTD</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item row="3" column="0">
+      <widget class="QLabel" name="colltime_label">
+       <property name="text">
+        <string>Время сбора данных</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <widget class="QSpinBox" name="colltime_spinBox"/>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QWidget" name="mca_page">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>0</y>
+      <width>281</width>
+      <height>150</height>
+     </rect>
+    </property>
+    <attribute name="label">
+     <string>Установки для измерения спектров MCA </string>
+    </attribute>
+    <layout class="QGridLayout" name="gridLayout_3">
+     <item row="0" column="0">
+      <widget class="QLabel" name="numberch_label">
+       <property name="text">
+        <string>Число каналов</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QSpinBox" name="numberch_spinBox"/>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="label_6">
+       <property name="text">
+        <string>Усиление сигнала</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QDoubleSpinBox" name="doubleSpinBox"/>
+     </item>
+     <item row="2" column="0">
+      <widget class="QLabel" name="flattop_label">
+       <property name="text">
+        <string>Flat Top Width</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="QDoubleSpinBox" name="flattop_doubleSpinBox"/>
+     </item>
+     <item row="3" column="0">
+      <widget class="QLabel" name="pktime_elabel">
+       <property name="text">
+        <string>Peaking Time</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <widget class="QDoubleSpinBox" name="pktime_doubleSpinBox"/>
+     </item>
+     <item row="4" column="0">
+      <widget class="QLabel" name="pileup_label">
+       <property name="text">
+        <string>Pile-up Reject </string>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="1">
+      <widget class="QPushButton" name="pileup_pushButton">
+       <property name="text">
+        <string>Enable</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QWidget" name="outsig_page">
+    <attribute name="label">
+     <string>Выходные сигналы</string>
+    </attribute>
+    <layout class="QGridLayout" name="gridLayout_4">
+     <item row="0" column="0">
+      <widget class="QLabel" name="outputdac_label">
+       <property name="text">
+        <string>Signal for Output DAC </string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QComboBox" name="outputdac_comboBox">
+       <item>
+        <property name="text">
+         <string>OFF</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>FAST</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>SHAPED</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>INPUT</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>PEAK</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="dacoffdet_label">
+       <property name="text">
+        <string>DAC offset</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QDoubleSpinBox" name="dacoffset_doubleSpinBox"/>
+     </item>
+     <item row="2" column="0">
+      <widget class="QLabel" name="aux1_label">
+       <property name="text">
+        <string>AUX1</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="QComboBox" name="aux1_comboBox">
+       <item>
+        <property name="text">
+         <string>DAC</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>AUXOUT1</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>AUXIN1</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item row="3" column="0">
+      <widget class="QLabel" name="aux2_label">
+       <property name="text">
+        <string>AUX2</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <widget class="QComboBox" name="aux2_comboBox">
+       <item>
+        <property name="text">
+         <string>AUXOUT2</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>AUXIN2</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>GATEH</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>GATEL</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
