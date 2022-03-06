@@ -1,17 +1,17 @@
 import sys
 from PyQt5 import QtWidgets
-from WarningMiniX2UIDesign import Ui_WarningMiniX2WidgetDesign
+from WarningUIDesign import Ui_WarningWidgetDesign
 
 
-class WaningMiniX2UI (QtWidgets.QWidget, Ui_WarningMiniX2WidgetDesign):
+class WarningWidget (QtWidgets.QWidget, Ui_WarningWidgetDesign):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
 
-        WaningMiniX2UI.setFixedSize(self, 281, 90)
+        WarningWidget.setFixedSize(self, 300, 90)
 
     def accept(self):
-        self.close()
+        pass
 
     def reject(self):
         pass
@@ -19,7 +19,7 @@ class WaningMiniX2UI (QtWidgets.QWidget, Ui_WarningMiniX2WidgetDesign):
 
 def main():
     app = QtWidgets.QApplication(sys.argv)
-    ex = WaningMiniX2UI()
+    ex = WarningWidget()
     ex.show()
     sys.exit(app.exec_())
 
