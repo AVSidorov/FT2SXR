@@ -1,4 +1,3 @@
-import sys
 import paramiko
 import time
 import datetime
@@ -47,10 +46,6 @@ class Board:
             ch.on = bool(mask & 1)
             mask >>= 1
 
-    def set_active(self, index=0, value: bool = True):
-        if all((index >= 0, index < len(self.channels))):
-            self.channels[index] = value
-
 
 class ADC(Core):
     def __init__(self, parent=None, nboards=1):
@@ -62,7 +57,7 @@ class ADC(Core):
         self.connected = False
         self.ssh = None
         self.ssh_timeout = 0.5
-        self.dump = 'data_0.bin'
+        self.file_base = 'data_0'
         self.wdir = os.path.abspath('./')
         self.scp = None
         self.config = None
@@ -88,10 +83,9 @@ class ADC(Core):
                 if bias is not None:
                     self.boards[0].channels[ch_n].bias = float(bias)
 
-
         # make directory whit current date, to store adc memory dumps and  cfg.ini for sending
         td = datetime.date.today()
-        wdir = format(td.year-2000, '02d')+format(td.month,'02d')+format(td.day, '02d')
+        wdir = format(td.year-2000, '02d')+format(td.month, '02d')+format(td.day, '02d')
         wdir = os.path.join(self.wdir, wdir)
 
         if not(os.path.exists(wdir)):
@@ -121,7 +115,6 @@ class ADC(Core):
             timeout = self.ssh_timeout
         time.sleep(timeout)
 
-        output = ""
         while self.ssh.recv_ready():
             try:
                 page = self.ssh.recv(3000)
@@ -137,7 +130,7 @@ class ADC(Core):
         if self.connected:
             self.scp.put(os.path.join(self.wdir, 'cfg.ini'), '/home/embedded/examples/exam_adc.ini')
 
-    def start(self):
+    def start(self, response=None):
         if self.connected:
             self.ssh.send('/home/embedded/examples/exam_adc\n')
             self.ssh_output(5)
@@ -145,18 +138,22 @@ class ADC(Core):
             self.scp.get('/home/embedded/examples/data_0.bin', self.wdir)
             while not(os.path.exists(os.path.join(self.wdir, self.file_base+'.bin'))):
                 pass
-            # dump = np.fromfile(os.path.join(self.wdir, self.file_base + '.bin'), dtype=np.int16)
+            dump = np.fromfile(os.path.join(self.wdir, self.file_base + '.bin'), dtype=np.int16)
         else:
             dump = np.round(np.random.normal(0, 1, int(1e5))*10)
 
-            dump = dump.reshape((-1, self.boards[0].n_active_ch)).T
-            cols = (_ for _ in dump)
+        dump = dump.reshape((-1, self.boards[0].n_active_ch)).T
+        cols = (_ for _ in dump)
 
         for ch in self.boards[0].channels:
             if ch.on:
                 ch.data = next(cols)
             else:
                 ch.data = np.ndarray((0,))
+
+        if response is not None:
+            if response.IsInitialized():
+                self.channel0.emit(response.SerializeToString())
 
     def channel0_slot(self, data: bytes):
         request = MainPacket()
@@ -172,7 +169,7 @@ class ADC(Core):
                 self.status_message(response)
             elif request.command == 2:
                 self.send_config()
-                self.start()
+                self.start(response)
 
     def status_message(self, response=None):
         status = AdcStatus()
@@ -272,7 +269,8 @@ class ADC(Core):
 
         if len(status.board_status) > 0:
             if len(status.board_status[0].channel_mask) > 0:
-                self.config['device0_fm814x250m0']['ChannelMask'] = f'0x{int().from_bytes(status.board_status[0].channel_mask, "big"):02X}'
+                self.config['device0_fm814x250m0']['ChannelMask'] =\
+                    f'0x{int().from_bytes(status.board_status[0].channel_mask, "big"):02X}'
                 self.boards[0].channel_mask = int().from_bytes(status.board_status[0].channel_mask, "big")
             else:
                 for ch, ch_ in zip(status.board_status[0].channel_status, self.boards[0].channels):
@@ -300,4 +298,3 @@ class ADC(Core):
             self.config['device0_fm814x250m0']['StartSource'] = '2'
         elif status.start == status.IN0:
             self.config['device0_fm814x250m0']['StartSource'] = '0'
-
