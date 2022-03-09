@@ -1,6 +1,6 @@
 import sys
 from PyQt5 import QtWidgets
-from PX5UIDesign import Ui_PX5WidgetDesign
+from ui.PX5UIDesign import Ui_PX5WidgetDesign
 
 
 class PX5Widget(QtWidgets.QWidget, Ui_PX5WidgetDesign):

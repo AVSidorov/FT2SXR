@@ -1,6 +1,6 @@
 import sys
 from PyQt5 import QtWidgets
-from GSAUIDesign import Ui_GSAWidgetDesign
+from ui.GSAUIDesign import Ui_GSAWidgetDesign
 
 
 class GSAWidget(QtWidgets.QWidget, Ui_GSAWidgetDesign):

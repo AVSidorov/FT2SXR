@@ -1,6 +1,6 @@
 import sys
 from PyQt5 import QtWidgets
-from MeasurementSettingsUIDesign import Ui_MeasurementSettingsWidgetDesign
+from ui.MeasurementSettingsUIDesign import Ui_MeasurementSettingsWidgetDesign
 
 
 class MeasurementSettingsWidget(QtWidgets.QWidget, Ui_MeasurementSettingsWidgetDesign):

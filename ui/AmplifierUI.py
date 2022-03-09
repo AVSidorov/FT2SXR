@@ -1,6 +1,6 @@
 import sys
 from PyQt5 import QtWidgets
-from AmplifierUIDesign import Ui_AmplifierWidgetDesign
+from ui.AmplifierUIDesign import Ui_AmplifierWidgetDesign
 
 
 class AmplifierWidget(QtWidgets.QWidget, Ui_AmplifierWidgetDesign):

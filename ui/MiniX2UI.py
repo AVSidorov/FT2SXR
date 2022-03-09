@@ -1,6 +1,6 @@
 import sys
 from PyQt5 import QtWidgets
-from MiniX2UIDesign import Ui_MiniX2WidgetDesign
+from ui.MiniX2UIDesign import Ui_MiniX2WidgetDesign
 
 
 class MiniX2Widget(QtWidgets.QWidget, Ui_MiniX2WidgetDesign):

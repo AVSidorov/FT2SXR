@@ -21,11 +21,15 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         win_main.show()
 
     def action_adc_set(self):
-        adcSettings = ADCUIWidget(self)
+        win = QtWidgets.QDialog(self)
+        win.setModal(True)
+
+        adcSettings = ADCUIWidget(win)
         adcSettings.channel0.connect(self.channel0)  # make uplink for child widgets
         self.channel1.connect(adcSettings.channel0_slot)  # downlink from system to children
 
-        win = self.mdiArea.addSubWindow(adcSettings)
+
+        # win = self.mdiArea.addSubWindow(adcSettings)
         win.show()
         request = packet_init(1, adcSettings.address)
         request.command = 0

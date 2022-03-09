@@ -1,15 +1,15 @@
 import sys
 from PyQt5 import QtWidgets
 
-from MainWindowUIDesignV2 import Ui_MainWindowDesign
-from ADCUI import ADCUIWidget
-from AmplifierUI import AmplifierWidget
-from CalibrationSettingsUI import CalibrationSettingsWidget
-from GSAUI import GSAWidget
-from MeasurementSettingsUI import MeasurementSettingsWidget
-from MiniX2UI import MiniX2Widget
-from PX5UI import PX5Widget
-from WarningUI import WarningWidget
+from ui.MainWindowUIDesignV2 import Ui_MainWindowDesign
+from ui.ADCUI import ADCUIWidget
+from ui.AmplifierUI import AmplifierWidget
+from ui.CalibrationSettingsUI import CalibrationSettingsWidget
+from ui.GSAUI import GSAWidget
+from ui.MeasurementSettingsUI import MeasurementSettingsWidget
+from ui.MiniX2UI import MiniX2Widget
+from ui.PX5UI import PX5Widget
+from ui.WarningUI import WarningWidget
 
 
 class MainWindow (QtWidgets.QMainWindow, Ui_MainWindowDesign):

@@ -1,6 +1,6 @@
 import sys
 from PyQt5 import QtWidgets
-from CalibrationSettingsUIDesign import Ui_CalibrationSettingsWidgetDesign
+from ui.CalibrationSettingsUIDesign import Ui_CalibrationSettingsWidgetDesign
 
 
 class CalibrationSettingsWidget (QtWidgets.QWidget, Ui_CalibrationSettingsWidgetDesign):

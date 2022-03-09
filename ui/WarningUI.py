@@ -1,6 +1,6 @@
 import sys
 from PyQt5 import QtWidgets
-from WarningUIDesign import Ui_WarningWidgetDesign
+from ui.WarningUIDesign import Ui_WarningWidgetDesign
 
 
 class WarningWidget (QtWidgets.QWidget, Ui_WarningWidgetDesign):
