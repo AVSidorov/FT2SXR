@@ -16,8 +16,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         super().__init__(parent)
         self.setupUi(self)
         self.actionADC.triggered.connect(self.action_adc_set)
-        main_widget = MainWidget(self)
-        win_main = self.mdiArea.addSubWindow(main_widget)
+        win_main = self.mdiArea.addSubWindow(MainWidget(self))
         win_main.show()
 
     def action_adc_set(self):
@@ -28,8 +27,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         adcSettings.channel0.connect(self.channel0)  # make uplink for child widgets
         self.channel1.connect(adcSettings.channel0_slot)  # downlink from system to children
 
-
-        # win = self.mdiArea.addSubWindow(adcSettings)
         win.show()
         request = packet_init(1, adcSettings.address)
         request.command = 0
