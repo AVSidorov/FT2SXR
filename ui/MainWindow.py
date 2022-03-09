@@ -1,5 +1,6 @@
 import sys
 from ui.MainWindowDesign import Ui_MainWindow
+from ui.MainWindowUIV2 import MainWindow as MainWidget
 from ui.ADCUI import ADCUIWidget
 from PyQt5 import QtWidgets, QtCore
 from core.sxr_protocol import packet_init
@@ -15,6 +16,9 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         super().__init__(parent)
         self.setupUi(self)
         self.actionADC.triggered.connect(self.action_adc_set)
+        main_widget = MainWidget(self)
+        win_main = self.mdiArea.addSubWindow(main_widget)
+        win_main.show()
 
     def action_adc_set(self):
         adcSettings = ADCUIWidget(self)

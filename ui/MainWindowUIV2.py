@@ -13,8 +13,8 @@ from WarningUI import WarningWidget
 
 
 class MainWindow (QtWidgets.QMainWindow, Ui_MainWindowDesign):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, parent=None):
+        super().__init__(parent=parent)
         self.setupUi(self)
         MainWindow.setFixedSize(self, 552, 484)
 
