@@ -48,7 +48,7 @@ class Board:
 
 
 class ADC(Core):
-    def __init__(self, parent=None, nboards=1):
+    def __init__(self, parent=None, nboards=1, connect=True):
         super().__init__(parent)
         self.address = 1
 
@@ -93,22 +93,23 @@ class ADC(Core):
 
         self.wdir = wdir
 
-        client = paramiko.SSHClient()
-        client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        try:
-            client.connect(hostname="192.168.0.242", username="adc_user", password="adc_user", look_for_keys=False,
-                           allow_agent=False)
-            self.connected = True
-            ssh = client.invoke_shell()
-            self.ssh = ssh
-            ssh.send('cd /home/embedded/examples\n')
-            self.ssh_output(0.5)
+        if connect:
+            client = paramiko.SSHClient()
+            client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+            try:
+                client.connect(hostname="192.168.0.242", username="adc_user", password="adc_user", look_for_keys=False,
+                               allow_agent=False)
+                self.connected = True
+                ssh = client.invoke_shell()
+                self.ssh = ssh
+                ssh.send('cd /home/embedded/examples\n')
+                self.ssh_output(0.5)
 
-            scp = SCPClient(client.get_transport())
-            self.scp = scp
-            self.send_config()
-        except:
-            self.connected = False
+                scp = SCPClient(client.get_transport())
+                self.scp = scp
+                self.send_config()
+            except:
+                self.connected = False
 
     def ssh_output(self, timeout=None):
         if timeout is None:
@@ -140,7 +141,9 @@ class ADC(Core):
                 pass
             dump = np.fromfile(os.path.join(self.wdir, self.file_base + '.bin'), dtype=np.int16)
         else:
-            dump = np.round(np.random.normal(0, 1, int(1e5))*10)
+            dump = self.generate_data()
+            with open(os.path.join(self.wdir, self.file_base + '.bin'), 'w') as f:
+                dump.tofile(f)
 
         dump = dump.reshape((-1, self.boards[0].n_active_ch)).T
         cols = (_ for _ in dump)
@@ -298,3 +301,21 @@ class ADC(Core):
             self.config['device0_fm814x250m0']['StartSource'] = '2'
         elif status.start == status.IN0:
             self.config['device0_fm814x250m0']['StartSource'] = '0'
+
+    def generate_data(self):
+        samples = self.get_cfg_item('Option', 'SamplesPerChannel')
+        if samples is None:
+            samples = int(1e4)
+        else:
+            samples = int(samples)
+
+        dump = np.ndarray((samples, self.boards[0].n_active_ch), dtype=np.int16)
+        col = 0
+        for ch in self.boards[0].channels:
+            if ch.on:
+                ch.data = ((np.random.normal(ch.bias*2**15/100, 4*ch.gain, samples)) // 4 * 4).astype(np.int16)
+                dump[:, col] = ch.data
+                col += 1
+
+        dump = dump.reshape((-1, 1)).squeeze()
+        return dump
