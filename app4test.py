@@ -1,4 +1,5 @@
 from ui.MainWindow import MainWindow
+from ui.dump_plotter import DumpPlotter
 from core.core import Core
 from core.logger import Logger
 from core.adc import ADC
@@ -21,6 +22,10 @@ def main():
 
     logger = Logger('log.txt', app)
     core.channel0.connect(logger.channel0_slot)
+
+    plotter = DumpPlotter(app)
+    plotter.status = adc.status_message()
+    core.channel0.connect(plotter.channel0_slot)
 
     mw.show()
     sys.exit(app.exec_())
