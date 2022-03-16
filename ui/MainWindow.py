@@ -1,5 +1,5 @@
 import sys
-from ui.MainWindowDesign import Ui_MainWindow
+from ui.MainWindowUIDesign import Ui_MainWindow
 from ui.ADCUI import ADCUIWidget
 from PyQt5 import QtWidgets, QtCore
 from core.sxr_protocol import packet_init
