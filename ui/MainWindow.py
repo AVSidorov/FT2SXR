@@ -1,6 +1,6 @@
 import sys
-from ui.MainWindowDesign import Ui_MainWindow
-from ui.MainWindowUIV2 import MainWindow as MainWidget
+from ui.MainWindowUIDesign import Ui_MainWindow
+from ui.CentralWidgetUI import MainWidget
 from ui.ADCUI import ADCUIWidget
 from PyQt5 import QtWidgets, QtCore
 from core.sxr_protocol import packet_init
@@ -13,10 +13,11 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     channel1 = QtCore.pyqtSignal(bytes)  # For downlink
 
     def __init__(self, parent=None):
-        super().__init__(parent)
+        super().__init__(parent=parent)
         self.setupUi(self)
         self.actionADC.triggered.connect(self.action_adc_set)
-        win_main = self.mdiArea.addSubWindow(MainWidget(self))
+
+        win_main = MainWidget(self.centralwidget)
         win_main.show()
 
     def action_adc_set(self):

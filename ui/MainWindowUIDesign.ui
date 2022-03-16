@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>552</width>
+    <height>484</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget"/>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>552</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuExit">
+    <property name="title">
+     <string>Save files</string>
+    </property>
+    <addaction name="actionSave_SXR_file"/>
+    <addaction name="actionSave_CLB_file"/>
+    <addaction name="actionSave_BKG_file"/>
+    <addaction name="actionSave_GSA_file"/>
+    <addaction name="actionSave_MCA_file"/>
+   </widget>
+   <widget class="QMenu" name="menuOpen_files">
+    <property name="title">
+     <string>Open files</string>
+    </property>
+    <addaction name="actionOpen_SXR_file"/>
+    <addaction name="actionOpen_CLB_file"/>
+    <addaction name="actionOpen_BKG_file"/>
+    <addaction name="actionOpen_GSA_file"/>
+    <addaction name="actionOpen_MCA_file"/>
+   </widget>
+   <widget class="QMenu" name="menuInstall">
+    <property name="title">
+     <string>Install</string>
+    </property>
+    <addaction name="actionPX_5"/>
+    <addaction name="actionADC"/>
+    <addaction name="actionMini_X2"/>
+    <addaction name="actionAmplifier"/>
+    <addaction name="actionGSA"/>
+   </widget>
+   <widget class="QMenu" name="menuCalibrations">
+    <property name="title">
+     <string>Calibrations</string>
+    </property>
+    <addaction name="actionCalibration_Status"/>
+    <addaction name="separator"/>
+    <addaction name="actionCalibration_settings"/>
+    <addaction name="actionThreshold_PX_5"/>
+   </widget>
+   <widget class="QMenu" name="menuMeasurements">
+    <property name="title">
+     <string>Measurements</string>
+    </property>
+    <addaction name="actionMeasurements_Status"/>
+    <addaction name="separator"/>
+    <addaction name="actionMeasurement_settings"/>
+   </widget>
+   <widget class="QMenu" name="menuSignals">
+    <property name="title">
+     <string>Signals</string>
+    </property>
+   </widget>
+   <widget class="QMenu" name="menuExit_2">
+    <property name="title">
+     <string>Exit</string>
+    </property>
+   </widget>
+   <addaction name="menuExit"/>
+   <addaction name="menuOpen_files"/>
+   <addaction name="menuInstall"/>
+   <addaction name="menuCalibrations"/>
+   <addaction name="menuMeasurements"/>
+   <addaction name="menuSignals"/>
+   <addaction name="menuExit_2"/>
+  </widget>
+  <action name="actionSave_SXR_file">
+   <property name="text">
+    <string>Save SXR file</string>
+   </property>
+  </action>
+  <action name="actionSave_CLB_file">
+   <property name="text">
+    <string>Save CLB file</string>
+   </property>
+  </action>
+  <action name="actionSave_BKG_file">
+   <property name="text">
+    <string>Save BKG file</string>
+   </property>
+  </action>
+  <action name="actionSave_GSA_file">
+   <property name="text">
+    <string>Save GSA file</string>
+   </property>
+  </action>
+  <action name="actionSave_MCA_file">
+   <property name="text">
+    <string>Save MCA file</string>
+   </property>
+  </action>
+  <action name="actionOpen_SXR_file">
+   <property name="text">
+    <string>Open SXR file</string>
+   </property>
+  </action>
+  <action name="actionOpen_CLB_file">
+   <property name="text">
+    <string>Open CLB file</string>
+   </property>
+  </action>
+  <action name="actionOpen_BKG_file">
+   <property name="text">
+    <string>Open BKG file</string>
+   </property>
+  </action>
+  <action name="actionOpen_GSA_file">
+   <property name="text">
+    <string>Open GSA file</string>
+   </property>
+  </action>
+  <action name="actionOpen_MCA_file">
+   <property name="text">
+    <string>Open MCA file</string>
+   </property>
+  </action>
+  <action name="actionPX_5">
+   <property name="text">
+    <string>PX-5</string>
+   </property>
+  </action>
+  <action name="actionADC">
+   <property name="text">
+    <string>ADC</string>
+   </property>
+  </action>
+  <action name="actionMini_X2">
+   <property name="text">
+    <string>Mini-X2</string>
+   </property>
+  </action>
+  <action name="actionAmplifier">
+   <property name="text">
+    <string>Amplifier</string>
+   </property>
+  </action>
+  <action name="actionGSA">
+   <property name="text">
+    <string>GSA</string>
+   </property>
+  </action>
+  <action name="actionFe">
+   <property name="text">
+    <string>Fe</string>
+   </property>
+  </action>
+  <action name="actionMini_X2_2">
+   <property name="text">
+    <string>Mini-X2</string>
+   </property>
+  </action>
+  <action name="actionGSA_2">
+   <property name="text">
+    <string>GSA</string>
+   </property>
+  </action>
+  <action name="actionThreshold_PX_5">
+   <property name="text">
+    <string>Threshold PX-5</string>
+   </property>
+  </action>
+  <action name="actionMeasurements_Status">
+   <property name="text">
+    <string>Status: Disable</string>
+   </property>
+  </action>
+  <action name="actionMeasurement_settings">
+   <property name="text">
+    <string>Measurement settings</string>
+   </property>
+  </action>
+  <action name="actionCalibration_Status">
+   <property name="text">
+    <string>Status: Disable</string>
+   </property>
+  </action>
+  <action name="actionCalibration_settings">
+   <property name="text">
+    <string>Calibration settings</string>
+   </property>
+  </action>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
