@@ -4,8 +4,8 @@ from ui.GSAUIDesign import Ui_GSAWidgetDesign
 
 
 class GSAWidget(QtWidgets.QWidget, Ui_GSAWidgetDesign):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, parent=None):
+        super().__init__(parent=parent)
         self.setupUi(self)
         GSAWidget.setFixedSize(self, 300, 85)
 

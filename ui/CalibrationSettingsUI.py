@@ -4,8 +4,8 @@ from ui.CalibrationSettingsUIDesign import Ui_CalibrationSettingsWidgetDesign
 
 
 class CalibrationSettingsWidget (QtWidgets.QWidget, Ui_CalibrationSettingsWidgetDesign):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, parent=None):
+        super().__init__(parent=parent)
         self.setupUi(self)
         CalibrationSettingsWidget.setFixedSize(self, 300, 95)
 

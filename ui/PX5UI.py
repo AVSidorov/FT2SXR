@@ -5,8 +5,8 @@ from ui.PX5UIDesign import Ui_PX5WidgetDesign
 
 class PX5Widget(QtWidgets.QWidget, Ui_PX5WidgetDesign):
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, parent=None):
+        super().__init__(parent=parent)
         self.setupUi(self)
         PX5Widget.setFixedSize(self, 300, 310)
 

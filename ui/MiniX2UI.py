@@ -5,8 +5,8 @@ from ui.MiniX2UIDesign import Ui_MiniX2WidgetDesign
 
 class MiniX2Widget(QtWidgets.QWidget, Ui_MiniX2WidgetDesign):
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, parent=None):
+        super().__init__(parent=parent)
         self.setupUi(self)
         MiniX2Widget.setFixedSize(self, 300, 170)
 

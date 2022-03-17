@@ -4,8 +4,8 @@ from ui.WarningUIDesign import Ui_WarningWidgetDesign
 
 
 class WarningWidget (QtWidgets.QWidget, Ui_WarningWidgetDesign):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, parent=None):
+        super().__init__(parent=parent)
         self.setupUi(self)
 
         WarningWidget.setFixedSize(self, 300, 90)

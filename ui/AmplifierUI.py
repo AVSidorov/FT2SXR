@@ -5,8 +5,8 @@ from ui.AmplifierUIDesign import Ui_AmplifierWidgetDesign
 
 class AmplifierWidget(QtWidgets.QWidget, Ui_AmplifierWidgetDesign):
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, parent=None):
+        super().__init__(parent=parent)
         self.setupUi(self)
         AmplifierWidget.setFixedSize(self, 300, 160)
 

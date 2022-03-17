@@ -5,8 +5,8 @@ from ui.MeasurementSettingsUIDesign import Ui_MeasurementSettingsWidgetDesign
 
 class MeasurementSettingsWidget(QtWidgets.QWidget, Ui_MeasurementSettingsWidgetDesign):
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, parent=None):
+        super().__init__(parent=parent)
         self.setupUi(self)
         MeasurementSettingsWidget.setFixedSize(self, 300, 155)
 
