@@ -8,6 +8,17 @@ from threading import Thread
 import uuid
 from PyQt5 import QtNetwork
 
+# devices names as tuple
+devs = ('DP5', 'PX5', 'DP5G', 'MCA8000D')
+
+# lambdas to avoid bad indexing
+devById = lambda id: devs[id % 4]
+idByDev = lambda dev: ([devs.index(_) for _ in (dev,) if _ in devs] + [None,])[0]
+
+# add aliases for lambdas
+id2dev = devById
+dev2id = idByDev
+
 
 def packet(pid1=b'\x00', pid2=b'\x00', data=b''):
     # make packet
@@ -52,6 +63,15 @@ def request_spectrum():
     return packet(b'\x02', b'\x01')
 
 
+def response_spectrum(pkt, obj=None):
+    if not check_packet(pkt):
+        return None
+    if not pkt[2:4] == b'\x02\x01':
+       return None
+    data = pack_spectrum(obj)
+    return packet(b'\x81', b'\x01', data)
+
+
 def request_spectrum_clear():
     return packet(b'\x02', b'\x02')
 
@@ -62,6 +82,25 @@ def request_spectrum_status():
 
 def request_spectrum_clear_status():
     return packet(b'\x02', b'\x04')
+
+
+def add_int(name,  nbytes=1, data=None, obj=None, k=1.0, byteorder='little', signed=False, full=False):
+    if data is None:
+        data = b''
+
+    if obj is None:
+        if full:
+            data += np.random.randint(2**(8*nbytes-1)).to_bytes(nbytes, byteorder, signed=signed)
+        else:
+            data += bytes(nbytes)
+    elif hasattr(obj, name):
+        if int(k*getattr(obj, name)).bit_length() <= 2**(8*nbytes-1):
+            data += int(k*getattr(obj, name)).to_bytes(nbytes, byteorder, signed=signed)
+        else:
+            data += bytes(nbytes)
+    else:
+        data += bytes(nbytes)
+    return data
 
 
 def unpack_status(data, obj=None):
@@ -98,30 +137,11 @@ def unpack_status(data, obj=None):
     status['PC5JumperNormal'] = (data[38] & 128) >> 7
     status['HVPolarity'] = 1 if (data[38] & 64) >> 6 else -1
     status['PreAmpVoltage'] = 8.5 if (data[38] & 32) >> 5 else 5
-    status['DeviceID'] = ('DP5', 'PX5', 'DP5G', 'MCA8000D')[data[39]]
+    status['DeviceID'] = devById(data[39])
     status['TECVoltage'] = int.from_bytes(data[40:42], 'big') / 758.5
     status['HPGeHVPSinstalled'] = data[42]
     if obj is None:
         return status
-
-
-def add_int(name,  nbytes=1, data=None, obj=None, k=1.0, byteorder='little', signed=False, full=False):
-    if data is None:
-        data = b''
-
-    if obj is None:
-        if full:
-            data += np.random.randint(2**(8*nbytes-1)).to_bytes(nbytes, byteorder, signed=signed)
-        else:
-            data += bytes(nbytes)
-    elif hasattr(obj, name):
-        if int(k*getattr(obj, name)).bit_length() <= 2**(8*nbytes-1):
-            data += int(k*getattr(obj, name)).to_bytes(nbytes, byteorder, signed=signed)
-        else:
-            data += bytes(nbytes)
-    else:
-        data += bytes(nbytes)
-    return data
 
 
 def pack_status(obj=None):
@@ -149,6 +169,39 @@ def pack_status(obj=None):
     data = add_int('HPGeHVPSinstalled', 1, data, obj)       # 42
     data += bytes(22)
     return data
+
+
+def unpack_spectrum(data, obj=None):
+    # make ndarray from buffer
+    data = np.frombuffer(data, dtype='S1')
+    # add zeros to get 4 bytes/channel instead 3 bytes/channel
+    data = np.insert(data, slice(3, data.size, 3), b'\x00')
+    data = np.append(data, bytes(4-data.size % 4))
+    # make from bytes array array of integers
+    data.dtype = '<i4'
+    return data
+
+
+def pack_spectrum(obj=None):
+    data = None
+    if obj is not None:
+        if isinstance(obj, np.ndarray):
+            data = obj.copy()
+        elif hasattr(obj, 'mca'):
+            if hasattr(obj.mca, 'spec'):
+                if isinstance(obj.mca.spec, np.ndarray):
+                    data = obj.mca.spec.copy()
+
+    if data is None:
+        data = np.histogram(53.19*np.random.randn(int(1e6))+4095, 8192)[0]
+
+    data = data.astype('<i4')
+    # represent as sequence of bytes
+    data.dtype = 'S1'
+    # remove ever 4th byte for representing numbers in 3 bytes/channel
+    data = np.delete(data, slice(3, data.size, 4))
+    return data.tobytes()
+
 
 def unpack_eth_settings(pkt):
     if not check_packet(pkt):
@@ -231,6 +284,23 @@ def netfinder_response(data, mac=0, ip=0):
     return resp
 
 
+def acsii_cfg_load(fname='', structured=False):
+    if len(fname) == 0:
+        fname = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'px5_ascii.csv')
+
+    if not os.path.exists(fname):
+        return None
+
+    if structured:
+        names = np.genfromtxt(fname, dtype=str, delimiter=',', comments=None)[0, :]
+        ascii_cfg = np.genfromtxt(fname, dtype=[(name,'<U255') for name in names],
+                                  delimiter=',', comments=None,skip_header=1)
+    else:
+        ascii_cfg = np.genfromtxt(fname, dtype=str, delimiter=',', comments=None, skip_header=1)
+
+    return ascii_cfg
+
+
 class Packet:
 
     def __new__(cls, pkt=None, **kwargs):
@@ -278,6 +348,7 @@ class Protocol:
         self.requests['request_status'] = request_status
         self.responses['response_status'] = response_status
         self.requests['request_spectrum'] = request_spectrum
+        self.responses['response_spectrum'] = response_spectrum
 
     def __call__(self, pkt, obj=None):
         resp = None
@@ -300,8 +371,7 @@ class PX5(Core):
 
         self.udp_socket = socket(AF_INET, SOCK_DGRAM)
         self.address_ip = ('192.168.0.239', 10001)
-        cmd_fname = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'px5_ascii.csv')
-        self.ascii_cmd = np.genfromtxt(cmd_fname, delimiter=';', dtype=str, usecols=(0, 2, 3))
+        self.ascii_cmd = acsii_cfg_load()
 
     def channel0_slot(self, data: bytes):
         request = MainPacket()
@@ -331,7 +401,7 @@ class PX5(Core):
 
     def get_ascii_cfg(self, cfg=None, response=None):
         if cfg is None:
-            cfg = '; '.join(self.ascii_cmd[:, 0]).replace(' ', '').replace('RESC;', '') + ';'
+            cfg = '=?;'.join(self.ascii_cmd[np.where(self.ascii_cmd[:, 1])[0], 0]).replace(' ', '') + '=?;'
         pkt = packet(b'\x20', b'\x03', cfg)
         self.udp_socket.sendto(pkt, self.addr)
         ack, _ = self.udp_socket.recvfrom(1024)
@@ -390,6 +460,8 @@ class PX5Imitator:
         self.DeviceID = 1
         self.TECVoltage = 0.021
         self.HPGeHVPSinstalled = 0
+
+        self.ascii_cfg = acsii_cfg_load()
 
         self.netfinder_addr = ('0.0.0.0', 3040)
         self.netfinder_thrd = Thread(name='Thread-NetFinder', target=self.netfinder_run, daemon=True)
