@@ -40,7 +40,7 @@ def check_chksum(pkt):
     chksumIn = pkt[-2:]
     chksum = ~sum(pkt[:-2]) + 1
     chksum = chksum.to_bytes(3, 'big', signed=True)[-2:]
-    return all((chksumIn == chksum, (sum(pkt[:-2]) + int().from_bytes(pkt[-2:], 'big', signed=True)) == 0))
+    return chksumIn == chksum
 
 
 def check_packet(pkt):
@@ -89,11 +89,22 @@ def response_spectrum_clear(pkt, obj=None):
     return packet(b'\x81', pid2, data)
 
 
-def request_spectrum_status(pkt, obj=None):
+def request_spectrum_status():
     return packet(b'\x02', b'\x03')
 
 
-def request_spectrum_clear_status():
+def response_spectrum_status(pkt, obj=None):
+    if not check_packet(pkt):
+        return None
+    if not pkt[2:4] == b'\x02\x03':
+        return None
+    data = pack_spectrum(obj)
+    data += pack_status(obj)
+    pid2 = spec_len2pid(len(data) // 3)+1
+    clear_spectrum(obj)
+    return packet(b'\x81', pid2, data)
+
+def request_spectrum_clear_status(pkt, obj=None):
     return packet(b'\x02', b'\x04')
 
 
@@ -180,7 +191,7 @@ def pack_status(obj=None):
     data = add_int('DeviceID', 1, data, obj)                # 39
     data = add_int('TECVoltage', 2, data, obj, k=758.5, byteorder='big')    #40-41
     data = add_int('HPGeHVPSinstalled', 1, data, obj)       # 42
-    data += bytes(22)
+    data += bytes(21)
     return data
 
 
@@ -366,12 +377,18 @@ class Protocol:
     def __init__(self):
         self.requests=dict()
         self.responses = dict()
+
         self.requests['request_status'] = request_status
         self.responses['response_status'] = response_status
+
         self.requests['request_spectrum'] = request_spectrum
         self.responses['response_spectrum'] = response_spectrum
+
         self.requests['request_spectrum_clear'] = request_spectrum_clear
         self.responses['response_spectrum_clear'] = response_spectrum_clear
+
+        self.requests['request_spectrum_status'] = request_spectrum_status
+        self.responses['response_spectrum_status'] = response_spectrum_status
 
     def __call__(self, pkt, obj=None):
         resp = None
@@ -514,9 +531,6 @@ class PX5Imitator:
             resp = self.protocol(req, self)
             if resp is not None:
                 sock.sendto(resp, addr)
-
-    def response_status(self):
-        pass
 
     @property
     def FirmwareVerMajor(self):
