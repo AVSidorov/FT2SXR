@@ -19,7 +19,7 @@ idByDev = lambda dev: ([devs.index(_) for _ in (dev,) if _ in devs] + [None,])[0
 id2dev = devById
 dev2id = idByDev
 
-spec_len2pid = lambda n_ch: (int(n_ch).bit_length()-8)*2-1
+spec_len2pid = lambda len_data: ((int(len_data // 3).bit_length()-8)*2-1)
 
 def packet(pid1=b'\x00', pid2=b'\x00', data=b''):
     # make packet
@@ -70,7 +70,7 @@ def response_spectrum(pkt, obj=None):
     if not pkt[2:4] == b'\x02\x01':
        return None
     data = pack_spectrum(obj)
-    pid2 = spec_len2pid(len(data) // 3)
+    pid2 = spec_len2pid(len(data))
     return packet(b'\x81', pid2, data)
 
 
@@ -84,7 +84,7 @@ def response_spectrum_clear(pkt, obj=None):
     if not pkt[2:4] == b'\x02\x02':
         return None
     data = pack_spectrum(obj)
-    pid2 = spec_len2pid(len(data) // 3)
+    pid2 = spec_len2pid(len(data))
     clear_spectrum(obj)
     return packet(b'\x81', pid2, data)
 
@@ -100,7 +100,7 @@ def response_spectrum_status(pkt, obj=None):
         return None
     data = pack_spectrum(obj)
     data += pack_status(obj)
-    pid2 = spec_len2pid(len(data) // 3)+1
+    pid2 = spec_len2pid(len(data))+1
     return packet(b'\x81', pid2, data)
 
 
@@ -115,7 +115,7 @@ def response_spectrum_clear_status(pkt, obj=None):
         return None
     data = pack_spectrum(obj)
     data += pack_status(obj)
-    pid2 = spec_len2pid(len(data) // 3)+1
+    pid2 = spec_len2pid(len(data))+1
     clear_spectrum(obj)
     return packet(b'\x81', pid2, data)
 
