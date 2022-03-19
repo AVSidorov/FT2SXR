@@ -19,6 +19,7 @@ idByDev = lambda dev: ([devs.index(_) for _ in (dev,) if _ in devs] + [None,])[0
 id2dev = devById
 dev2id = idByDev
 
+spec_len2pid = lambda n_ch: (int(n_ch).bit_length()-8)*2-1
 
 def packet(pid1=b'\x00', pid2=b'\x00', data=b''):
     # make packet
@@ -69,14 +70,26 @@ def response_spectrum(pkt, obj=None):
     if not pkt[2:4] == b'\x02\x01':
        return None
     data = pack_spectrum(obj)
-    return packet(b'\x81', b'\x01', data)
+    pid2 = spec_len2pid(len(data) // 3)
+    return packet(b'\x81', pid2, data)
 
 
 def request_spectrum_clear():
     return packet(b'\x02', b'\x02')
 
 
-def request_spectrum_status():
+def response_spectrum_clear(pkt, obj=None):
+    if not check_packet(pkt):
+        return None
+    if not pkt[2:4] == b'\x02\x02':
+        return None
+    data = pack_spectrum(obj)
+    pid2 = spec_len2pid(len(data) // 3)
+    clear_spectrum(obj)
+    return packet(b'\x81', pid2, data)
+
+
+def request_spectrum_status(pkt, obj=None):
     return packet(b'\x02', b'\x03')
 
 
@@ -180,6 +193,14 @@ def unpack_spectrum(data, obj=None):
     # make from bytes array array of integers
     data.dtype = '<i4'
     return data
+
+
+def clear_spectrum(obj=None):
+    if obj is not None:
+        if hasattr(obj, 'mca'):
+            if hasattr(obj.mca, 'spec'):
+                if isinstance(obj.mca.spec, np.ndarray):
+                    obj.mca.spec.fill(0)
 
 
 def pack_spectrum(obj=None):
@@ -349,6 +370,8 @@ class Protocol:
         self.responses['response_status'] = response_status
         self.requests['request_spectrum'] = request_spectrum
         self.responses['response_spectrum'] = response_spectrum
+        self.requests['request_spectrum_clear'] = request_spectrum_clear
+        self.responses['response_spectrum_clear'] = response_spectrum_clear
 
     def __call__(self, pkt, obj=None):
         resp = None
