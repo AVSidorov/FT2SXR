@@ -84,7 +84,7 @@ def response_spectrum_clear(pkt, obj=None):
     if not pkt[2:4] == b'\x02\x02':
         return None
     data = pack_spectrum(obj)
-    pid2 = spec_len2pid(len(data) // 3)
+    pid2 = spec_len2pid(len(data) // 3)+1
     clear_spectrum(obj)
     return packet(b'\x81', pid2, data)
 
@@ -100,12 +100,44 @@ def response_spectrum_status(pkt, obj=None):
         return None
     data = pack_spectrum(obj)
     data += pack_status(obj)
+    pid2 = spec_len2pid(len(data) // 3)
+    return packet(b'\x81', pid2, data)
+
+
+def request_spectrum_clear_status():
+    return packet(b'\x02', b'\x04')
+
+
+def response_spectrum_clear_status(pkt, obj=None):
+    if not check_packet(pkt):
+        return None
+    if not pkt[2:4] == b'\x02\x04':
+        return None
+    data = pack_spectrum(obj)
+    data += pack_status(obj)
     pid2 = spec_len2pid(len(data) // 3)+1
     clear_spectrum(obj)
     return packet(b'\x81', pid2, data)
 
-def request_spectrum_clear_status(pkt, obj=None):
-    return packet(b'\x02', b'\x04')
+
+def request_txt_cfg_readback(ascii_req):
+    return packet(b'\x20', b'\x03', ascii_req)
+
+
+def response_txt_cfg_readback(pkt, obj=None):
+    if not check_packet(pkt):
+        return None
+    if not pkt[2:4] == b'\x20\x03':
+        return None
+
+    pkt = Packet(pkt)
+    req = pkt.data.decode()
+    data = pack_txt_cfg(req, obj)
+
+    if isinstance(data, (tuple, list, np.ndarray)):
+        return [packet(b'\x82', b'\x07', _) for _ in data]
+    else:
+        return packet(b'\x82', b'\x07', data)
 
 
 def add_int(name,  nbytes=1, data=None, obj=None, k=1.0, byteorder='little', signed=False, full=False):
@@ -333,6 +365,22 @@ def acsii_cfg_load(fname='', structured=False):
     return ascii_cfg
 
 
+acsii_req_full = lambda cfg: '=?;'.join(cfg[np.where(cfg[:, 1])[0], 0]).replace(' ', '') + '=?;'
+ascii_resp = lambda req, cfg: ';'.join([f'{cmd}={cfg[cfg[:,0]==cmd,1][0]}'\
+                                        for cmd in req.replace('=', '').replace('?', '').rstrip(';').split(';')]) + ';'
+
+
+def pack_txt_cfg(req, obj=None):
+    if obj is None:
+        cfg = acsii_cfg_load()
+    if hasattr(obj, 'ascii_cfg'):
+        cfg = obj.ascii_cfg
+    if cfg is None:
+        return None
+
+    return ascii_resp(req, cfg)
+
+
 class Packet:
 
     def __new__(cls, pkt=None, **kwargs):
@@ -389,6 +437,11 @@ class Protocol:
 
         self.requests['request_spectrum_status'] = request_spectrum_status
         self.responses['response_spectrum_status'] = response_spectrum_status
+
+        self.requests['request_spectrum_clear_status'] = request_spectrum_clear_status
+        self.responses['response_spectrum_clear_status'] = response_spectrum_clear_status
+
+        self.responses['response_txt_cfg_readback'] = response_txt_cfg_readback
 
     def __call__(self, pkt, obj=None):
         resp = None
@@ -530,6 +583,7 @@ class PX5Imitator:
             print(req)
             resp = self.protocol(req, self)
             if resp is not None:
+                print(f'resp length is {len(resp)}')
                 sock.sendto(resp, addr)
 
     @property
