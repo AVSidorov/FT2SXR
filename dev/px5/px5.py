@@ -84,7 +84,7 @@ def response_spectrum_clear(pkt, obj=None):
     if not pkt[2:4] == b'\x02\x02':
         return None
     data = pack_spectrum(obj)
-    pid2 = spec_len2pid(len(data) // 3)+1
+    pid2 = spec_len2pid(len(data) // 3)
     clear_spectrum(obj)
     return packet(b'\x81', pid2, data)
 
@@ -100,7 +100,7 @@ def response_spectrum_status(pkt, obj=None):
         return None
     data = pack_spectrum(obj)
     data += pack_status(obj)
-    pid2 = spec_len2pid(len(data) // 3)
+    pid2 = spec_len2pid(len(data) // 3)+1
     return packet(b'\x81', pid2, data)
 
 
@@ -452,6 +452,7 @@ class Protocol:
             for func in self.responses:
                 resp = self.responses[func](pkt, obj)
                 if resp is not None:
+                    print(f' request {func} received')
                     break
 
         return resp
