@@ -8,11 +8,14 @@ from threading import Thread
 import uuid
 from PyQt5 import QtNetwork
 
+macBytes2str = lambda mac: ':'.join([f'{_:02X}' for _ in mac[:6]])
+ipBytes2str = lambda ip: '.'.join([f'{_:d}' for _ in ip[:4]])
+
 # devices names as tuple
 devs = ('DP5', 'PX5', 'DP5G', 'MCA8000D')
 
 # lambdas to avoid bad indexing
-devById = lambda id: devs[id % 4]
+devById = lambda id: devs[id % len(devs)]
 idByDev = lambda dev: ([devs.index(_) for _ in (dev,) if _ in devs] + [None,])[0]
 
 # add aliases for lambdas
@@ -150,7 +153,7 @@ def add_int(name,  nbytes=1, data=None, obj=None, k=1.0, byteorder='little', sig
         else:
             data += bytes(nbytes)
     elif hasattr(obj, name):
-        if int(k*getattr(obj, name)).bit_length() <= 2**(8*nbytes-1):
+        if int(k*getattr(obj, name)).bit_length() <= 8*nbytes-1:
             data += int(k*getattr(obj, name)).to_bytes(nbytes, byteorder, signed=signed)
         else:
             data += bytes(nbytes)
@@ -283,12 +286,16 @@ def unpack_eth_settings(pkt):
     eth_settings['mac'] = data[19:25]
     return eth_settings
 
+nf_udp_status = ('Open', 'Shared', 'Binded', 'Locked', 'USB connected')
+nf_id2status = lambda sID: nf_udp_status[sID % len(nf_udp_status)]
+nf_status2id = lambda status: ([nf_udp_status.index(_) for _ in (status,) if _ in status] + [None,])[0]
+
 
 def netfinder_unpack(data):
     if data[0] != 1:
         return
     desc = dict()
-    desc['UDPStatus'] = ('Open', 'Shared', 'Binded', 'Locked', 'USB connected')[data[1]]
+    desc['UDPStatus'] = nf_id2status(data[1])
     desc['RequestID'] = int.from_bytes(data[2:4], 'big')
     desc['Event1Days'] = int.from_bytes(data[4:6], 'big')
     desc['Event1Hours'] = data[6]
@@ -346,6 +353,171 @@ def netfinder_response(data, mac=0, ip=0):
     resp += b'Null1\x00'  # desc['Event1Name'] = descriptions[2].decode()
     resp += b'Null2\x00'  # desc['Event2Name'] = descriptions[3].decode()
     return resp
+
+
+class Netfinder_packet:
+    def __init__(self, pkt=None, **kwargs):
+        if pkt is not None:
+            self._pkt = bytearray(pkt)
+        else:
+            self._pkt = bytearray(36)
+            self._pkt[0] = b'\x01'
+
+    @property
+    def prefix(self):
+        return self._pkt[0]
+
+    @prefix.setter
+    def prefix(self):
+        self._pkt[0] = b'\x01'
+
+    @property
+    def UDPStatus(self):
+        return nf_id2status(self._pkt[1])
+
+    @UDPStatus.setter
+    def UDPStatus(self, val):
+        if isinstance(val, int):
+            self._pkt[1] = val.to_bytes(1, 'big')
+        elif isinstance(val, (bytes, bytearray)):
+            self._pkt[1] = val[-1]
+        elif isinstance(val, str):
+            if nf_status2id is not None:
+                self._pkt[1] = nf_status2id.to_bytes(1, 'big')
+
+    @property
+    def RequestID(self):
+        return int.from_bytes(self._pkt[2:4], 'big')
+
+    @RequestID.setter
+    def RequestID(self, val):
+        pass
+
+    @property
+    def Event1Days(self):
+        return int.from_bytes(self._pkt[4:6], 'big')
+
+    @Event1Days.setter
+    def Event1Days(self, val):
+        pass
+
+    @property
+    def Event1Hours(self):
+        return self._pkt[6]
+
+    @Event1Hours.setter
+    def Event1Hours(self, val):
+        pass
+
+    @property
+    def Event1Minutes(self):
+        return self._pkt[7]
+
+    @Event1Minutes.setter
+    def Event1Minutes(self, val):
+        pass
+
+    @property
+    def Event2Days(self):
+        return int.from_bytes(self._pkt[8:10], 'big')
+
+    @Event2Days.setter
+    def Event1Days(self, val):
+        pass
+
+    @property
+    def Event2Hours(self):
+        return self._pkt[10]
+
+    @Event2Hours.setter
+    def Event2Hours(self, val):
+        pass
+
+    @property
+    def Event2Minutes(self):
+        return self._pkt[11]
+
+    @Event2Minutes.setter
+    def Event2Minutes(self, val):
+        pass
+
+    @property
+    def Event1Seconds(self):
+        return self._pkt[12]
+
+    @Event1Seconds.setter
+    def Event1Seconds(self, val):
+        pass
+
+    @property
+    def Event2Seconds(self):
+        return self._pkt[13]
+
+    @Event2Seconds.setter
+    def Event2Seconds(self, val):
+        pass
+
+    @property
+    def mac(self):
+        return macBytes2str(self._pkt[14:20])
+
+    @mac.setter
+    def mac(self,val):
+        pass
+
+    @property
+    def ip(self):
+        return ipBytes2str(self._pkt[20:24])
+
+    @ip.setter
+    def ip(self, value):
+        if isinstance(value,str):
+            self._pkt[20:24] = QtNetwork.QHostAddress(value).toIPv4Address().to_bytes(4, 'big')
+        elif isinstance(value,int):
+            self._pkt[20:24] = value.to_bytes(4, 'big')
+        elif isinstance(value, (bytes, bytearray)):
+            self._pkt[20:24] = value
+
+    @property
+    def mask(self):
+        return '.'.join([f'{_:d}' for _ in self._pkt[24:28]])
+
+    @mask.setter
+    def mask(self, value):
+        pass
+
+    @property
+    def gateway(self):
+        return '.'.join([f'{_:d}' for _ in self._pkt[28:32]])
+
+    @mask.setter
+    def gateway(self, value):
+        pass
+
+    @property
+    def descriptions(self):
+        desc_list = self._pkt[32:].split(b'\x00')
+        desc = dict()
+        desc['DeviceName'] = desc_list[0].decode()
+        desc['DeviceDesc'] = desc_list[1].decode()
+        desc['Event1Name'] = desc_list[2].decode()
+        desc['Event2Name'] = desc_list[3].decode()
+        return desc
+
+    @descriptions.setter
+    def descriptions(self, value):
+        pass
+
+    def __len__(self):
+        return len(self._pkt)
+
+    def __call__(self, typeOut=bytes):
+        if typeOut == bytes:
+            return bytes(self._pkt)
+        elif typeOut == bytearray:
+            return bytearray(self._pkt)
+        elif typeOut == dict:
+            return netfinder_unpack(self._pkt)
 
 
 def acsii_cfg_load(fname='', structured=False):
@@ -520,7 +692,7 @@ class PX5Imitator:
     def __init__(self):
 
         self.ip = '127.0.0.2'
-        self.port = 10001
+        self.port = 10002
         self.mac = 0
         self.netmask = b'\xff\xff\xff\x00'
         self.gateway = '127.0.0.2'
@@ -557,7 +729,6 @@ class PX5Imitator:
 
         self.ascii_cfg = acsii_cfg_load()
 
-        self.netfinder_addr = ('0.0.0.0', 3040)
         self.netfinder_thrd = Thread(name='Thread-NetFinder', target=self.netfinder_run, daemon=True)
         self.netfinder_actv = True
         self.netfinder_thrd.start()
@@ -570,7 +741,7 @@ class PX5Imitator:
 
     def netfinder_run(self):
         netfinder_sock = socket(AF_INET, SOCK_DGRAM)
-        netfinder_sock.bind(self.netfinder_addr)
+        netfinder_sock.bind(('0.0.0.0', 3041))
         while self.netfinder_actv:
             req, addr = netfinder_sock.recvfrom(1024)
             resp = netfinder_response(req, ip=self.ip)
@@ -602,3 +773,43 @@ class PX5Imitator:
     @property
     def AccTimeMs(self):
         return int(self.AccvTime % 100)
+
+
+class Retranslator:
+    def __init__(self, ip_px5='192.168.0.239', ip_this='127.0.0.3'):
+        self.ip = ip_this
+        self.ip_px5 = ip_px5
+        self.client = (self.ip, 10002)
+
+        self.thrd = Thread(name='Thread-retranslator', target=self.run, args=(10001,), daemon=True)
+        self.thrd.start()
+
+        self.netfinder_thrd = Thread(name='Thread-NetFinder', target=self.run, args=(3040, ), daemon=True)
+        self.netfinder_thrd.start()
+
+    def run(self, port=3040):
+        sock = socket(AF_INET, SOCK_DGRAM)
+        sock.bind(('0.0.0.0', port))
+
+        while True:
+            req, addr = sock.recvfrom(1024)
+            print(f'get req from {addr[0]}:{addr[1]}')
+            print(req)
+            # if all((addr != (self.ip_px5, 3040), addr != (self.ip_px5, 10001))):
+            if all((addr != (self.ip_px5, 3041), addr != (self.ip_px5, 10002))):
+                if sock.sendto(req, (self.ip_px5, port+1)) > 0:
+                    print(f'send req to {self.ip_px5}:{port+1}')
+                resp, addr1 = sock.recvfrom(32775)
+                print(f'get resp from {addr1[0]}:{addr1[1]}')
+                print(resp)
+                # if any((addr1 == (self.ip_px5, 3040), addr1 == (self.ip_px5, 10001))):
+                if addr1[1] == port+1:  # temporary for imitator
+                    if port == 3040:
+                        pkt = Netfinder_packet(resp)
+                        # change ip to retranslator ip
+                        pkt.ip = self.ip
+                        resp = pkt()
+                    if sock.sendto(resp, addr) > 0:
+                        print(f'send resp to {addr[0]}:{addr[1]}')
+                        print(resp)
+
