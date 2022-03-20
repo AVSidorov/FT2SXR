@@ -33,6 +33,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         # self.actionCalibStatus.triggered.connect(self.switch_calib_measure)
 
         win_main = MainWidget(self.centralwidget)
+        win_main.channel0.connect(self.channel0)
+        self.channel1.connect(win_main.channel0_slot)
         win_main.show()
 
     def action_adc_set(self):
