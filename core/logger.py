@@ -1,5 +1,5 @@
 import io
-from PyQt5 import QtCore
+from PyQt5 import QtCore, QtWidgets
 import datetime
 from .core import Core
 from .sxr_protocol_pb2 import MainPacket
@@ -9,7 +9,6 @@ class Logger(Core):
     def __init__(self, out=None, parent=None):
         super().__init__(parent)
         self.out = out
-
 
     @QtCore.pyqtSlot(bytes)
     def channel0_slot(self, data: bytes):
@@ -26,6 +25,8 @@ class Logger(Core):
             elif isinstance(self.out, str):
                 with open(self.out, 'at') as f:
                     f.write(data)
+            elif isinstance(self.out, QtWidgets.QTextBrowser):
+                self.out.append(data[:-1])
 
 
 

@@ -12,10 +12,10 @@ from ui.WarningUI import WarningWidget
 from PyQt5 import QtWidgets, QtCore
 from core.sxr_protocol import packet_init
 from core.sxr_protocol_pb2 import MainPacket
+from core.logger import Logger
 
 
 class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
-
     channel0 = QtCore.pyqtSignal(bytes)  # For uplink
     channel1 = QtCore.pyqtSignal(bytes)  # For downlink
 
@@ -31,10 +31,15 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.actionMini_X2.triggered.connect(self.action_minix2_set)
         # self.actionMeasureStatus.triggered.connect(self.switch_calib_measure)
         # self.actionCalibStatus.triggered.connect(self.switch_calib_measure)
+        self.actionOpen_SXR_file.triggered.connect(self.open_sxr)
 
         win_main = MainWidget(self.centralwidget)
         win_main.channel0.connect(self.channel0)
         self.channel1.connect(win_main.channel0_slot)
+
+        logger = Logger(win_main.log_textBrowser, self)
+        self.channel0.connect(logger.channel0_slot)
+
         win_main.show()
 
     def action_adc_set(self):
@@ -99,6 +104,14 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
         minix2Settings = MiniX2Widget(win)
         win.show()
+
+    def open_sxr(self):
+        # dirlist = QtWidgets.QFileDialog.getExistingDirectory(self, "Выбрать папку измерения", ".")
+        files = QtWidgets.QFileDialog.getOpenFileNames(self,
+                                                       "Select one or more files to open",
+                                                       ".",
+                                                       "HDF5 Files (*.hdf *.hdf5 *.he5)")
+
 
     @QtCore.pyqtSlot(bytes)
     def channel0_slot(self, data: bytes):
