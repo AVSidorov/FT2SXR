@@ -176,9 +176,6 @@ class ADC(Core):
                 self.send_config()
                 self.start(response)
 
-    def channel2_slot(self, data: bytes):
-        print(data)
-
     def status_message(self, response=None):
         status = AdcStatus()
 
