@@ -13,6 +13,7 @@ class ADCUIWidget (QtWidgets.QWidget, Ui_ADCWidgetDesign):
         self.setupUi(self)
         ADCUIWidget.setFixedSize(self, 400, 290)
 
+
         self.address = 11
 
         self.status = AdcStatus()  # Object - message for storage ADC state

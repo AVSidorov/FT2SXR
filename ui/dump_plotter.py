@@ -1,3 +1,5 @@
+import matplotlib.widgets
+
 from core.core import Core
 from core.sxr_protocol_pb2 import MainPacket, AdcStatus
 import matplotlib.pyplot as plt
@@ -11,6 +13,7 @@ class DumpPlotter(Core):
         super().__init__(parent=parent)
         self.address = 12
         self._status = None
+        self.type = 'samples'  # 'samples' or 'msec'
 
         td = datetime.date.today()
         wdir = format(td.year - 2000, '02d') + format(td.month, '02d') + format(td.day, '02d')
@@ -48,7 +51,13 @@ class DumpPlotter(Core):
                     dump = dump.reshape((-1, n_ch)).T
                     cols = (_ for _ in dump)
 
+                    rate = self.status.sampling_rate
+                    samples = self.status.samples
+
                     for col, row in zip(cols, range(1, n_ch+1)):
                         plt.subplot(n_ch, 1, row)
-                        plt.plot(col)
+                        if self.type == 'samples':
+                            plt.plot(col)
+                        elif self.type == 'msec':
+                            plt.plot(np.linspace(0, samples/rate, samples)*1000, col)
                     plt.show()

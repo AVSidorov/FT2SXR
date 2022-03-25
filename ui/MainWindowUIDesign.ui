@@ -80,6 +80,12 @@
      <string>Exit</string>
     </property>
    </widget>
+   <widget class="QMenu" name="menuADC_Log">
+    <property name="title">
+     <string>ADC Log</string>
+    </property>
+    <addaction name="actionShow_log"/>
+   </widget>
    <addaction name="menuExit"/>
    <addaction name="menuOpen_files"/>
    <addaction name="menuInstall"/>
@@ -87,6 +93,7 @@
    <addaction name="menuMeasurements"/>
    <addaction name="menuSignals"/>
    <addaction name="menuExit_2"/>
+   <addaction name="menuADC_Log"/>
   </widget>
   <action name="actionSave_SXR_file">
    <property name="text">
@@ -201,6 +208,11 @@
   <action name="actionCalibration_settings">
    <property name="text">
     <string>Calibration settings</string>
+   </property>
+  </action>
+  <action name="actionShow_log">
+   <property name="text">
+    <string>Show log</string>
    </property>
   </action>
  </widget>

@@ -13,6 +13,7 @@ from PyQt5 import QtWidgets, QtCore
 from core.sxr_protocol import packet_init
 from core.sxr_protocol_pb2 import MainPacket
 from core.logger import Logger
+from ui.ADCLogUI import AdcLog
 
 
 class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
@@ -29,18 +30,26 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.actionCalibration_settings.triggered.connect(self.action_calibration_set)
         self.actionMeasurement_settings.triggered.connect(self.action_measurement_set)
         self.actionMini_X2.triggered.connect(self.action_minix2_set)
-        # self.actionMeasureStatus.triggered.connect(self.switch_calib_measure)
-        # self.actionCalibStatus.triggered.connect(self.switch_calib_measure)
+        self.actionShow_log.triggered.connect(self.action_adclog)
+
         self.actionOpen_SXR_file.triggered.connect(self.open_sxr)
 
-        win_main = MainWidget(self.centralwidget)
+        width = QtWidgets.QApplication.desktop().screenGeometry().width()
+        height = QtWidgets.QApplication.desktop().screenGeometry().height()
+        self.w = int(self.size().width() * 1366 / width)
+        self.h = int(self.size().height() * 768 / height)
+        self.setFixedSize(self.w, self.h)
+
+        win_main = MainWidget(self.centralwidget, w=self.w, h=(self.h-10))
+        # win_main.resize(self.size().width(), self.size().height())
         win_main.channel0.connect(self.channel0)
         self.channel1.connect(win_main.channel0_slot)
 
         logger = Logger(win_main.log_textBrowser, self)
         self.channel0.connect(logger.channel0_slot)
-
         win_main.show()
+
+        self.adc_log = AdcLog()
 
     def action_adc_set(self):
         win = QtWidgets.QDialog(self)
@@ -104,6 +113,10 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
         minix2Settings = MiniX2Widget(win)
         win.show()
+
+    def action_adclog(self):
+        print('in')
+        self.adc_log.show()
 
     def open_sxr(self):
         # dirlist = QtWidgets.QFileDialog.getExistingDirectory(self, "Выбрать папку измерения", ".")
