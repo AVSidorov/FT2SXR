@@ -15,6 +15,7 @@ def main():
     adc = ADC()
     adc.channel0.connect(core.channel0)
     core.channel0.connect(adc.channel0_slot)
+    adc.channel2.connect(adc.channel2)
 
     mw = MainWindow()
     mw.channel0.connect(core.channel0)
