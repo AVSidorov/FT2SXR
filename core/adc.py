@@ -299,10 +299,13 @@ class ADC(Core):
 
         if status.start == status.SOFTSTART:
             self.config['device0_fm814x250m0']['StartSource'] = '3'
+            self.config['device0_fm814x250m0']['StartBaseSource'] = '0'
         elif status.start == status.EXTSTART:
             self.config['device0_fm814x250m0']['StartSource'] = '2'
+            self.config['device0_fm814x250m0']['StartBaseSource'] = '7'
         elif status.start == status.IN0:
             self.config['device0_fm814x250m0']['StartSource'] = '0'
+            self.config['device0_fm814x250m0']['StartBaseSource'] = '7'
 
     def generate_data(self):
         samples = self.get_cfg_item('Option', 'SamplesPerChannel')
