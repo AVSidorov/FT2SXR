@@ -133,9 +133,8 @@ class ADC(Core):
 
     def start(self, response=None):
         if self.connected:
-            # TODO del/rename dump file before start
             if os.path.exists(os.path.join(self.wdir, self.file_base+'.bin')):
-                os.remove(os.path.exists(os.path.join(self.wdir, self.file_base+'.bin')))
+                os.remove(os.path.join(self.wdir, self.file_base+'.bin'))
             self.ssh.send('/home/embedded/examples/exam_adc\n')
             self.ssh_output(5)
 
