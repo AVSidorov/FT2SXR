@@ -13,12 +13,14 @@ from PyQt5 import QtWidgets, QtCore
 from core.sxr_protocol import packet_init
 from core.sxr_protocol_pb2 import MainPacket
 from core.logger import Logger
+from core.adc_logger import ADCLogger
 from ui.ADCLogUI import AdcLog
 
 
 class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     channel0 = QtCore.pyqtSignal(bytes)  # For uplink
     channel1 = QtCore.pyqtSignal(bytes)  # For downlink
+    channel2 = QtCore.pyqtSignal(bytes)  # For ADC Log
 
     def __init__(self, parent=None):
         super().__init__(parent=parent)
@@ -50,6 +52,9 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         win_main.show()
 
         self.adc_log = AdcLog()
+        adc_logger = ADCLogger(self.adc_log.textBrowser, self)
+        self.channel2.connect(adc_logger.channel2_slot)
+
 
     def action_adc_set(self):
         win = QtWidgets.QDialog(self)
@@ -115,7 +120,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         win.show()
 
     def action_adclog(self):
-        print('in')
         self.adc_log.show()
 
     def open_sxr(self):

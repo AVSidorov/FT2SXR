@@ -8,6 +8,7 @@
 /.idea/*
 /.idea/*.*
 /log.txt
+/adc_log.txt
 /core/log.txt
 /*/cfg.ini
 /*/*.bin
