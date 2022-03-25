@@ -14,7 +14,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x12sxr_protocol.proto\x12\x0csxr_protocol\"]\n\nMainPacket\x12\x0f\n\x07\x61\x64\x64ress\x18\x01 \x02(\x07\x12\x0e\n\x06sender\x18\x02 \x02(\x07\x12\x0f\n\x07\x63ommand\x18\x03 \x02(\x07\x12\x0c\n\x04\x64\x61ta\x18\x04 \x01(\x0c\x12\x0f\n\x07version\x18\x05 \x01(\t\"\xaa\x08\n\tAdcStatus\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x16\n\x07\x65nabled\x18\x02 \x01(\x08:\x05\x66\x61lse\x12\x18\n\tconnected\x18\x03 \x01(\x08:\x05\x66\x61lse\x12\x15\n\rsampling_rate\x18\x04 \x01(\x07\x12\x1b\n\x13inter_channel_delay\x18) \x01(\x02\x12\x1a\n\x12inter_sample_delay\x18* \x01(\x02\x12\x0f\n\x07samples\x18\x05 \x01(\x07\x12\x41\n\x05start\x18\x06 \x01(\x0e\x32\'.sxr_protocol.AdcStatus.EnumStartSource:\tSOFTSTART\x12\x17\n\x0fstart_threshold\x18= \x01(\x02\x12\x17\n\x0fstart_inversion\x18> \x01(\x08\x12\x12\n\nstart_mode\x18? \x01(\x0c\x12@\n\x04stop\x18\x07 \x01(\x0e\x32\'.sxr_protocol.AdcStatus.EnumStartSource:\tSOFTSTART\x12\x16\n\x0estop_threshold\x18G \x01(\x02\x12\x16\n\x0estop_inversion\x18H \x01(\x08\x12\x11\n\tstop_mode\x18I \x01(\x0c\x12G\n\x0c\x63lock_source\x18\x08 \x01(\x0e\x32\'.sxr_protocol.AdcStatus.EnumClockSource:\x08\x43LOCKINT\x12\x37\n\x0bmemory_type\x18\t \x01(\x0e\x32\".sxr_protocol.AdcStatus.EnumMemory\x12\x39\n\x0c\x62oard_status\x18\n \x03(\x0b\x32#.sxr_protocol.AdcStatus.BoardStatus\x1a\xe6\x01\n\x0b\x42oardStatus\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x0f\n\x07\x65nabled\x18\x02 \x01(\x08\x12\x14\n\x0c\x63hannel_mask\x18\x03 \x01(\x0c\x12I\n\x0e\x63hannel_status\x18\x04 \x03(\x0b\x32\x31.sxr_protocol.AdcStatus.BoardStatus.ChannelStatus\x1aW\n\rChannelStatus\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x16\n\x07\x65nabled\x18\x02 \x01(\x08:\x05\x66\x61lse\x12\x0f\n\x04gain\x18\x03 \x01(\x02:\x01\x31\x12\x0f\n\x04\x62ias\x18\x04 \x01(\x02:\x01\x30\"W\n\x0f\x45numStartSource\x12\r\n\tSOFTSTART\x10\x00\x12\x0c\n\x08INTSTART\x10\x00\x12\x0c\n\x08\x45XTSTART\x10\x01\x12\x07\n\x03IN0\x10\x02\x12\x0c\n\x08STARTTHR\x10\x02\x1a\x02\x10\x01\";\n\x0f\x45numClockSource\x12\x0c\n\x08\x43LOCKOFF\x10\x00\x12\x0c\n\x08\x43LOCKINT\x10\x01\x12\x0c\n\x08\x43LOCKEXT\x10\x02\"2\n\nEnumMemory\x12\x0b\n\x07MEMHOST\x10\x00\x12\n\n\x06MEMINT\x10\x01\x12\x0b\n\x07MEMFIFO\x10\x03')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x12sxr_protocol.proto\x12\x0csxr_protocol\"]\n\nMainPacket\x12\x0f\n\x07\x61\x64\x64ress\x18\x01 \x02(\x07\x12\x0e\n\x06sender\x18\x02 \x02(\x07\x12\x0f\n\x07\x63ommand\x18\x03 \x02(\x07\x12\x0c\n\x04\x64\x61ta\x18\x04 \x01(\x0c\x12\x0f\n\x07version\x18\x05 \x01(\t\"\xaa\x08\n\tAdcStatus\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x16\n\x07\x65nabled\x18\x02 \x01(\x08:\x05\x66\x61lse\x12\x18\n\tconnected\x18\x03 \x01(\x08:\x05\x66\x61lse\x12\x15\n\rsampling_rate\x18\x04 \x01(\x07\x12\x1b\n\x13inter_channel_delay\x18) \x01(\x02\x12\x1a\n\x12inter_sample_delay\x18* \x01(\x02\x12\x0f\n\x07samples\x18\x05 \x01(\x07\x12\x41\n\x05start\x18\x06 \x01(\x0e\x32\'.sxr_protocol.AdcStatus.EnumStartSource:\tSOFTSTART\x12\x17\n\x0fstart_threshold\x18= \x01(\x02\x12\x17\n\x0fstart_inversion\x18> \x01(\x08\x12\x12\n\nstart_mode\x18? \x01(\x0c\x12@\n\x04stop\x18\x07 \x01(\x0e\x32\'.sxr_protocol.AdcStatus.EnumStartSource:\tSOFTSTART\x12\x16\n\x0estop_threshold\x18G \x01(\x02\x12\x16\n\x0estop_inversion\x18H \x01(\x08\x12\x11\n\tstop_mode\x18I \x01(\x0c\x12G\n\x0c\x63lock_source\x18\x08 \x01(\x0e\x32\'.sxr_protocol.AdcStatus.EnumClockSource:\x08\x43LOCKINT\x12\x37\n\x0bmemory_type\x18\t \x01(\x0e\x32\".sxr_protocol.AdcStatus.EnumMemory\x12\x39\n\x0c\x62oard_status\x18\n \x03(\x0b\x32#.sxr_protocol.AdcStatus.BoardStatus\x1a\xe6\x01\n\x0b\x42oardStatus\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x0f\n\x07\x65nabled\x18\x02 \x01(\x08\x12\x14\n\x0c\x63hannel_mask\x18\x03 \x01(\x0c\x12I\n\x0e\x63hannel_status\x18\x04 \x03(\x0b\x32\x31.sxr_protocol.AdcStatus.BoardStatus.ChannelStatus\x1aW\n\rChannelStatus\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x16\n\x07\x65nabled\x18\x02 \x01(\x08:\x05\x66\x61lse\x12\x0f\n\x04gain\x18\x03 \x01(\x02:\x01\x31\x12\x0f\n\x04\x62ias\x18\x04 \x01(\x02:\x01\x30\"W\n\x0f\x45numStartSource\x12\r\n\tSOFTSTART\x10\x00\x12\x0c\n\x08INTSTART\x10\x00\x12\x0c\n\x08\x45XTSTART\x10\x01\x12\x07\n\x03IN0\x10\x02\x12\x0c\n\x08STARTTHR\x10\x02\x1a\x02\x10\x01\";\n\x0f\x45numClockSource\x12\x0c\n\x08\x43LOCKOFF\x10\x00\x12\x0c\n\x08\x43LOCKINT\x10\x01\x12\x0c\n\x08\x43LOCKEXT\x10\x02\"2\n\nEnumMemory\x12\x0b\n\x07MEMHOST\x10\x00\x12\n\n\x06MEMINT\x10\x01\x12\x0b\n\x07MEMFIFO\x10\x03\"\x99\x02\n\x0cSystemStatus\x12\x39\n\x05state\x18\x01 \x02(\x0e\x32$.sxr_protocol.SystemStatus.EnumState:\x04IDLE\x12\x30\n\x04\x64\x65vs\x18\x02 \x03(\x0e\x32\".sxr_protocol.SystemStatus.EnumDev\"G\n\tEnumState\x12\x08\n\x04IDLE\x10\x00\x12\x0f\n\x0bMEASUREMENT\x10\x01\x12\x0f\n\x0b\x43\x41LIBRATION\x10\x02\x12\x0e\n\nBACKGROUND\x10\x03\"S\n\x07\x45numDev\x12\x07\n\x03\x41\x44\x43\x10\x01\x12\x07\n\x03PX5\x10\x02\x12\x07\n\x03\x41MP\x10\x03\x12\x07\n\x03GSA\x10\x05\x12\n\n\x06MINIX2\x10\x06\x12\x08\n\x04XRAY\x10\x06\x12\n\n\x06SOURCE\x10\x06\x1a\x02\x10\x01')
 
 
 
@@ -22,9 +22,12 @@ _MAINPACKET = DESCRIPTOR.message_types_by_name['MainPacket']
 _ADCSTATUS = DESCRIPTOR.message_types_by_name['AdcStatus']
 _ADCSTATUS_BOARDSTATUS = _ADCSTATUS.nested_types_by_name['BoardStatus']
 _ADCSTATUS_BOARDSTATUS_CHANNELSTATUS = _ADCSTATUS_BOARDSTATUS.nested_types_by_name['ChannelStatus']
+_SYSTEMSTATUS = DESCRIPTOR.message_types_by_name['SystemStatus']
 _ADCSTATUS_ENUMSTARTSOURCE = _ADCSTATUS.enum_types_by_name['EnumStartSource']
 _ADCSTATUS_ENUMCLOCKSOURCE = _ADCSTATUS.enum_types_by_name['EnumClockSource']
 _ADCSTATUS_ENUMMEMORY = _ADCSTATUS.enum_types_by_name['EnumMemory']
+_SYSTEMSTATUS_ENUMSTATE = _SYSTEMSTATUS.enum_types_by_name['EnumState']
+_SYSTEMSTATUS_ENUMDEV = _SYSTEMSTATUS.enum_types_by_name['EnumDev']
 MainPacket = _reflection.GeneratedProtocolMessageType('MainPacket', (_message.Message,), {
   'DESCRIPTOR' : _MAINPACKET,
   '__module__' : 'sxr_protocol_pb2'
@@ -55,11 +58,20 @@ _sym_db.RegisterMessage(AdcStatus)
 _sym_db.RegisterMessage(AdcStatus.BoardStatus)
 _sym_db.RegisterMessage(AdcStatus.BoardStatus.ChannelStatus)
 
+SystemStatus = _reflection.GeneratedProtocolMessageType('SystemStatus', (_message.Message,), {
+  'DESCRIPTOR' : _SYSTEMSTATUS,
+  '__module__' : 'sxr_protocol_pb2'
+  # @@protoc_insertion_point(class_scope:sxr_protocol.SystemStatus)
+  })
+_sym_db.RegisterMessage(SystemStatus)
+
 if _descriptor._USE_C_DESCRIPTORS == False:
 
   DESCRIPTOR._options = None
   _ADCSTATUS_ENUMSTARTSOURCE._options = None
   _ADCSTATUS_ENUMSTARTSOURCE._serialized_options = b'\020\001'
+  _SYSTEMSTATUS_ENUMDEV._options = None
+  _SYSTEMSTATUS_ENUMDEV._serialized_options = b'\020\001'
   _MAINPACKET._serialized_start=36
   _MAINPACKET._serialized_end=129
   _ADCSTATUS._serialized_start=132
@@ -74,4 +86,10 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _ADCSTATUS_ENUMCLOCKSOURCE._serialized_end=1146
   _ADCSTATUS_ENUMMEMORY._serialized_start=1148
   _ADCSTATUS_ENUMMEMORY._serialized_end=1198
+  _SYSTEMSTATUS._serialized_start=1201
+  _SYSTEMSTATUS._serialized_end=1482
+  _SYSTEMSTATUS_ENUMSTATE._serialized_start=1326
+  _SYSTEMSTATUS_ENUMSTATE._serialized_end=1397
+  _SYSTEMSTATUS_ENUMDEV._serialized_start=1399
+  _SYSTEMSTATUS_ENUMDEV._serialized_end=1482
 # @@protoc_insertion_point(module_scope)

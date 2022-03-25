@@ -68,3 +68,26 @@ message AdcStatus{
   repeated BoardStatus board_status = 10;
 
 }
+
+message SystemStatus{
+  enum EnumState{
+    IDLE = 0;
+    MEASUREMENT = 1;
+    CALIBRATION = 2;
+    BACKGROUND = 3;
+ }
+  required EnumState state = 1 [default = IDLE];
+
+  enum EnumDev{
+    option allow_alias = true;
+    ADC = 1;
+    PX5 = 2;
+    AMP = 3;
+    GSA = 5;
+    MINIX2 = 6;
+    XRAY = 6;
+    SOURCE = 6;
+  }
+  repeated EnumDev devs = 2;
+}
+
