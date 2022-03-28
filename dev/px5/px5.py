@@ -624,7 +624,7 @@ class Protocol:
             for func in self.responses:
                 resp = self.responses[func](pkt, obj)
                 if resp is not None:
-                    print(f' request {func} received')
+                    print(f'[prot] request {func} received')
                     break
 
         return resp
@@ -692,7 +692,7 @@ class PX5Imitator:
     def __init__(self):
 
         self.ip = '127.0.0.2'
-        self.port = 10002
+        self.port = 10001
         self.mac = 0
         self.netmask = b'\xff\xff\xff\x00'
         self.gateway = '127.0.0.2'
@@ -710,7 +710,7 @@ class PX5Imitator:
         self.BoardTemp = 23
         self.PresetRealTimeReached = 0
         self.FastThresholedLocked = 1
-        self.MCAEnabled = 0
+        self.MCAEnabled = 1
         self.PresetCountReached = 0
         self.OscilloscopeReady = 0
         self.UnitIsConfigured = 0
@@ -741,7 +741,7 @@ class PX5Imitator:
 
     def netfinder_run(self):
         netfinder_sock = socket(AF_INET, SOCK_DGRAM)
-        netfinder_sock.bind(('0.0.0.0', 3041))
+        netfinder_sock.bind(('0.0.0.0', 3040))
         while self.netfinder_actv:
             req, addr = netfinder_sock.recvfrom(1024)
             resp = netfinder_response(req, ip=self.ip)
@@ -749,13 +749,11 @@ class PX5Imitator:
 
     def imitator_run(self):
         sock = socket(AF_INET, SOCK_DGRAM)
-        sock.bind((self.ip, self.port))
+        sock.bind(('0.0.0.0', self.port))
         while self.actv:
             req, addr = sock.recvfrom(1024)
-            print(req)
             resp = self.protocol(req, self)
             if resp is not None:
-                print(f'resp length is {len(resp)}')
                 sock.sendto(resp, addr)
 
     @property
@@ -779,7 +777,6 @@ class Retranslator:
     def __init__(self, ip_px5='192.168.0.239', ip_this='127.0.0.3'):
         self.ip = ip_this
         self.ip_px5 = ip_px5
-        self.client = (self.ip, 10002)
 
         self.thrd = Thread(name='Thread-retranslator', target=self.run, args=(10001,), daemon=True)
         self.thrd.start()
@@ -788,20 +785,21 @@ class Retranslator:
         self.netfinder_thrd.start()
 
     def run(self, port=3040):
+        # TODO make local thread storage and return to one GET one SEND scheme. It's possible multiple requests
         sock = socket(AF_INET, SOCK_DGRAM)
         sock.bind(('0.0.0.0', port))
 
         while True:
             req, addr = sock.recvfrom(1024)
-            print(f'get req from {addr[0]}:{addr[1]}')
+            print(f'[retr] GET req from {addr[0]}:{addr[1]}')
             print(req)
             # if all((addr != (self.ip_px5, 3040), addr != (self.ip_px5, 10001))):
             if all((addr != (self.ip_px5, 3041), addr != (self.ip_px5, 10002))):
                 if sock.sendto(req, (self.ip_px5, port+1)) > 0:
-                    print(f'send req to {self.ip_px5}:{port+1}')
+                    print(f'[retr] SEND req to {self.ip_px5}:{port+1}')
                 resp, addr1 = sock.recvfrom(32775)
-                print(f'get resp from {addr1[0]}:{addr1[1]}')
-                print(resp)
+                print(f'[retr] GET resp from {addr1[0]}:{addr1[1]}')
+                print(resp) if len(resp) < 521 else None
                 # if any((addr1 == (self.ip_px5, 3040), addr1 == (self.ip_px5, 10001))):
                 if addr1[1] == port+1:  # temporary for imitator
                     if port == 3040:
@@ -809,7 +807,8 @@ class Retranslator:
                         # change ip to retranslator ip
                         pkt.ip = self.ip
                         resp = pkt()
+                        print('[retr] resp changed')
+                        print(resp) if len(resp) < 521 else None
                     if sock.sendto(resp, addr) > 0:
-                        print(f'send resp to {addr[0]}:{addr[1]}')
-                        print(resp)
+                        print(f'[retr] SEND resp to {addr[0]}:{addr[1]}')
 
