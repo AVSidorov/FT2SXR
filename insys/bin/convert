@@ -1,0 +1,30 @@
+#!/bin/bash
+
+#
+# convertint file *.cpp *.h *.ini
+# from cp1251 encoding to utf8
+#
+
+FROM=cp1251
+TO=utf8
+
+cd $1
+
+list=`ls -RF *.h *.cpp *.ini`
+index=0
+
+mkdir -p ${TO}
+mkdir -p ${FROM}
+
+for FILE in ${list}
+do
+    echo Converting file ${FILE} ... 
+    iconv -f ${FROM} -t ${TO} ${FILE} -o ./${TO}/${FILE}
+    echo DONE.
+done
+
+    cp ${list} ./${FROM}
+    rm -fv ${list}
+    cp ./${TO}/* . 
+
+exit 0

@@ -1,0 +1,5 @@
+../baseentry.cpp
+bzynq.cpp
+bzynq.h
+bzynqll.cpp
+resource.h

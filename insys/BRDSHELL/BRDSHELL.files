@@ -1,0 +1,16 @@
+brd.cpp
+brdctrl.h
+brdi.h
+brdinit.cpp
+brdisup.cpp
+brdpu.cpp
+brdreinit.cpp
+brdserv.cpp
+captor.cpp
+captor.h
+dbprintf.cpp
+dbprintf.h
+getregry.cpp
+idxbrd.cpp
+idxbrd.h
+resource.h

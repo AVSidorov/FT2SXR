@@ -1,0 +1,55 @@
+#!/bin/sh 
+
+# 
+# This script is loading modules in the kernel. 
+# 
+
+echo
+
+kernel=`uname -r | grep 2.4.`
+
+if [ $kernel ]
+    then
+        module=lzynq.o
+        mname=${module%.o}
+    else
+        module=`find *.ko`
+        mname=${module%.ko}
+fi
+
+device=lzynq
+mode="666"
+
+chmod 777 /dev/shm
+rm -fv /dev/shm/*
+
+if [ ${module} ]
+    then
+        echo Find ${module} - kernel module.
+    else
+        echo No kernel module found. ${module}
+        exit
+fi
+
+was_loaded=`/sbin/lsmod | cut -c 1-6 | grep $device`
+
+if [ ${was_loaded} ]
+    then
+        echo Remove loaded module: ${module}
+        /sbin/rmmod $device
+    else
+        echo Loading module: ${module}
+fi
+
+/sbin/insmod ./$module $* || exit 1
+
+str=`cat /proc/devices | grep $mname`
+major=`expr match "$str" '\([0-9]*\)'`
+
+echo ${module} loaded successfuly. Major number ${major}.
+
+sleep 1
+
+chmod -v ${mode} /dev/${device}*
+
+echo

@@ -1,0 +1,68 @@
+
+
+#
+# Select apropriate IPC methods
+#
+
+#IPC_TYPE := _POSIX_IPC_
+IPC_TYPE := _INSYS_IPC_
+
+#
+# Setup common Makefile rules and defines
+#
+
+CC := $(CSTOOL_PREFIX)gcc
+LD := $(CSTOOL_PREFIX)gcc
+
+CFLAGS += -fPIC -Wall -g -D$(IPC_TYPE)
+LFLAGS += -lstdc++
+
+%.o: %.cpp
+	$(CC) $(CFLAGS) -c -MD $<
+	
+%.o: %.c
+	$(CC) $(CFLAGS) -c -MD $<
+
+include $(wildcard *.d)
+
+distclean:
+	rm -f *.o *~ core
+	rm -f *.d *~ core
+	rm -f *.so
+	rm -f *.0
+	rm -f $(TARGET_NAME)
+
+clean:
+	rm -f *.o *~ core
+	rm -f *.d *~ core
+	rm -f *.so
+	rm -f *.0
+	rm -f $(TARGET_NAME)
+
+SYSLIBDIR := /usr/local/lib/bardy
+
+#
+# в каталоге /etc/ld.so.conf.d/
+# создать файл bardy.conf
+# в котором прописать путь к библиотекам
+# /usr/local/lib/bardy
+# и выполнить ldconfig -v -n
+#
+
+ifeq "$(INSTALL_PREFIX)" ""
+install:
+	mkdir -p $(SYSLIBDIR)
+	chmod 777 $(SYSLIBDIR)
+	cp -af $(LIBNAME) $(SYSLIBDIR)
+	ln -sf $(SYSLIBDIR)/$(LIBNAME) $(SYSLIBDIR)/$(SONAME)
+	ln -sf $(SYSLIBDIR)/$(SONAME) $(SYSLIBDIR)/$(BASENAME)
+	echo '/usr/local/lib/bardy' > /etc/ld.so.conf.d/bardy.conf
+	/sbin/ldconfig
+else
+install:
+	mkdir -p $(INSTALL_PREFIX)$(SYSLIBDIR)
+	chmod 777 $(INSTALL_PREFIX)$(SYSLIBDIR)
+	cp -af $(LIBNAME) $(INSTALL_PREFIX)$(SYSLIBDIR)
+	cp -af $(SONAME) $(INSTALL_PREFIX)$(SYSLIBDIR)
+	cp -af $(BASENAME) $(INSTALL_PREFIX)$(SYSLIBDIR)
+endif

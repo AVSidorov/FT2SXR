@@ -1,0 +1,2 @@
+/home/karak/insys/bardy.git/gipcy/linux/ipcdrv/ipcext.o /home/karak/insys/bardy.git/gipcy/linux/ipcdrv/ipcproc.o /home/karak/insys/bardy.git/gipcy/linux/ipcdrv/ioctlrw.o /home/karak/insys/bardy.git/gipcy/linux/ipcdrv/ipcmodule.o /home/karak/insys/bardy.git/gipcy/linux/ipcdrv/ipcsem.o /home/karak/insys/bardy.git/gipcy/linux/ipcdrv/ipcmutex.o /home/karak/insys/bardy.git/gipcy/linux/ipcdrv/ipcevent.o /home/karak/insys/bardy.git/gipcy/linux/ipcdrv/ipcshm.o
+
