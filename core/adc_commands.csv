@@ -1,0 +1,5 @@
+GET_ADC_STATUS; 0; Get ADC status message
+SET_ADC_STATUS; 1; Set ADC through status message
+START_ADC; 2; Start ADC
+GET_PX5_STATUS; 3; Get PX5 Status Message
+INIT_PX5_FROM_MEM; 4; Init PX5 from stored configuration
