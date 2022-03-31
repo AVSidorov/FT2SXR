@@ -1,0 +1,3 @@
+[submodule "insys/EXAM/exam_adc"]
+	path = insys/EXAM/exam_adc
+	url = https://github.com/AVSidorov/exam_adc
