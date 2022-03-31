@@ -8,7 +8,6 @@ class PX5Widget(QtWidgets.QWidget, Ui_PX5WidgetDesign):
     def __init__(self, parent=None):
         super().__init__(parent=parent)
         self.setupUi(self)
-        PX5Widget.setFixedSize(self, 300, 310)
 
         # PX5 initial values
         # Режим запуска

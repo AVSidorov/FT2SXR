@@ -11,8 +11,6 @@ class ADCUIWidget (QtWidgets.QWidget, Ui_ADCWidgetDesign):
     def __init__(self, parent=None):
         super().__init__(parent=parent)
         self.setupUi(self)
-        ADCUIWidget.setFixedSize(self, 400, 290)
-
 
         self.address = 11
 

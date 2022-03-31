@@ -1,14 +1,12 @@
 import sys
 from PyQt5 import QtWidgets
-from ui.WarningUIDesign import Ui_WarningWidgetDesign
+from ui.WarningUIDesign import Ui_WarningWidget
 
 
-class WarningWidget (QtWidgets.QWidget, Ui_WarningWidgetDesign):
+class WarningWidget (QtWidgets.QWidget, Ui_WarningWidget):
     def __init__(self, parent=None):
         super().__init__(parent=parent)
         self.setupUi(self)
-
-        WarningWidget.setFixedSize(self, 300, 90)
 
     def accept(self):
         pass

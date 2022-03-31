@@ -40,12 +40,14 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         height = QtWidgets.QApplication.desktop().screenGeometry().height()
         self.w = int(self.size().width() * 1366 / width)
         self.h = int(self.size().height() * 768 / height)
-        self.setFixedSize(self.w, self.h)
+        self.resize(self.w, self.h)
 
-        win_main = MainWidget(self.centralwidget, w=self.w, h=(self.h-10))
-        # win_main.resize(self.size().width(), self.size().height())
+        win_main = MainWidget(self.centralwidget)
         win_main.channel0.connect(self.channel0)
         self.channel1.connect(win_main.channel0_slot)
+        self.verticalLayout = QtWidgets.QVBoxLayout(self.centralwidget)
+        self.verticalLayout.setObjectName("verticalLayout")
+        self.verticalLayout.addWidget(win_main)
 
         logger = Logger(win_main.log_textBrowser, self)
         self.channel0.connect(logger.channel0_slot)
@@ -65,6 +67,9 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         adcSettings.channel0.connect(self.channel0)  # make uplink for child widgets
         self.channel1.connect(adcSettings.channel0_slot)  # downlink from system to children
 
+        win.verticalLayout = QtWidgets.QVBoxLayout(win)
+        win.verticalLayout.addWidget(adcSettings)
+
         win.show()
         request = packet_init(1, adcSettings.address)
         request.command = 0
@@ -77,6 +82,9 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         win.setWindowTitle('PX-5')
 
         px5Settings = PX5Widget(win)
+        win.verticalLayout = QtWidgets.QVBoxLayout(win)
+        win.verticalLayout.addWidget(px5Settings)
+
         win.show()
 
     def action_gsa_set(self):
@@ -85,6 +93,9 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         win.setWindowTitle('GSA')
 
         gsaSettings = GSAWidget(win)
+        win.verticalLayout = QtWidgets.QVBoxLayout(win)
+        win.verticalLayout.addWidget(gsaSettings)
+
         win.show()
 
     def action_amplifier_set(self):
@@ -93,6 +104,9 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         win.setWindowTitle('Amplifier')
 
         amplifierSettings = AmplifierWidget(win)
+        win.verticalLayout = QtWidgets.QVBoxLayout(win)
+        win.verticalLayout.addWidget(amplifierSettings)
+
         win.show()
 
     def action_calibration_set(self):
@@ -101,6 +115,9 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         win.setWindowTitle('Calibration settings')
 
         calibrationSettings = CalibrationSettingsWidget(win)
+        win.verticalLayout = QtWidgets.QVBoxLayout(win)
+        win.verticalLayout.addWidget(calibrationSettings)
+
         win.show()
 
     def action_measurement_set(self):
@@ -109,6 +126,9 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         win.setWindowTitle('Measurement settings')
 
         measurementSettings = MeasurementSettingsWidget(win)
+        win.verticalLayout = QtWidgets.QVBoxLayout(win)
+        win.verticalLayout.addWidget(measurementSettings)
+
         win.show()
 
     def action_minix2_set(self):
@@ -117,6 +137,9 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         win.setWindowTitle('Mini-X2')
 
         minix2Settings = MiniX2Widget(win)
+        win.verticalLayout = QtWidgets.QVBoxLayout(win)
+        win.verticalLayout.addWidget(minix2Settings)
+
         win.show()
 
     def action_adclog(self):

@@ -1,14 +1,13 @@
 import sys
 from PyQt5 import QtWidgets
-from ui.MeasurementSettingsUIDesign import Ui_MeasurementSettingsWidgetDesign
+from ui.MeasurementSettingsUIDesign import Ui_MeasurementSettingsWidget
 
 
-class MeasurementSettingsWidget(QtWidgets.QWidget, Ui_MeasurementSettingsWidgetDesign):
+class MeasurementSettingsWidget(QtWidgets.QWidget, Ui_MeasurementSettingsWidget):
 
     def __init__(self, parent=None):
         super().__init__(parent=parent)
         self.setupUi(self)
-        MeasurementSettingsWidget.setFixedSize(self, 300, 155)
 
 
 def main():
