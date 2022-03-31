@@ -1,0 +1,8 @@
+LIBRARY     SIDEDRV
+
+DESCRIPTION 'Side Driver dynamic library'
+
+EXPORTS
+    SIDE_initData
+	SIDE_initAuto
+    SIDE_entry

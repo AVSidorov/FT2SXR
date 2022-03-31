@@ -1,0 +1,112 @@
+
+#include "gipcy.h"
+
+#include <iostream>
+#include <string>
+#include <istream>
+#include <fstream>
+#include <iomanip>
+#include <cstring>
+#include <signal.h>
+#include <vector>
+
+using namespace std;
+
+//------------------------------------------------------------------
+
+unsigned int exit_flag = 0;
+unsigned int counter = 0;
+
+void sighandler(int sig)
+{
+    fprintf(stderr, "SIGNAL: %d\n", sig);
+    exit_flag = 1;
+}
+
+//------------------------------------------------------------------
+
+struct test_param {
+    unsigned int id = 0;
+    unsigned int *counter = 0;
+    unsigned int *flag = nullptr;
+    IPC_handle lock = nullptr;
+};
+
+//------------------------------------------------------------------
+
+thread_value thread_function(void *param)
+{
+    struct test_param* test = (test_param*)param;
+    fprintf(stderr, "start thread: 0x%lx\n", IPC_threadID());
+    while(!test->flag[0]) {
+      IPC_captureMutex(test->lock, -1);
+      unsigned int *pdata = test->counter;
+      fprintf(stderr, "counter: %d [%d - 0x%lx]\n", pdata[0], test->id, IPC_threadID());
+      pdata[0]++;
+      IPC_delay(20);
+      IPC_releaseMutex(test->lock);
+    }
+    fprintf(stderr, "stop thread: 0x%lx\n", IPC_threadID());
+    return (thread_value)IPC_threadID();
+}
+
+//------------------------------------------------------------------
+
+int main(int argc, char* argv[])
+{
+    std::cout << "TEST STARTED" << endl;
+
+    signal(SIGINT, sighandler);
+
+    if(IPC_init() < 0) {
+        std::cout << "IPC_init() - Erorr" << endl;
+        return -1;
+    }
+
+    IPC_handle lockMutex = IPC_createMutex("lockMutex", false);
+    if(!lockMutex) {
+        std::cout << "IPC_createMutex() - Error" << endl;
+        return -1;
+    } else {
+        std::cout << "IPC_createMutex(0) - Ok" << endl;
+    }
+
+
+    std::vector<IPC_handle> threads;
+    std::vector<test_param> params;
+    for(unsigned i=0; i<3; i++) {
+      struct test_param param = { i, &counter, &exit_flag, lockMutex };
+      params.push_back(param);
+      IPC_handle h = IPC_createThread(0, thread_function, &params.at(i));
+      if(!h) {
+        fprintf(stderr, "Can'create thread: %d\n", i);
+        break;
+      }
+      threads.push_back(h);
+    }
+
+    while(!exit_flag);
+
+    IPC_delay(1000);
+
+    for(unsigned i=0; i<threads.size(); i++) {
+      IPC_handle h = threads.at(i);
+      IPC_waitThread(h, -1);
+      IPC_deleteThread(h);
+    }
+
+    threads.clear();
+
+    int res = IPC_deleteMutex(lockMutex);
+    if(res != IPC_OK) {
+        std::cout << "IPC_deleteMutex() - Error" << endl;
+    } else {
+        std::cout << "IPC_deleteMutex() - Ok" << endl;
+    }
+
+    IPC_cleanup();
+
+    std::cout << "TEST COMPLETE" << endl;
+
+    return 0;
+}

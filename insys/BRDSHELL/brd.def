@@ -1,0 +1,63 @@
+LIBRARY     BRD.DLL
+
+EXPORTS
+    BRD_capture                   = _BRD_capture@20                     @1  
+    BRD_cleanup                   = _BRD_cleanup@0                      @2 
+    BRD_close                     = _BRD_close@4                        @3 
+    BRD_ctrl                      = _BRD_ctrl@16                        @4 
+    BRD_displayMode               = _BRD_displayMode@4                  @5 
+    BRD_error                     = _BRD_error@4                        @6  
+    BRD_extension                 = _BRD_extension@16                   @7 
+    BRD_getInfo                   = _BRD_getInfo@8                      @8 
+    BRD_getMsg                    = _BRD_getMsg@20                      @9 
+    BRD_init                      = _BRD_init@8                         @10
+    BRD_initEx                    = _BRD_initEx@16                      @11 
+    BRD_lidCtrl                   = _BRD_lidCtrl@16                     @12
+    BRD_load                      = _BRD_load@20                        @13
+    BRD_open                      = _BRD_open@12                        @14
+    BRD_peek                      = _BRD_peek@12                        @15
+    BRD_puLoad                    = _BRD_puLoad@16                      @16
+    BRD_puState                   = _BRD_puState@12                     @17
+    BRD_puList                    = _BRD_puList@16                      @18
+    BRD_poke                      = _BRD_poke@16                        @19
+    BRD_putMsg                    = _BRD_putMsg@20                      @20
+    BRD_read                      = _BRD_read@20                        @21
+    BRD_readDPRAM                 = _BRD_readDPRAM@20                   @22
+    BRD_readFIFO                  = _BRD_readFIFO@24                    @23
+    BRD_readRAM                   = _BRD_readRAM@24                     @24
+    BRD_reinit                    = _BRD_reinit@4                       @25
+    BRD_release                   = _BRD_release@8                      @26
+    BRD_reset                     = _BRD_reset@8                        @27
+    BRD_signalSend                = _BRD_signalSend@12                  @28
+    BRD_signalGrab                = _BRD_signalGrab@20                  @29
+    BRD_signalWait                = _BRD_signalWait@20                  @30
+    BRD_signalIack                = _BRD_signalIack@12                  @31
+    BRD_signalFresh               = _BRD_signalFresh@16                 @32
+    BRD_signalInfo                = _BRD_signalInfo@16                  @33
+    BRD_signalList                = _BRD_signalList@20                  @34
+    BRDI_setError                 = _BRDI_setError@4                    @35
+    BRD_shell                     = _BRD_shell@8                        @36
+    BRD_start                     = _BRD_start@8                        @37
+    BRD_stop                      = _BRD_stop@8                         @38
+    BRD_symbol                    = _BRD_symbol@16                      @39
+    BRD_version                   = _BRD_version@8                      @40
+    BRD_write                     = _BRD_write@20                       @41
+    BRD_writeDPRAM                = _BRD_writeDPRAM@20                  @42
+    BRD_writeFIFO                 = _BRD_writeFIFO@24                   @43
+    BRD_writeRAM                  = _BRD_writeRAM@24                    @44
+    BRD_lock                      = _BRD_lock@16                        @45
+    BRD_unlock                    = _BRD_unlock@12                      @46
+    BRDI_feof                     = _BRDI_feof@4                        @47
+    BRDI_fgets                    = _BRDI_fgets@12                      @48
+    BRDI_ftell                    = _BRDI_ftell@4                       @49
+    BRDI_fseek                    = _BRDI_fseek@12                      @50
+    BRDI_print                    = _BRDI_print@12                      @51
+    BRDI_printf                   = _BRDI_printf@16                     @52
+    BRDI_support                  = _BRDI_support@8                     @53
+    BRD_serviceList               = _BRD_serviceList@20                 @54
+    BRD_puRead                    = _BRD_puRead@20                      @55
+    BRD_puWrite                   = _BRD_puWrite@20                     @56
+    BRD_lidList                   = _BRD_lidList@12                     @57
+    BRD_puEnable                  = _BRD_puEnable@8                     @58
+
+
