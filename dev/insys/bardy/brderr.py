@@ -42,7 +42,7 @@ BRDerrLvl = \
     {
         0b00: 'Success',
         0b10: 'Error',
-        0b11: 'Success'
+        0b11: 'Fatal Error'
     }
 
 BRDerrSrc = \

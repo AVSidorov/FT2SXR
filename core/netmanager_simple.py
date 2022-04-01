@@ -26,9 +26,8 @@ class NetManagerSimple(Core):
         while self.actv:
             data, addr = self.sock.recvfrom(1024)
             self.clients.add(addr)
-            # self.channel0.emit(data)
-            self.channel0.emit(f'New data from {addr[0]}:{addr[1]}'.encode('utf8'))
-            print(data)
+            self.channel0.emit(data)
+            # self.channel0.emit(f'New data from {addr[0]}:{addr[1]}'.encode('utf8'))
 
     def channel0_slot(self, data: bytes):
         self.sendToClients(data)

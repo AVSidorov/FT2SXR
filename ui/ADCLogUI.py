@@ -1,5 +1,6 @@
 from PyQt5 import QtWidgets
 from ui.ADCLogUIDesign import Ui_AdcStatusWin
+import sys
 
 
 class AdcLog (QtWidgets.QWidget, Ui_AdcStatusWin):
@@ -9,9 +10,10 @@ class AdcLog (QtWidgets.QWidget, Ui_AdcStatusWin):
         self.setupUi(self)
         AdcLog.setFixedSize(self, 505, 295)
 
+
 def main():
     app = QtWidgets.QApplication(sys.argv)
-    log_win = AdcLog(app)
+    log_win = AdcLog()
     log_win.show()
     sys.exit(app.exec_())
 
