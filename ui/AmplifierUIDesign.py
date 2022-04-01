@@ -15,13 +15,16 @@ class Ui_AmplifierWidgetDesign(object):
     def setupUi(self, AmplifierWidgetDesign):
         AmplifierWidgetDesign.setObjectName("AmplifierWidgetDesign")
         AmplifierWidgetDesign.resize(300, 160)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(AmplifierWidgetDesign.sizePolicy().hasHeightForWidth())
         AmplifierWidgetDesign.setSizePolicy(sizePolicy)
+        AmplifierWidgetDesign.setMinimumSize(QtCore.QSize(260, 160))
+        self.verticalLayout = QtWidgets.QVBoxLayout(AmplifierWidgetDesign)
+        self.verticalLayout.setSizeConstraint(QtWidgets.QLayout.SetMaximumSize)
+        self.verticalLayout.setObjectName("verticalLayout")
         self.splitter = QtWidgets.QSplitter(AmplifierWidgetDesign)
-        self.splitter.setGeometry(QtCore.QRect(10, 10, 281, 141))
         self.splitter.setOrientation(QtCore.Qt.Vertical)
         self.splitter.setObjectName("splitter")
         self.groupBox = QtWidgets.QGroupBox(self.splitter)
@@ -50,13 +53,14 @@ class Ui_AmplifierWidgetDesign(object):
         self.decay_doubleSpinBox = QtWidgets.QDoubleSpinBox(self.groupBox_2)
         self.decay_doubleSpinBox.setObjectName("decay_doubleSpinBox")
         self.gridLayout_2.addWidget(self.decay_doubleSpinBox, 0, 1, 1, 1)
+        self.verticalLayout.addWidget(self.splitter)
 
         self.retranslateUi(AmplifierWidgetDesign)
         QtCore.QMetaObject.connectSlotsByName(AmplifierWidgetDesign)
 
     def retranslateUi(self, AmplifierWidgetDesign):
         _translate = QtCore.QCoreApplication.translate
-        AmplifierWidgetDesign.setWindowTitle(_translate("AmplifierWidgetDesign", "Amplifier"))
+        AmplifierWidgetDesign.setWindowTitle(_translate("AmplifierWidgetDesign", "Form"))
         self.groupBox.setTitle(_translate("AmplifierWidgetDesign", "Коэффициент усиления"))
         self.gainA_label.setText(_translate("AmplifierWidgetDesign", "Канал A"))
         self.gainB_label.setText(_translate("AmplifierWidgetDesign", "Канал B"))

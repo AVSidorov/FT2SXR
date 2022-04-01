@@ -1,13 +1,12 @@
 import sys
 from PyQt5 import QtWidgets
-from ui.CalibrationSettingsUIDesign import Ui_CalibrationSettingsWidgetDesign
+from ui.CalibrationSettingsUIDesign import Ui_CalibrationSettingsWidget
 
 
-class CalibrationSettingsWidget (QtWidgets.QWidget, Ui_CalibrationSettingsWidgetDesign):
+class CalibrationSettingsWidget (QtWidgets.QWidget, Ui_CalibrationSettingsWidget):
     def __init__(self, parent=None):
         super().__init__(parent=parent)
         self.setupUi(self)
-        CalibrationSettingsWidget.setFixedSize(self, 300, 95)
 
 
 def main():

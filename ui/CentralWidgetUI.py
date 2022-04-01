@@ -9,13 +9,13 @@ class MainWidget(QtWidgets.QWidget, Ui_MainWidgetDesign):
     channel0 = QtCore.pyqtSignal(bytes)  # For uplink
     channel1 = QtCore.pyqtSignal(bytes)  # For downlink
 
-    def __init__(self, parent=None, w=553, h=462):
+    def __init__(self, parent=None):
         super().__init__(parent=parent)
         self.setupUi(self)
-        MainWidget.setFixedSize(self, w, h)
-        self.groupBox_3.setGeometry(QtCore.QRect(10, 10, int(w*0.28), int(h-30)))
-        self.groupBox_2.setGeometry(QtCore.QRect(int(w*0.29)+10, int(0.61*h)+10, int(w*0.68), int(h-30)))
-        self.groupBox.setGeometry(QtCore.QRect(int(w*0.29)+10, 10, int(w*0.68), int(0.6*h)))
+        # MainWidget.resize(self, w, h)
+        # self.groupBox_3.setGeometry(QtCore.QRect(10, 10, int(w*0.28), int(h-30)))
+        # self.groupBox_2.setGeometry(QtCore.QRect(int(w*0.29)+10, int(0.61*h)+10, int(w*0.68), int(h-30)))
+        # self.groupBox.setGeometry(QtCore.QRect(int(w*0.29)+10, 10, int(w*0.68), int(0.6*h)))
 
         self.manual_pushButton.clicked.connect(self.start_adc)
 

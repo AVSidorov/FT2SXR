@@ -11,12 +11,20 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 
-class Ui_CalibrationSettingsWidgetDesign(object):
-    def setupUi(self, CalibrationSettingsWidgetDesign):
-        CalibrationSettingsWidgetDesign.setObjectName("CalibrationSettingsWidgetDesign")
-        CalibrationSettingsWidgetDesign.resize(300, 95)
-        self.groupBox = QtWidgets.QGroupBox(CalibrationSettingsWidgetDesign)
-        self.groupBox.setGeometry(QtCore.QRect(10, 10, 281, 71))
+class Ui_CalibrationSettingsWidget(object):
+    def setupUi(self, CalibrationSettingsWidget):
+        CalibrationSettingsWidget.setObjectName("CalibrationSettingsWidget")
+        CalibrationSettingsWidget.resize(300, 95)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(CalibrationSettingsWidget.sizePolicy().hasHeightForWidth())
+        CalibrationSettingsWidget.setSizePolicy(sizePolicy)
+        CalibrationSettingsWidget.setMinimumSize(QtCore.QSize(250, 80))
+        self.verticalLayout = QtWidgets.QVBoxLayout(CalibrationSettingsWidget)
+        self.verticalLayout.setSizeConstraint(QtWidgets.QLayout.SetMaximumSize)
+        self.verticalLayout.setObjectName("verticalLayout")
+        self.groupBox = QtWidgets.QGroupBox(CalibrationSettingsWidget)
         self.groupBox.setObjectName("groupBox")
         self.gridLayout = QtWidgets.QGridLayout(self.groupBox)
         self.gridLayout.setObjectName("gridLayout")
@@ -29,9 +37,10 @@ class Ui_CalibrationSettingsWidgetDesign(object):
         self.source_comboBox.addItem("")
         self.source_comboBox.addItem("")
         self.gridLayout.addWidget(self.source_comboBox, 0, 1, 1, 1)
+        self.verticalLayout.addWidget(self.groupBox)
 
-        self.retranslateUi(CalibrationSettingsWidgetDesign)
-        QtCore.QMetaObject.connectSlotsByName(CalibrationSettingsWidgetDesign)
+        self.retranslateUi(CalibrationSettingsWidget)
+        QtCore.QMetaObject.connectSlotsByName(CalibrationSettingsWidget)
 
     def retranslateUi(self, CalibrationSettingsWidget):
         _translate = QtCore.QCoreApplication.translate

@@ -11,14 +11,21 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 
-class Ui_WarningWidgetDesign(object):
-    def setupUi(self, WarningWidgetDesign):
-        WarningWidgetDesign.setObjectName("WarningWidgetDesign")
-        WarningWidgetDesign.resize(300, 90)
-        WarningWidgetDesign.setToolTipDuration(-1)
-        self.verticalLayout = QtWidgets.QVBoxLayout(WarningWidgetDesign)
+class Ui_WarningWidget(object):
+    def setupUi(self, WarningWidget):
+        WarningWidget.setObjectName("WarningWidget")
+        WarningWidget.resize(307, 114)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(WarningWidget.sizePolicy().hasHeightForWidth())
+        WarningWidget.setSizePolicy(sizePolicy)
+        WarningWidget.setMinimumSize(QtCore.QSize(200, 100))
+        WarningWidget.setToolTipDuration(-1)
+        self.verticalLayout = QtWidgets.QVBoxLayout(WarningWidget)
+        self.verticalLayout.setSizeConstraint(QtWidgets.QLayout.SetMaximumSize)
         self.verticalLayout.setObjectName("verticalLayout")
-        self.label = QtWidgets.QLabel(WarningWidgetDesign)
+        self.label = QtWidgets.QLabel(WarningWidget)
         font = QtGui.QFont()
         font.setPointSize(8)
         font.setBold(True)
@@ -29,18 +36,19 @@ class Ui_WarningWidgetDesign(object):
         self.label.setAlignment(QtCore.Qt.AlignCenter)
         self.label.setObjectName("label")
         self.verticalLayout.addWidget(self.label)
-        self.buttonBox = QtWidgets.QDialogButtonBox(WarningWidgetDesign)
+        self.buttonBox = QtWidgets.QDialogButtonBox(WarningWidget)
         self.buttonBox.setOrientation(QtCore.Qt.Horizontal)
-        self.buttonBox.setStandardButtons(QtWidgets.QDialogButtonBox.Cancel | QtWidgets.QDialogButtonBox.Ok)
+        self.buttonBox.setStandardButtons(QtWidgets.QDialogButtonBox.Cancel|QtWidgets.QDialogButtonBox.Ok)
         self.buttonBox.setObjectName("buttonBox")
         self.verticalLayout.addWidget(self.buttonBox)
 
-        self.retranslateUi(WarningWidgetDesign)
-        self.buttonBox.accepted.connect(WarningWidgetDesign.accept)
-        self.buttonBox.rejected.connect(WarningWidgetDesign.reject)
-        QtCore.QMetaObject.connectSlotsByName(WarningWidgetDesign)
+        self.retranslateUi(WarningWidget)
+        self.buttonBox.accepted.connect(WarningWidget.accept)
+        self.buttonBox.rejected.connect(WarningWidget.reject)
+        QtCore.QMetaObject.connectSlotsByName(WarningWidget)
 
     def retranslateUi(self, WarningWidget):
         _translate = QtCore.QCoreApplication.translate
-        WarningWidget.setWindowTitle(_translate("WarningWidget", "Exit"))
-        self.label.setText(_translate("WarningWidget", "Сохранить всё, выключить приборы и выйти?"))
+        WarningWidget.setWindowTitle(_translate("WarningWidget", "Warning"))
+        self.label.setText(_translate("WarningWidget", "Завершить прогамму и \n"
+"выключить оборудование?"))

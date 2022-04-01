@@ -7,7 +7,6 @@ class GSAWidget(QtWidgets.QWidget, Ui_GSAWidgetDesign):
     def __init__(self, parent=None):
         super().__init__(parent=parent)
         self.setupUi(self)
-        GSAWidget.setFixedSize(self, 300, 85)
 
         # GSA initial values
         self.amplitude = 0
