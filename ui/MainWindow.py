@@ -53,10 +53,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.channel0.connect(logger.channel0_slot)
         win_main.show()
 
-        self.adc_log = AdcLog()
-        adc_logger = ADCLogger(self.adc_log.textBrowser, self)
-        self.channel2.connect(adc_logger.channel2_slot)
-
 
     def action_adc_set(self):
         win = QtWidgets.QDialog(self)
@@ -143,7 +139,14 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         win.show()
 
     def action_adclog(self):
-        self.adc_log.show()
+        win = QtWidgets.QDialog(self)
+        win.setModal(False)
+        win.setWindowTitle('ADC feedback')
+
+        adc_log = AdcLog(win)
+        adc_logger = ADCLogger(adc_log.textBrowser, self)
+        self.channel2.connect(adc_logger.channel2_slot)
+        win.show()
 
     def open_sxr(self):
         # dirlist = QtWidgets.QFileDialog.getExistingDirectory(self, "Выбрать папку измерения", ".")
