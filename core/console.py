@@ -1,5 +1,5 @@
 from PyQt5.QtCore import QCoreApplication
-from core import Core
+from core.core import Core
 import sys
 import signal
 
