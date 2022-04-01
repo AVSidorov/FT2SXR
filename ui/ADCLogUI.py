@@ -8,4 +8,13 @@ class AdcLog (QtWidgets.QWidget, Ui_AdcStatusWin):
         super().__init__(parent=parent)
         self.setupUi(self)
         AdcLog.setFixedSize(self, 505, 295)
-        
+
+def main():
+    app = QtWidgets.QApplication(sys.argv)
+    log_win = AdcLog(app)
+    log_win.show()
+    sys.exit(app.exec_())
+
+
+if __name__ == '__main__':
+    main()

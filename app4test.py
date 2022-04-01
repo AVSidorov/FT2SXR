@@ -4,6 +4,7 @@ from core.core import Core
 from core.logger import Logger
 from core.adc_logger import ADCLogger
 from core.adc import ADC
+from core.netmanager_simple import NetManagerSimple
 from PyQt5 import QtWidgets
 import sys
 
@@ -13,16 +14,18 @@ def main():
 
     core = Core(app)
 
+    netmanager =NetManagerSimple(app)
+    netmanager.channel0.connect(core.channel2)
+
     adc = ADC()
     adc.channel0.connect(core.channel0)
     core.channel0.connect(adc.channel0_slot)
-    adc_logger = ADCLogger('adc_log.txt', app)
-    adc.channel2.connect(adc_logger.channel2_slot)
+    # adc.channel2.connect(core.channel2)
 
     mw = MainWindow()
     mw.channel0.connect(core.channel0)
     core.channel0.connect(mw.channel0_slot)
-    adc.channel2.connect(mw.channel2)
+    core.channel2.connect(mw.channel2)
 
     logger = Logger('log.txt', app)
     core.channel0.connect(logger.channel0_slot)
