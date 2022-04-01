@@ -45,8 +45,18 @@ BRDerrLvl = \
         0b11: 'Success'
     }
 
+BRDerrSrc = \
+    {
+        0b000: 'BRD Environment',
+        0b001: 'Driver'
+    }
 
-#
+brdErrSrc = \
+    {
+        'BRD Environment': 0b000,
+        'Driver': 0b001
+    }
+
 # Error Support Macros
 #
 
@@ -58,21 +68,12 @@ BRDerrLvl = \
 
 mkErr = lambda lvl, src, code: ((lvl & 3) << 30) + ((src & 0x7) << 16) + ((code & 0xFFFF) << 0)
 
-#
-# EXTERRLVL - Extract Error Level from Error Code
-#
-# define EXTERRLVL(err)		 (((err)>>30)&3)
+extrErrLvl = lambda err: ((err >> 30) & 3)
 
-extErrLvl = lambda err: ((err >> 30) & 3)
-#
-# GETERRLVL - Extract Mask of Error Level from Error Code
-#
-# define GETERRLVL(err)		 (1<<(((err)>>30)&3))
+extrErrSrc = lambda err: ((err >> 16) & 7)
 
-#
-#  BRD_errext() - Remove Source Code from Error Code
-#
-# define BRD_errext(err)		 ((err)&~0x00070000)
+extrErrCode = lambda err: (err & 0xFFFF)
+
 
 #
 # S32 BRD_errcmp( S32 errcode1, S32 errcode2 );
