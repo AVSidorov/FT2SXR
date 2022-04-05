@@ -16,7 +16,7 @@ class ADCLogger(Core):
 
     @QtCore.pyqtSlot(bytes)
     def channel2_slot(self, data: bytes):
-        head = f'[{datetime.datetime.now().strftime("%d.%m.%Y %H:%M:%S")}]'
+        head = f'[{datetime.datetime.now().strftime("%d.%m.%Y %H:%M:%S")}] '
         lvl = None
         # get packet length
         pkt = BRD_ctrl()
@@ -28,40 +28,50 @@ class ADCLogger(Core):
         if len(data) == pktSize:
             pkt.ParseFromString(data)
             if pkt.IsInitialized():
+                data = head + \
+                        f"{f'cmd: 0x{pkt.command:08X}':<32s}" \
+                        f"{f'out: 0x{pkt.out:08X}':<32s}" \
+                        f"{f'status: 0x{pkt.status:08X}':<32s}\n"
+
                 cmd = getCmdName(pkt.command)
                 if cmd is None:
                     cmd = f'0x{pkt.command:04X}'
-                out = f'0x{pkt.out:X}'
 
-                if pkt.status in BRDerr:
-                    status = BRDerr[pkt.status]
-                elif pkt.status in BRDerr_ADC:
-                    status = BRDerr_ADC[pkt.status]
-                else:
-                    status = f'0x{pkt.status:X}'
+                out = f'0x{pkt.out:04X}'
 
-                brd_str = f'cmd:{cmd} ' \
-                          f'out: {out} ' \
-                          f'status: {status}\n'
+                status = getErrName(pkt.status)
+                if status is None:
+                    status = f'0x{pkt.status:04X}'
+
+                data += head + \
+                                f"{f'cmd:{cmd}':<32s}" \
+                                f"{f'out: {out} ':<32s}" \
+                                f"{f'status: {status}':<32s}\n"
 
                 lvl = extrErrLvl(pkt.status)
+                if lvl in BRDerrLvl:
+                    lvl = f'{BRDerrLvl[lvl]}'
+                else:
+                    lvl = f'0b{lvl:02b}'
+
                 src = extrErrSrc(pkt.status)
+                if src in BRDerrSrc:
+                    src = f'from {BRDerrSrc[src]}'
+                else:
+                    src = f'src unknown 0b{src:03b}'
+
                 code = extrErrCode(pkt.status)
                 dev = getBaseName(code)
-
-                if lvl in BRDerrLvl:
-                    status += f' {BRDerrLvl[lvl]} '
-                if src in BRDerrSrc:
-                    status += f' from {BRDerrSrc[src]} '
-                status += f' {dev} error code 0x{code:04X}'
-
-                data = brd_str + status
+                code = f'{dev} error code {code & 0x00FF:03d}'
+                data += head + \
+                        f"{lvl:<32s}" \
+                        f"{src:<32s}" \
+                        f"{code:<32s}\n"
             else:
-                data = 'Bad Packet'
+                data = head + ' Bad Packet'
         else:
-            head += f' len is {len(data)} '
+            data = head + f'data len is {len(data)} '
 
-        data = head + data
         if self.out is not None:
             if isinstance(self.out, io.TextIOBase):
                 self.out.write(data+'\n')

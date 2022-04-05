@@ -1,5 +1,6 @@
-from .ctrl import BRDctrl, BRDctrl_COMMON
-from .ctrladc import brdAdcCode, BRDctrl_ADC
+from .ctrl import *
+from .ctrladc import *
+from .brderr import *
 
 
 def getBaseName(code):
@@ -22,3 +23,12 @@ def getCmdName(code):
     else:
         cmdName = None
     return cmdName
+
+
+def getErrName(status):
+    if status & ~0x00070000 in [_ & ~0x00070000 for _ in BRDerr]:
+        return BRDerr[status & ~0x00070000]
+    elif status & ~0x00070000 in [_ & ~0x00070000 for _ in BRDerr_ADC]:
+        return BRDerr_ADC[status & ~0x00070000]
+    else:
+        return None

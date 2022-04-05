@@ -35,26 +35,28 @@ brdErrLvl = \
     {
         'Success': 0b00,
         'Information': 0b00,
+        'Warning': 0b01,
         'Error': 0b10,
         'Fatal Error': 0b11
     }
 BRDerrLvl = \
     {
         0b00: 'Success',
+        0b01: 'Warning',
         0b10: 'Error',
         0b11: 'Fatal Error'
     }
 
 BRDerrSrc = \
     {
-        0b000: 'BRD Environment',
-        0b001: 'Driver'
+        1: 'BRD Environment',
+        2: 'Driver'
     }
 
 brdErrSrc = \
     {
-        'BRD Environment': 0b000,
-        'Driver': 0b001
+        'BRD Environment': 1,
+        'Driver': 2
     }
 
 # Error Support Macros
