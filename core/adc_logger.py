@@ -6,7 +6,7 @@ from core.core import Core
 from dev.insys.bardy.brderr import *
 from dev.insys.bardy.getCodesNames import *
 from dev.insys.bardy.ctrladc import *
-from core.exam_protocol_pb2 import BRD_ctrl
+from insys.EXAM.exam_adc.exam_protocol_pb2 import BRD_ctrl
 
 
 class ADCLogger(Core):
@@ -17,10 +17,15 @@ class ADCLogger(Core):
     @QtCore.pyqtSlot(bytes)
     def channel2_slot(self, data: bytes):
         head = f'[{datetime.datetime.now().strftime("%d.%m.%Y %H:%M:%S")}]'
-
         lvl = None
-        if len(data) == 15:
-            pkt = BRD_ctrl()
+        # get packet length
+        pkt = BRD_ctrl()
+        pkt.command = 0
+        pkt.out = 0
+        pkt.status =0
+        pktSize = pkt.ByteSize()
+
+        if len(data) == pktSize:
             pkt.ParseFromString(data)
             if pkt.IsInitialized():
                 cmd = getCmdName(pkt.command)
@@ -54,8 +59,8 @@ class ADCLogger(Core):
             else:
                 data = 'Bad Packet'
         else:
-            head += 'ADC SSH SESSION\n'
-            data = data.decode('utf-8').replace('\r', '')
+            head += f' len is {len(data)} '
+
         data = head + data
         if self.out is not None:
             if isinstance(self.out, io.TextIOBase):
