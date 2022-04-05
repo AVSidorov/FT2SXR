@@ -28,10 +28,11 @@ class ADCLogger(Core):
         if len(data) == pktSize:
             pkt.ParseFromString(data)
             if pkt.IsInitialized():
-                data = head + \
-                        f"{f'cmd: 0x{pkt.command:08X}':<32s}" \
-                        f"{f'out: 0x{pkt.out:08X}':<32s}" \
-                        f"{f'status: 0x{pkt.status:08X}':<32s}\n"
+                data = ''
+                # data += head + \
+                #         f"{f'cmd: 0x{pkt.command:08X}':<64s}" \
+                #         f"{f'out: 0x{pkt.out:08X}':<10s}" \
+                #         f"{f'status: 0x{pkt.status:08X}':<s}\n"
 
                 cmd = getCmdName(pkt.command)
                 if cmd is None:
@@ -44,9 +45,9 @@ class ADCLogger(Core):
                     status = f'0x{pkt.status:04X}'
 
                 data += head + \
-                                f"{f'cmd:{cmd}':<32s}" \
-                                f"{f'out: {out} ':<32s}" \
-                                f"{f'status: {status}':<32s}\n"
+                                f'cmd: {cmd:<32}' \
+                                f'out: {out:<16}' \
+                                f'status: {status}'
 
                 lvl = extrErrLvl(pkt.status)
                 if lvl in BRDerrLvl:
@@ -63,14 +64,14 @@ class ADCLogger(Core):
                 code = extrErrCode(pkt.status)
                 dev = getBaseName(code)
                 code = f'{dev} error code {code & 0x00FF:03d}'
-                data += head + \
-                        f"{lvl:<32s}" \
-                        f"{src:<32s}" \
-                        f"{code:<32s}\n"
+                # data += head + \
+                #         f"{lvl:<64s}" \
+                #         f"{src:<10s}" \
+                #         f"{code:<s}"
             else:
                 data = head + ' Bad Packet'
         else:
-            data = head + f'data len is {len(data)} '
+            data = head + f'data len is {len(data)}'
 
         if self.out is not None:
             if isinstance(self.out, io.TextIOBase):
@@ -80,10 +81,14 @@ class ADCLogger(Core):
                     f.write(str(data)+'\n')
             elif isinstance(self.out, QtWidgets.QTextBrowser):
                 if lvl is not None:
-                    if lvl == 2:
+                    if lvl in ('Success', 'Information'):
+                        self.out.setTextColor(QColor(0x000000))
+                    elif lvl == 'Warning':
                         self.out.setTextColor(QColor(0x0000ff))
-                    elif lvl == 3:
+                    elif lvl == 'Error':
+                        self.out.setTextColor(QColor(0xffbb44))
+                    elif lvl == 'Fatal Error':
                         self.out.setTextColor(QColor(0xff0000))
-
+                    else:
+                        self.out.setTextColor(QColor(0x00ff00))
                 self.out.append(data)
-                self.out.setTextColor(QColor(0))
