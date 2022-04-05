@@ -26,11 +26,12 @@ def getCmdName(code):
 
 
 def getErrName(status):
-    if status & ~0x00070000 in [_ & ~0x00070000 for _ in BRDerr]:
-        return BRDerr[status & ~0x00070000]
-    elif status & ~0x00070000 in [_ & ~0x00070000 for _ in BRDerr_ADC]:
-        return BRDerr_ADC[status & ~0x00070000]
-    elif status & ~0x00070000 in [_ & ~0x00070000 for _ in BRDerr_STREAM]:
-        return BRDerr_STREAM[status & ~0x00070000]
+    base = getBaseName(status)
+    sourceDict = 'BRDerr'
+    if base is not None:
+        sourceDict += base[base.find('_'):]
+
+    if eval(f'status & ~0x00070000 in [_ & ~0x00070000 for _ in {sourceDict}]'):
+        return eval(f'{sourceDict}[status & ~0x00070000]')
     else:
         return None
