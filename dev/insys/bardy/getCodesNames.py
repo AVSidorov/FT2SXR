@@ -1,7 +1,7 @@
 from .ctrl import *
 from .ctrladc import *
 from .brderr import *
-
+from .ctrlstrm import *
 
 def getBaseName(code):
     baseCode = code & 0xFF00
@@ -30,5 +30,7 @@ def getErrName(status):
         return BRDerr[status & ~0x00070000]
     elif status & ~0x00070000 in [_ & ~0x00070000 for _ in BRDerr_ADC]:
         return BRDerr_ADC[status & ~0x00070000]
+    elif status & ~0x00070000 in [_ & ~0x00070000 for _ in BRDerr_STREAM]:
+        return BRDerr_STREAM[status & ~0x00070000]
     else:
         return None
