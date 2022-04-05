@@ -14,13 +14,13 @@ def main():
 
     core = Core(app)
 
-    netmanager =NetManagerSimple(app)
-    netmanager.channel0.connect(core.channel2)
+    adc_watcher =NetManagerSimple(app)
+    adc_watcher.channel0.connect(core.channel2)
 
     adc = ADC()
     adc.channel0.connect(core.channel0)
     core.channel0.connect(adc.channel0_slot)
-    # adc.channel2.connect(core.channel2)
+    core.channel2.connect(adc.channel2_slot)
 
     mw = MainWindow()
     mw.channel0.connect(core.channel0)

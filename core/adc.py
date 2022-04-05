@@ -8,7 +8,9 @@ import numpy as np
 from .core import Core
 from .sxr_protocol_pb2 import MainPacket, AdcStatus, SystemStatus
 from .sxr_protocol import packet_init
-
+from threading import Thread
+from dev.insys.bardy.getCodesNames import *
+from insys.EXAM.exam_adc.exam_protocol_pb2 import BRD_ctrl
 
 class Channel:
     def __init__(self, gain=1., bias=0., on=False):
@@ -93,6 +95,9 @@ class ADC(Core):
 
         self.wdir = wdir
 
+        self.isAcqComplete = False
+        self.started = False
+
         if connect:
             client = paramiko.SSHClient()
             client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
@@ -132,16 +137,27 @@ class ADC(Core):
             self.scp.put(os.path.join(self.wdir, 'cfg.ini'), '/home/embedded/examples/exam_adc.ini')
 
     def start(self, response=None):
+        self.started = True
+        self.isAcqComplete = False
         if self.connected:
             if os.path.exists(os.path.join(self.wdir, self.file_base+'.bin')):
                 os.remove(os.path.join(self.wdir, self.file_base+'.bin'))
             self.ssh.send('/home/embedded/examples/exam_adc\n')
-            self.ssh_output(5)
 
-            self.scp.get('/home/embedded/examples/data_0.bin', self.wdir)
-            while not(os.path.exists(os.path.join(self.wdir, self.file_base+'.bin'))):
+            # wait for exam_adc ending
+            # self.ssh_output(5)
+            while self.started:
                 pass
-            dump = np.fromfile(os.path.join(self.wdir, self.file_base + '.bin'), dtype=np.int16)
+
+            # if data acquired get adc memory dump file
+            if self.isAcqComplete:
+                self.scp.get('/home/embedded/examples/data_0.bin', self.wdir)
+                # wait for file transfer completes
+                while not(os.path.exists(os.path.join(self.wdir, self.file_base+'.bin'))):
+                    pass
+                dump = np.fromfile(os.path.join(self.wdir, self.file_base + '.bin'), dtype=np.int16)
+            else:
+                dump = np.ndarray((0,))
         else:
             dump = self.generate_data()
             with open(os.path.join(self.wdir, self.file_base + '.bin'), 'w') as f:
@@ -157,6 +173,7 @@ class ADC(Core):
                 ch.data = np.ndarray((0,))
 
         if response is not None:
+            response.data = len(dump).to_bytes(4, 'big')
             if response.IsInitialized():
                 self.channel0.emit(response.SerializeToString())
 
@@ -174,7 +191,25 @@ class ADC(Core):
                 self.status_message(response)
             elif request.command == 2:
                 self.send_config()
-                self.start(response)
+                thrd = Thread(name='Thread-adc-start', target=self.start, args=(response,), daemon=True)
+                thrd.start()
+
+    def channel2_slot(self, data: bytes):
+        pkt = BRD_ctrl()
+        pkt.command = 0
+        pkt.out = 0
+        pkt.status =0
+        pktSize = pkt.ByteSize()
+
+        if len(data) == pktSize:
+            pkt.ParseFromString(data)
+            if pkt.IsInitialized():
+                cmd = getCmdName(pkt.command)
+                if cmd == 'BRDctrl_SDRAM_ISACQCOMPLETE':
+                    self.isAcqComplete = bool(pkt.out)
+                elif cmd == 'BRDctrl_STREAM_CBUF_FREE':
+                    self.started = False
+
 
     def status_message(self, response=None):
         status = AdcStatus()
