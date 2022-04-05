@@ -384,6 +384,14 @@ brdStreamErrCode = \
         'BRDerr_STREAM_NOT_STOPPED_YET' : 0xC0000E08
     }
 
+"""print('BRDerr_STREAM = \\')
+print('{')
+for key in brdStreamErrCode:
+    if brdStreamErrCode[key] is not None:
+        print(f"    0x{brdStreamErrCode[key]:04X}: '{key}',")
+print('}')
+"""
+
 BRDerr_STREAM = \
     {
         0x40000E00: 'BRDerr_STREAM_WARNING',

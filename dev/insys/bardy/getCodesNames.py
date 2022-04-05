@@ -2,6 +2,7 @@ from .ctrl import *
 from .ctrladc import *
 from .brderr import *
 from .ctrlstrm import *
+from .ctrlsysmon import *
 
 def getBaseName(code):
     baseCode = code & 0xFF00
