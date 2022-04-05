@@ -3,6 +3,7 @@ from .ctrladc import *
 from .brderr import *
 from .ctrlstrm import *
 from .ctrlsysmon import *
+from .ctrlsdram import *
 
 def getBaseName(code):
     baseCode = code & 0xFF00
@@ -34,5 +35,7 @@ def getErrName(status):
 
     if eval(f'status & ~0x00070000 in [_ & ~0x00070000 for _ in {sourceDict}]'):
         return eval(f'{sourceDict}[status & ~0x00070000]')
+    elif eval(f'status & 0xFFFF in {sourceDict}'):
+        return eval(f'{sourceDict}[status & 0xFFFF]')
     else:
         return None
