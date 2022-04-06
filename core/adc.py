@@ -139,29 +139,30 @@ class ADC(Core):
     def start(self, response=None):
         self.started = True
         self.isAcqComplete = False
+        if os.path.exists(os.path.join(self.wdir, self.file_base+'.bin')):
+            os.remove(os.path.join(self.wdir, self.file_base+'.bin'))
+
+        # if connected run exam_adc
         if self.connected:
-            if os.path.exists(os.path.join(self.wdir, self.file_base+'.bin')):
-                os.remove(os.path.join(self.wdir, self.file_base+'.bin'))
             self.ssh.send('/home/embedded/examples/exam_adc\n')
 
-            # wait for exam_adc ending
-            # self.ssh_output(5)
-            while self.started:
-                pass
+        # wait for exam_adc ending or stopping by user
+        while self.started:
+            pass
 
-            # if data acquired get adc memory dump file
-            if self.isAcqComplete:
+        # if data acquired get adc memory dump file
+        if self.isAcqComplete:
+            if self.connected:
+                # if connected copy from adc
                 self.scp.get('/home/embedded/examples/data_0.bin', self.wdir)
+
                 # wait for file transfer completes
                 while not(os.path.exists(os.path.join(self.wdir, self.file_base+'.bin'))):
                     pass
-                dump = np.fromfile(os.path.join(self.wdir, self.file_base + '.bin'), dtype=np.int16)
-            else:
-                dump = np.ndarray((0,))
+            # read dump from disk (generated or loaded from adc)
+            dump = np.fromfile(os.path.join(self.wdir, self.file_base + '.bin'), dtype=np.int16)
         else:
-            dump = self.generate_data()
-            with open(os.path.join(self.wdir, self.file_base + '.bin'), 'w') as f:
-                dump.tofile(f)
+            dump = np.ndarray((0,))
 
         dump = dump.reshape((-1, self.boards[0].n_active_ch)).T
         cols = (_ for _ in dump)
@@ -191,8 +192,14 @@ class ADC(Core):
                 self.status_message(response)
             elif request.command == 2:
                 self.send_config()
-                thrd = Thread(name='Thread-adc-start', target=self.start, args=(response,), daemon=True)
-                thrd.start()
+                self.run(response)
+            elif request.command == 3:
+                self.stop_waiting()
+
+    def run(self, response=None):
+        # separate function for ability run start thread "manually", not only by command in packet
+        thrd = Thread(name='Thread-adc-start', target=self.start, args=(response,), daemon=True)
+        thrd.start()
 
     def channel2_slot(self, data: bytes):
         pkt = BRD_ctrl()
@@ -209,7 +216,6 @@ class ADC(Core):
                     self.isAcqComplete = bool(pkt.out)
                 elif cmd == 'BRDctrl_STREAM_CBUF_FREE':
                     self.started = False
-
 
     def status_message(self, response=None):
         status = AdcStatus()
@@ -357,4 +363,13 @@ class ADC(Core):
                 col += 1
 
         dump = dump.reshape((-1, 1)).squeeze()
+        with open(os.path.join(self.wdir, self.file_base + '.bin'), 'w') as f:
+            dump.tofile(f)
+        self.isAcqComplete = True
+        self.started = False
         return dump
+
+    def stop_waiting(self):
+        if self.connected:
+            self.ssh.send(b'\x1B')
+        self.started = False

@@ -18,10 +18,17 @@ class MainWidget(QtWidgets.QWidget, Ui_MainWidgetDesign):
         # self.groupBox.setGeometry(QtCore.QRect(int(w*0.29)+10, 10, int(w*0.68), int(0.6*h)))
 
         self.manual_pushButton.clicked.connect(self.start_adc)
+        self.stop_pushButton.clicked.connect(self.stop_adc)
 
     def start_adc(self):
         request = packet_init(1, 0)
         request.command = 2
+        if request.IsInitialized():
+            self.channel0.emit(request.SerializeToString())
+
+    def stop_adc(self):
+        request = packet_init(1, 0)
+        request.command = 3
         if request.IsInitialized():
             self.channel0.emit(request.SerializeToString())
 

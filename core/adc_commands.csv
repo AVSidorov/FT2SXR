@@ -1,5 +1,7 @@
-GET_ADC_STATUS; 0; Get ADC status message
-SET_ADC_STATUS; 1; Set ADC through status message
-START_ADC; 2; Start ADC
-GET_PX5_STATUS; 3; Get PX5 Status Message
-INIT_PX5_FROM_MEM; 4; Init PX5 from stored configuration
+Name; Address; Command
+GET_ADC_STATUS; 1;0; Get ADC status message
+SET_ADC_STATUS; 1;1; Set ADC through status message
+START_ADC; 1; 2; Start ADC
+STOP_ADC; 1; 3; Stop waiting of external trigger or data finishing data acquiring
+GET_PX5_STATUS;2; 1; Get PX5 Status Message
+INIT_PX5_FROM_MEM; 2; 2; Init PX5 from stored configuration
