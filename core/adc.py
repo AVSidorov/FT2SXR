@@ -11,6 +11,8 @@ from .sxr_protocol import packet_init
 from threading import Thread
 from dev.insys.bardy.getCodesNames import *
 from insys.EXAM.exam_adc.exam_protocol_pb2 import BRD_ctrl
+from core.netmanager_simple import NetManagerSimple
+
 
 class Channel:
     def __init__(self, gain=1., bias=0., on=False):
@@ -115,6 +117,12 @@ class ADC(Core):
                 self.send_config()
             except:
                 self.connected = False
+
+        # run watcher of udp packets from exam_adc
+        if self.connected:
+            adc_watcher = NetManagerSimple(self)
+            adc_watcher.channel0.connect(self.channel1)
+            adc_watcher.channel0.connect(self.channel2_slot)
 
     def ssh_output(self, timeout=None):
         if timeout is None:
