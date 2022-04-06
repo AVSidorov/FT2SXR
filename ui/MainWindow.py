@@ -50,7 +50,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.verticalLayout.addWidget(win_main)
 
         logger = Logger(win_main.log_textBrowser, self)
-        self.channel0.connect(logger.channel0_slot)
+        self.channel1.connect(logger.channel0_slot)
         win_main.show()
 
 
@@ -145,7 +145,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
         adc_log = AdcLog(win)
         adc_logger = ADCLogger(adc_log.textBrowser, self)
-        self.channel2.connect(adc_logger.channel2_slot)
+        self.channel2.connect(adc_logger.channel2_slot)  # make downlink for BRD_ctrl messages
+        adc_log.channel0.connect(self.channel0)  # make uplink for reboot
         win.show()
 
     def open_sxr(self):

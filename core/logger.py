@@ -15,7 +15,11 @@ class Logger(Core):
         pck = MainPacket()
         pck.ParseFromString(data)
 
-        data = f'[{datetime.datetime.now().strftime("%d.%m.%Y %H:%M:%S")}] To: {pck.address} From: {pck.sender} Command: {pck.command} data length={len(pck.data)}'
+        head = f'[{datetime.datetime.now().strftime("%d.%m.%Y %H:%M:%S")}] '
+        data = head + f' To: {pck.address} From: {pck.sender} Command: {pck.command} data length={len(pck.data)}'
+        if pck.command == 0xFFFFFFFF:
+            data += '\n' + head + pck.data.decode()
+
         if data[-1] != '\n':
             data += '\n'
 

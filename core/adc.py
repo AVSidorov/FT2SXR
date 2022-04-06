@@ -59,12 +59,15 @@ class ADC(Core):
         self.boards = [Board() for _ in range(nboards)]
 
         self.connected = False
+        self.client = None
         self.ssh = None
         self.ssh_timeout = 0.5
         self.file_base = 'data_0'
         self.wdir = os.path.abspath('./')
         self.scp = None
         self.config = None
+        self.isAcqComplete = False
+        self.started = False
 
         config = configparser.ConfigParser(inline_comment_prefixes=(';', '//'))
         config.optionxform = str
@@ -97,11 +100,18 @@ class ADC(Core):
 
         self.wdir = wdir
 
-        self.isAcqComplete = False
-        self.started = False
-
         if connect:
+            self.make_connection()
+
+        # run watcher of udp packets from exam_adc
+        if self.connected:
+            adc_watcher = NetManagerSimple(self)
+            adc_watcher.channel0.connect(self.channel1)
+            adc_watcher.channel0.connect(self.channel2_slot)
+
+    def make_connection(self):
             client = paramiko.SSHClient()
+            self.client = client
             client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
             try:
                 client.connect(hostname="192.168.0.242", username="adc_user", password="adc_user", look_for_keys=False,
@@ -115,14 +125,18 @@ class ADC(Core):
                 scp = SCPClient(client.get_transport())
                 self.scp = scp
                 self.send_config()
+
+                connection_watch = Thread(name='Thread-connection-watchdog', target=self.watchdog, daemon=True)
+                connection_watch.start()
+
+                response = packet_init(0, self.address)
+                response.command = 0xFFFFFFFF
+                response.data = 'ADC connected'.encode()
+                if response.IsInitialized():
+                    self.channel0.emit(response.SerializeToString())
             except:
                 self.connected = False
 
-        # run watcher of udp packets from exam_adc
-        if self.connected:
-            adc_watcher = NetManagerSimple(self)
-            adc_watcher.channel0.connect(self.channel1)
-            adc_watcher.channel0.connect(self.channel2_slot)
 
     def ssh_output(self, timeout=None):
         if timeout is None:
@@ -182,7 +196,7 @@ class ADC(Core):
                 ch.data = np.ndarray((0,))
 
         if response is not None:
-            response.data = len(dump).to_bytes(4, 'big')
+            response.data = dump.size.to_bytes(4, 'big')
             if response.IsInitialized():
                 self.channel0.emit(response.SerializeToString())
 
@@ -203,6 +217,8 @@ class ADC(Core):
                 self.run(response)
             elif request.command == 3:
                 self.stop_waiting()
+            elif request.command == 4:
+                self.reboot()
 
     def run(self, response=None):
         # separate function for ability run start thread "manually", not only by command in packet
@@ -381,3 +397,25 @@ class ADC(Core):
         if self.connected:
             self.ssh.send(b'\x1B')
         self.started = False
+    
+    def reboot(self):
+        if self.connected:
+            client = paramiko.SSHClient()
+            client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+            client.connect(hostname="192.168.0.242", username="root", key_filename='root_key', password='root')
+            ssh = client.invoke_shell()
+            ssh.send('reboot\n')
+
+    def watchdog(self):
+        transp = self.client.get_transport()
+        transp.set_keepalive(10)
+        while self.connected:
+            self.connected = transp.is_alive()
+            time.sleep(5)
+
+        response = packet_init(0, self.address)
+        response.command = 0xFFFFFFFF
+        response.data = 'ADC disconnected'.encode()
+        if response.IsInitialized():
+            self.channel0.emit(response.SerializeToString())
+        self.make_connection()
