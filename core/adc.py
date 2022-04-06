@@ -224,7 +224,7 @@ class ADC(Core):
         if rate is not None:
             status.sampling_rate = int(rate)
 
-        samples = self.get_cfg_item('Option', 'SamplesPerChannel')
+        samples = self.get_cfg_item('Option', 'MemSamplesPerChan')
         if samples is not None:
             status.samples = int(samples)
 
@@ -304,7 +304,6 @@ class ADC(Core):
             status.ParseFromString(data)
 
         self.config['Option']['DaqIntoMemory'] = str(status.memory_type)
-        self.config['Option']['SamplesPerChannel'] = str(status.samples)
         self.config['Option']['MemSamplesPerChan'] = str(status.samples)
 
         if len(status.board_status) > 0:
@@ -343,7 +342,7 @@ class ADC(Core):
             self.config['device0_fm814x250m0']['StartBaseSource'] = '7'
 
     def generate_data(self):
-        samples = self.get_cfg_item('Option', 'SamplesPerChannel')
+        samples = self.get_cfg_item('Option', 'MemSamplesPerChan')
         if samples is None:
             samples = int(1e4)
         else:
