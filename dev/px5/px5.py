@@ -7,6 +7,7 @@ from core.sxr_protocol import packet_init
 from threading import Thread
 import uuid
 from PyQt5 import QtNetwork
+import io
 
 macBytes2str = lambda mac: ':'.join([f'{_:02X}' for _ in mac[:6]])
 ipBytes2str = lambda ip: '.'.join([f'{_:d}' for _ in ip[:4]])
@@ -774,41 +775,55 @@ class PX5Imitator:
 
 
 class Retranslator:
-    def __init__(self, ip_px5='192.168.0.239', ip_this='127.0.0.3'):
+    def __init__(self, ip_px5='192.168.0.239', ip_this='127.0.0.2', log=None):
         self.ip = ip_this
         self.ip_px5 = ip_px5
 
-        self.thrd = Thread(name='Thread-retranslator', target=self.run, args=(10001,), daemon=True)
-        self.thrd.start()
+        if log is not None:
+            if isinstance(log, str):
+                self.logger = open('log', 'at')
+            elif isinstance(log, io.TextIOBase):
+                self.logger = log
+        else:
+            self.logger = None
 
-        self.netfinder_thrd = Thread(name='Thread-NetFinder', target=self.run, args=(3040, ), daemon=True)
-        self.netfinder_thrd.start()
 
-    def run(self, port=3040):
-        # TODO make local thread storage and return to one GET one SEND scheme. It's possible multiple requests
+        thrd = Thread(name='Thread-NetFinder', target=self.sock_wrap, args=(3040, ), daemon=True)
+        thrd.start()
+
+        thrd = Thread(name='Thread-px5Main', target=self.sock_wrap, args=(10001, ), daemon=True)
+        thrd.start()
+
+    def sock_wrap(self, port=3040):
+        # create socket on choosen port
         sock = socket(AF_INET, SOCK_DGRAM)
         sock.bind(('0.0.0.0', port))
 
+        client = ('127.0.0.1', port+1)
         while True:
-            req, addr = sock.recvfrom(1024)
-            print(f'[retr] GET req from {addr[0]}:{addr[1]}')
-            print(req)
-            # if all((addr != (self.ip_px5, 3040), addr != (self.ip_px5, 10001))):
-            if all((addr != (self.ip_px5, 3041), addr != (self.ip_px5, 10002))):
-                if sock.sendto(req, (self.ip_px5, port+1)) > 0:
-                    print(f'[retr] SEND req to {self.ip_px5}:{port+1}')
-                resp, addr1 = sock.recvfrom(32775)
-                print(f'[retr] GET resp from {addr1[0]}:{addr1[1]}')
-                print(resp) if len(resp) < 521 else None
-                # if any((addr1 == (self.ip_px5, 3040), addr1 == (self.ip_px5, 10001))):
-                if addr1[1] == port+1:  # temporary for imitator
-                    if port == 3040:
-                        pkt = Netfinder_packet(resp)
-                        # change ip to retranslator ip
-                        pkt.ip = self.ip
-                        resp = pkt()
-                        print('[retr] resp changed')
-                        print(resp) if len(resp) < 521 else None
-                    if sock.sendto(resp, addr) > 0:
-                        print(f'[retr] SEND resp to {addr[0]}:{addr[1]}')
+            data, addr = sock.recvfrom(1024)
+            print(f'[retr nf] GET from {addr[0]}:{addr[1]}')
+            print(data)
+            # logging
+            if self.logger is not None:
+                self.logger.write(f'[retr nf] GET from {addr[0]}:{addr[1]}\n')
+                self.logger.write(data)
+
+            # if not from px5 save client and send to px5
+            if addr[0] != self.ip_px5:
+                client = addr
+                req = data
+                out = sock.sendto(req, (self.ip_px5, port))
+                print(f'[retr nf] Send req {out} bytes to {self.ip_px5}:{port}')
+            else:
+                if port == 3040:
+                    nf_resp = Netfinder_packet(data)
+                    nf_resp.ip = self.ip
+                    resp = nf_resp()
+                    print(resp)
+                else:
+                    resp = data
+
+                out = sock.sendto(resp, client)
+                print(f'[retr nf] Send resp {out} bytes to {client[0]}:{client[1]}')
 
