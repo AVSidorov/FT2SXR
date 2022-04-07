@@ -23,7 +23,9 @@ idByDev = lambda dev: ([devs.index(_) for _ in (dev,) if _ in devs] + [None,])[0
 id2dev = devById
 dev2id = idByDev
 
-spec_len2pid = lambda len_data: ((int(len_data // 3).bit_length()-8)*2-1)
+spec_len2pidI = lambda len_data: ((int(len_data // 3).bit_length()-8)*2-1)
+spec_len2pidB = lambda len_data: ((int(len_data // 3).bit_length()-8)*2-1).to_bytes(1,'big')
+
 
 def packet(pid1=b'\x00', pid2=b'\x00', data=b''):
     # make packet
@@ -48,7 +50,14 @@ def check_chksum(pkt):
 
 
 def check_packet(pkt):
-    return all((pkt[:2] == b'\xf5\xfa', int().from_bytes(pkt[4:6],'big') == len(pkt)-8, check_chksum(pkt)))
+    return all((pkt[:2] == b'\xf5\xfa', int().from_bytes(pkt[4:6], 'big') == len(pkt)-8, check_chksum(pkt)))
+
+
+def parse_header(pkt):
+    if pkt[:2] == b'\xf5\xfa':
+        return int().from_bytes(pkt[4:6], 'big')
+    else:
+        return None
 
 
 def request_status():
@@ -58,10 +67,13 @@ def request_status():
 def response_status(pkt, obj=None):
     if not check_packet(pkt):
         return None
-    if not pkt[2:4] == b'\x01\x01':
+    if pkt[2:4] == b'\x01\x01':
+        data = pack_status(obj)
+        return packet(b'\x80', b'\x01', data)
+    elif pkt[2:4] == b'\x80\x01':
+        return True
+    else:
         return None
-    data = pack_status(obj)
-    return packet(b'\x80', b'\x01', data)
 
 
 def request_spectrum():
@@ -71,11 +83,16 @@ def request_spectrum():
 def response_spectrum(pkt, obj=None):
     if not check_packet(pkt):
         return None
-    if not pkt[2:4] == b'\x02\x01':
-       return None
-    data = pack_spectrum(obj)
-    pid2 = spec_len2pid(len(data))
-    return packet(b'\x81', pid2, data)
+    pck = Packet(pkt)
+    if pkt[2:4] == b'\x02\x01':
+        data = pack_spectrum(obj)
+        pid2 = spec_len2pidB(len(data))
+        return packet(b'\x81', pid2, data)
+    elif pck.pid1 == b'\x81' and\
+         pck.pid2 == spec_len2pidB(len(pkt)-8):
+        return True
+    else:
+        return None
 
 
 def request_spectrum_clear():
@@ -85,12 +102,14 @@ def request_spectrum_clear():
 def response_spectrum_clear(pkt, obj=None):
     if not check_packet(pkt):
         return None
-    if not pkt[2:4] == b'\x02\x02':
+    pck = Packet(pkt)
+    if pkt[2:4] == b'\x02\x02':
+        data = pack_spectrum(obj)
+        pid2 = spec_len2pidI(len(data))
+        clear_spectrum(obj)
+        return packet(b'\x81', pid2, data)
+    else:
         return None
-    data = pack_spectrum(obj)
-    pid2 = spec_len2pid(len(data))
-    clear_spectrum(obj)
-    return packet(b'\x81', pid2, data)
 
 
 def request_spectrum_status():
@@ -100,12 +119,17 @@ def request_spectrum_status():
 def response_spectrum_status(pkt, obj=None):
     if not check_packet(pkt):
         return None
-    if not pkt[2:4] == b'\x02\x03':
+    pck = Packet(pkt)
+    if pkt[2:4] == b'\x02\x03':
+        data = pack_spectrum(obj)
+        data += pack_status(obj)
+        pid2 = spec_len2pidI(len(data))+1
+        return packet(b'\x81', pid2, data)
+    elif pck.pid1 == b'\x81' and \
+         pck.pid2 == (spec_len2pidI(len(pkt)-8)+1).to_bytes(1, 'big'):
+        return True
+    else:
         return None
-    data = pack_spectrum(obj)
-    data += pack_status(obj)
-    pid2 = spec_len2pid(len(data))+1
-    return packet(b'\x81', pid2, data)
 
 
 def request_spectrum_clear_status():
@@ -119,29 +143,97 @@ def response_spectrum_clear_status(pkt, obj=None):
         return None
     data = pack_spectrum(obj)
     data += pack_status(obj)
-    pid2 = spec_len2pid(len(data))+1
+    pid2 = spec_len2pidI(len(data))+1
     clear_spectrum(obj)
     return packet(b'\x81', pid2, data)
+
+
+def request_txt_cfg(ascii_req):
+    return packet(b'\x20', b'\x02', ascii_req)
 
 
 def request_txt_cfg_readback(ascii_req):
     return packet(b'\x20', b'\x03', ascii_req)
 
 
-def response_txt_cfg_readback(pkt, obj=None):
+def response_txt_cfg(pkt, obj=None):
     if not check_packet(pkt):
-        return None
-    if not pkt[2:4] == b'\x20\x03':
         return None
 
     pkt = Packet(pkt)
-    req = pkt.data.decode()
-    data = pack_txt_cfg(req, obj)
 
-    if isinstance(data, (tuple, list, np.ndarray)):
-        return [packet(b'\x82', b'\x07', _) for _ in data]
+    if pkt.pid1 == b'\x20' and pkt.pid2 == b'\x02':
+        return request_ok()
     else:
-        return packet(b'\x82', b'\x07', data)
+        return None
+
+
+def response_txt_cfg_readback(pkt, obj=None):
+    if not check_packet(pkt):
+        return None
+
+    pkt = Packet(pkt)
+
+    if pkt.pid1 == b'\x20' and pkt.pid2 == b'\x03':
+        req = pkt.data.decode()
+        data = pack_txt_cfg(req, obj)
+
+        if isinstance(data, (tuple, list, np.ndarray)):
+            return [packet(b'\x82', b'\x07', _) for _ in data]
+        else:
+            return packet(b'\x82', b'\x07', data)
+    elif pkt.pid1 == b'\x82' and pkt.pid2 == b'\x07':
+        return True
+    else:
+        return None
+
+
+def request_enable_mca():
+    packet(b'\xf0', b'\x02')
+
+
+def response_enable_mca(pkt, obj):
+    pkt = Packet(pkt)
+    if pkt is None:
+        return None
+    if pkt.pid1 == b'\xf0' and pkt.pid2 == b'\x02':
+        return request_ok()
+    return None
+
+
+def request_disable_mca():
+    packet(b'\xf0', b'\x03')
+
+
+def response_disable_mca(pkt, obj):
+    pkt = Packet(pkt)
+    if pkt is None:
+        return None
+    if pkt.pid1 == b'\xf0' and pkt.pid2 == b'\x03':
+        return request_ok()
+    return None
+
+
+def request_ok():
+    return packet(b'\xff', b'\x00')
+
+
+def response_ok(pkt, obj=None):
+    pkt = Packet(pkt)
+    if pkt is None:
+        return None
+    if pkt.pid1 == b'\xff' and pkt.pid2 == b'\x00':
+        return True
+    return None
+
+
+def response_sync_error(pkt, obj=None):
+    pkt = Packet(pkt)
+    if pkt is None:
+        return None
+    if pkt.pid1 == b'\xff' and pkt.pid2 == b'\x01':
+        return True
+    return None
 
 
 def add_int(name,  nbytes=1, data=None, obj=None, k=1.0, byteorder='little', signed=False, full=False):
@@ -596,6 +688,9 @@ class Packet:
 
 class Protocol:
     def __init__(self):
+        self.buf = b''
+        self.pkt_length = 0
+
         self.requests=dict()
         self.responses = dict()
 
@@ -614,7 +709,15 @@ class Protocol:
         self.requests['request_spectrum_clear_status'] = request_spectrum_clear_status
         self.responses['response_spectrum_clear_status'] = response_spectrum_clear_status
 
+        self.responses['response_txt_cfg'] = response_txt_cfg
+
         self.responses['response_txt_cfg_readback'] = response_txt_cfg_readback
+
+        self.responses['response_ok'] = response_ok
+
+        self.responses['response_enable_mca'] = response_enable_mca
+
+        self.responses['response_disable_mca'] = response_disable_mca
 
     def __call__(self, pkt, obj=None):
         resp = None
@@ -622,11 +725,37 @@ class Protocol:
             if pkt in self.requests:
                 resp = self.requests[pkt]()
         elif isinstance(pkt, (bytes, bytearray)):
-            for func in self.responses:
-                resp = self.responses[func](pkt, obj)
-                if resp is not None:
-                    print(f'[prot] request {func} received')
-                    break
+            pktL = parse_header(pkt)
+
+            # if header is determined clear buffer and store full length
+            if pktL is not None:
+                self.pkt_length = pktL+8
+                self.buf = b''
+
+            # store in buffer only if full length determined
+            if self.pkt_length > 0:
+                self.buf += pkt
+
+            # if full packet acquired
+            if len(self.buf) == self.pkt_length:
+                recognized = False
+                for func in self.responses:
+                    resp = self.responses[func](self.buf, obj)
+                    if isinstance(resp, (bytes, bytearray)):
+                        print(f'[prot] {func} is made')
+                        recognized = True
+                        break
+                    elif resp:
+                        print(f'[prot] {func} received')
+                        recognized = True
+                        break
+
+                if not recognized:
+                    print("Don't recognized packet")
+                    print(self.buf)
+
+                self.buf = b''
+                self.pkt_length = 0
 
         return resp
 
@@ -781,6 +910,8 @@ class Retranslator:
         self.ip = ip_this
         self.ip_px5 = ip_px5
         self.actv = True
+        self.protocol_to = Protocol()
+        self.protocol_from = Protocol()
 
         if log is not None:
             if isinstance(log, str):
@@ -813,8 +944,7 @@ class Retranslator:
         client = ('127.0.0.1', port+1)
         while self.actv:
             data, addr = sock.recvfrom(1024)
-            print(f'GET {len(data)} bytes from {addr[0]}:{addr[1]}')
-            print(data)
+
             # logging
             if self.logger is not None:
                 self.logger.write(f'GET {len(data)} bytes from {addr[0]}:{addr[1]}')
@@ -825,6 +955,10 @@ class Retranslator:
             if addr[0] != self.ip_px5:
                 client = addr
                 req = data
+
+                if self.protocol_to(req):
+                    print(f'GET {len(data)} bytes from {addr[0]}:{addr[1]}')
+
                 sock.sendto(req, (self.ip_px5, port))
             else:
                 if port == 3040:
@@ -834,6 +968,9 @@ class Retranslator:
                     print(resp)
                 else:
                     resp = data
+
+                if self.protocol_from(resp):
+                    print(f'GET {len(data)} bytes from {addr[0]}:{addr[1]}')
 
                 sock.sendto(resp, client)
 
