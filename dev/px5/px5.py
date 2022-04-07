@@ -697,6 +697,7 @@ class PX5Imitator:
         self.mac = 0
         self.netmask = b'\xff\xff\xff\x00'
         self.gateway = '127.0.0.2'
+        self.mtu = 520
 
         self.FastCount = 0
         self.SlowCount = 0
@@ -752,10 +753,11 @@ class PX5Imitator:
         sock = socket(AF_INET, SOCK_DGRAM)
         sock.bind(('0.0.0.0', self.port))
         while self.actv:
-            req, addr = sock.recvfrom(1024)
+            req, addr = sock.recvfrom(self.mtu)
             resp = self.protocol(req, self)
             if resp is not None:
-                sock.sendto(resp, addr)
+                for i in range(len(resp) // self.mtu + 1):
+                    sock.sendto(resp[i*self.mtu:(i+1)*self.mtu], addr)
 
     @property
     def FirmwareVerMajor(self):
@@ -775,17 +777,26 @@ class PX5Imitator:
 
 
 class Retranslator:
-    def __init__(self, ip_px5='192.168.0.239', ip_this='127.0.0.2', log=None):
+    def __init__(self, ip_px5='192.168.0.239', ip_this='127.0.0.2', log=None, dump=None):
         self.ip = ip_this
         self.ip_px5 = ip_px5
+        self.actv = True
 
         if log is not None:
             if isinstance(log, str):
-                self.logger = open('log', 'at')
+                self.logger = open(dump, 'at')
             elif isinstance(log, io.TextIOBase):
                 self.logger = log
         else:
             self.logger = None
+
+        if dump is not None:
+            if isinstance(dump, str):
+                self.dump = open(dump, 'ab')
+            elif isinstance(log, io.TextIOBase):
+                self.dump = dump
+        else:
+            self.dump = None
 
 
         thrd = Thread(name='Thread-NetFinder', target=self.sock_wrap, args=(3040, ), daemon=True)
@@ -800,21 +811,21 @@ class Retranslator:
         sock.bind(('0.0.0.0', port))
 
         client = ('127.0.0.1', port+1)
-        while True:
+        while self.actv:
             data, addr = sock.recvfrom(1024)
-            print(f'[retr nf] GET from {addr[0]}:{addr[1]}')
+            print(f'GET {len(data)} bytes from {addr[0]}:{addr[1]}')
             print(data)
             # logging
             if self.logger is not None:
-                self.logger.write(f'[retr nf] GET from {addr[0]}:{addr[1]}\n')
-                self.logger.write(data)
+                self.logger.write(f'GET {len(data)} bytes from {addr[0]}:{addr[1]}')
+            if self.dump is not None:
+                self.dump.write(data)
 
             # if not from px5 save client and send to px5
             if addr[0] != self.ip_px5:
                 client = addr
                 req = data
-                out = sock.sendto(req, (self.ip_px5, port))
-                print(f'[retr nf] Send req {out} bytes to {self.ip_px5}:{port}')
+                sock.sendto(req, (self.ip_px5, port))
             else:
                 if port == 3040:
                     nf_resp = Netfinder_packet(data)
@@ -824,6 +835,11 @@ class Retranslator:
                 else:
                     resp = data
 
-                out = sock.sendto(resp, client)
-                print(f'[retr nf] Send resp {out} bytes to {client[0]}:{client[1]}')
+                sock.sendto(resp, client)
 
+    def stop(self):
+        self.actv = False
+        if self.logger is not None:
+            self.logger.close()
+        if self.dump is not None:
+            self.dump.close()
