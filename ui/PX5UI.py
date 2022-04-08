@@ -1,9 +1,12 @@
 import sys
-from PyQt5 import QtWidgets
+from PyQt5 import QtWidgets, QtCore
 from ui.PX5UIDesign import Ui_PX5WidgetDesign
+from core.sxr_protocol_pb2 import MainPacket, AdcStatus
+from core.sxr_protocol import packet_init
 
 
 class PX5Widget(QtWidgets.QWidget, Ui_PX5WidgetDesign):
+    channel0 = QtCore.pyqtSignal(bytes)
 
     def __init__(self, parent=None):
         super().__init__(parent=parent)
@@ -32,6 +35,11 @@ class PX5Widget(QtWidgets.QWidget, Ui_PX5WidgetDesign):
 
         # signals
         self.enable_pushButton.clicked.connect(self.setenable)
+
+        statusbar = QtWidgets.QStatusBar(self)
+        statusbar.setMaximumSize(16777215, 22)
+        self.verticalLayout.addWidget(statusbar)
+        statusbar.show()
 
     def setenable(self):
         if self.enabled is None:
