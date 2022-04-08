@@ -8,6 +8,7 @@ from threading import Thread
 import uuid
 from PyQt5 import QtNetwork
 import io
+import sys
 
 macBytes2str = lambda mac: ':'.join([f'{_:02X}' for _ in mac[:6]])
 ipBytes2str = lambda ip: '.'.join([f'{_:d}' for _ in ip[:4]])
@@ -690,6 +691,7 @@ class Protocol:
     def __init__(self):
         self.buf = b''
         self.pkt_length = 0
+        self.request = b''
 
         self.requests=dict()
         self.responses = dict()
@@ -738,6 +740,7 @@ class Protocol:
 
             # if full packet acquired
             if len(self.buf) == self.pkt_length:
+                self.request = self.buf
                 recognized = False
                 for func in self.responses:
                     resp = self.responses[func](self.buf, obj)
@@ -776,9 +779,9 @@ class PX5(Core):
             response = packet_init(request.sender, self.address)
             response.command = request.command
 
-            if request.command == 3:
+            if request.command == 0:
                 self.init_from_px5(response)
-            elif request.command == 4:
+            elif request.command == 1:
                 self.get_status(response)
 
     def init_from_px5(self, response=None):
@@ -786,7 +789,7 @@ class PX5(Core):
         self.send_acsii_cmd(cfg_to, response)
 
     def get_status(self, response=None):
-        pkt = packet(b'\x01', b'\x01')
+        pkt = request_status()
         self.udp_socket.sendto(pkt, self.addr)
         ack, _ = self.udp_socket.recvfrom(1024)
         if response is not None:
@@ -906,7 +909,7 @@ class PX5Imitator:
 
 
 class Retranslator:
-    def __init__(self, ip_px5='192.168.0.239', ip_this='127.0.0.2', log=None, dump=None):
+    def __init__(self, ip_px5='192.168.0.239', ip_this='127.0.0.2', log=sys.stdout, dump=None):
         self.ip = ip_this
         self.ip_px5 = ip_px5
         self.actv = True
@@ -929,7 +932,6 @@ class Retranslator:
         else:
             self.dump = None
 
-
         thrd = Thread(name='Thread-NetFinder', target=self.sock_wrap, args=(3040, ), daemon=True)
         thrd.start()
 
@@ -945,22 +947,17 @@ class Retranslator:
         while self.actv:
             data, addr = sock.recvfrom(1024)
 
-            # logging
-            if self.logger is not None:
-                self.logger.write(f'GET {len(data)} bytes from {addr[0]}:{addr[1]}')
-            if self.dump is not None:
-                self.dump.write(data)
-
             # if not from px5 save client and send to px5
             if addr[0] != self.ip_px5:
                 client = addr
                 req = data
 
                 if self.protocol_to(req):
-                    print(f'GET {len(data)} bytes from {addr[0]}:{addr[1]}')
+                    self.logging(self.protocol_to.request, addr)
 
                 sock.sendto(req, (self.ip_px5, port))
             else:
+                # in case netfinder change ip in packet
                 if port == 3040:
                     nf_resp = Netfinder_packet(data)
                     nf_resp.ip = self.ip
@@ -970,13 +967,21 @@ class Retranslator:
                     resp = data
 
                 if self.protocol_from(resp):
-                    print(f'GET {len(data)} bytes from {addr[0]}:{addr[1]}')
+                    self.logging(self.protocol_from.request, addr)
 
                 sock.sendto(resp, client)
 
     def stop(self):
         self.actv = False
         if self.logger is not None:
-            self.logger.close()
+            if self.logger.name != '<stdout>':
+                self.logger.close()
         if self.dump is not None:
             self.dump.close()
+
+    def logging(self, data=b'', addr=('', 0)):
+        if self.dump is not None:
+            self.dump.write(data)
+        if self.logger is not None:
+            self.logger.write(f'GET {len(data)} bytes from {addr[0]}:{addr[1]}')
+
