@@ -1,5 +1,6 @@
 import sys
 from PyQt5 import QtWidgets, QtCore
+from math import trunc
 from ui.ADCUIDesign import Ui_ADCWidgetDesign
 from core.sxr_protocol_pb2 import MainPacket, AdcStatus
 from core.sxr_protocol import packet_init
@@ -19,9 +20,6 @@ class ADCUIWidget (QtWidgets.QWidget, Ui_ADCWidgetDesign):
         for _ in range(8):
             self.status.board_status[0].channel_status.add()
 
-        self.delay = 0
-        self.interval = 0
-
         # signals
         for ch_n in range(1, 9):
             eval(f'self.ch{ch_n}_checkBox.clicked.connect(self.ui2status)')
@@ -32,6 +30,11 @@ class ADCUIWidget (QtWidgets.QWidget, Ui_ADCWidgetDesign):
         self.bias_doubleSpinBox.valueChanged.connect(self.ui2status)
 
         self.ch_comboBox.currentTextChanged.connect(self.show_channel)
+
+        self.statusbar = QtWidgets.QStatusBar(self)
+        self.statusbar.setMaximumSize(16777215, 22)
+        self.verticalLayout.addWidget(self.statusbar)
+        self.statusbar.show()
 
         self.ui2status()
         self.status2ui()
@@ -61,6 +64,7 @@ class ADCUIWidget (QtWidgets.QWidget, Ui_ADCWidgetDesign):
         self.status = status
 
         last_ch = None
+        n_ch = 0
         if len(status.board_status) > 0:
             # store ch_comboBox state
             if self.ch_comboBox.count() > 0:
@@ -71,16 +75,37 @@ class ADCUIWidget (QtWidgets.QWidget, Ui_ADCWidgetDesign):
                 if status.board_status[0].channel_status[ch_n].enabled:
                     self.ch_comboBox.addItem(str(ch_n+1))
                     self.show_channel()
+                    n_ch += 1
 
         self.frec_spinBox.blockSignals(True)
         self.frec_spinBox.setValue(int(status.sampling_rate/1e6))
         self.frec_spinBox.blockSignals(False)
+
+        if n_ch > 0:
+            max_time = trunc(536870912/(2*status.sampling_rate*n_ch)*1e3)
+            self.interval_spinBox.blockSignals(True)
+            self.interval_spinBox.setMaximum(trunc(max_time))
+            self.interval_val_label.setText(f'0...{max_time}, мс')
+            self.interval_spinBox.blockSignals(False)
+        else:
+            self.interval_spinBox.blockSignals(True)
+            self.interval_spinBox.setMaximum(16777215)
+            self.interval_val_label.setText(f'0..., мс')
+            self.interval_spinBox.blockSignals(False)
+
+        self.interval_spinBox.blockSignals(True)
+        self.interval_spinBox.setValue(int(status.samples/status.sampling_rate*1e3))
+        self.interval_spinBox.blockSignals(False)
+
+        self.statusbar.showMessage('Connected' if status.connected else 'Disconnected')
+        self.statusbar.show()
 
         self.ch_comboBox.blockSignals(True)
         if status.start == status.SOFTSTART:
             self.source_comboBox.setCurrentIndex(0)
         elif status.start == status.EXTSTART:
             self.source_comboBox.setCurrentIndex(1)
+        self.ch_comboBox.blockSignals(False)
         self.ch_comboBox.blockSignals(False)
 
         self.interval_spinBox.blockSignals(True)

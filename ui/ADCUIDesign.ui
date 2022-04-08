@@ -138,7 +138,7 @@
         <item row="2" column="1">
          <widget class="QLabel" name="delay_val_label">
           <property name="text">
-           <string>from to</string>
+           <string/>
           </property>
          </widget>
         </item>
@@ -198,7 +198,7 @@
         <item row="0" column="1">
          <widget class="QLabel" name="frec_val_label">
           <property name="text">
-           <string>40...250 МГц</string>
+           <string>40...250, МГц</string>
           </property>
          </widget>
         </item>
@@ -323,7 +323,7 @@
         <item row="3" column="1">
          <widget class="QLabel" name="interval_val_label">
           <property name="text">
-           <string>from to, мс</string>
+           <string>0...auto, мс</string>
           </property>
          </widget>
         </item>
