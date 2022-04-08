@@ -2,7 +2,7 @@ from socket import socket, AF_INET, SOCK_DGRAM
 from core.core import Core
 import numpy as np
 import os
-from core.sxr_protocol_pb2 import MainPacket
+from core.sxr_protocol_pb2 import MainPacket, SystemStatus
 from core.sxr_protocol import packet_init
 from threading import Thread
 import uuid
@@ -261,18 +261,18 @@ def unpack_status(data, obj=None):
         status = dict()
     else:
         status = obj.__dict__
-    status['FastCount'] = int.from_bytes(data[0:4], 'little')
-    status['SlowCount'] = int.from_bytes(data[4:8], 'little')
-    status['GPCount'] = int.from_bytes(data[8:12], 'little')
-    status['AccTimeMs'] = data[12]
-    status['AccTime'] = int.from_bytes(data[13:16], 'little') * 100
-    status['RealTime'] = int.from_bytes(data[20:24], 'little')
-    status['FirmwareVerMajor'] = (data[24] & int('0b11110000', 2)) >> 4
-    status['FirmwareVerMinor'] = data[24] & int('0b00001111', 2)
+    status['FastCount'] = int.from_bytes(data[0:4], 'little')           # 0-3
+    status['SlowCount'] = int.from_bytes(data[4:8], 'little')           # 4-7
+    status['GPCount'] = int.from_bytes(data[8:12], 'little')            # 8-11
+    status['AccTimeMs'] = data[12]                                      # 12
+    status['AccTime'] = int.from_bytes(data[13:16], 'little') * 100     # 13-15
+    status['RealTime'] = int.from_bytes(data[20:24], 'little')          # 20-24
+    status['FirmwareVerMajor'] = (data[24] & int('0b11110000', 2)) >> 4 # 24 D7-D4
+    status['FirmwareVerMinor'] = data[24] & int('0b00001111', 2)        # 24 D3-D0
     status['FPGAVerMinor'] = data[25] & int('0b00001111', 2)
     status['FPGAVerMajor'] = (data[25] & int('0b11110000', 2)) >> 4
     status['SerialNum'] = int.from_bytes(data[26:30], 'little')
-    status['HV'] = int.from_bytes(data[30:32], 'big', signed=True) * 0.5
+    status['HV'] = int.from_bytes(data[30:31], 'big', signed=True) * 0.5
     status['DetectorTemp'] = int.from_bytes(data[32:34], 'big', signed=True) * 0.1
     status['BoardTemp'] = int.from_bytes(data[34].to_bytes(1, 'big'), 'big', signed=True)
     status['PresetRealTimeReached'] = (data[35] & 128) >> 7
@@ -764,12 +764,12 @@ class Protocol:
 
 
 class PX5(Core):
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, px5_ip='192.168.0.239'):
         super().__init__(parent)
-        self.address = 2
+        self.address = SystemStatus.PX5
 
         self.udp_socket = socket(AF_INET, SOCK_DGRAM)
-        self.address_ip = ('192.168.0.239', 10001)
+        self.address_ip = (px5_ip, 10001)
         self.ascii_cmd = acsii_cfg_load()
 
     def channel0_slot(self, data: bytes):
@@ -790,13 +790,15 @@ class PX5(Core):
 
     def get_status(self, response=None):
         pkt = request_status()
-        self.udp_socket.sendto(pkt, self.addr)
+        self.udp_socket.sendto(pkt, self.address_ip)
         ack, _ = self.udp_socket.recvfrom(1024)
         if response is not None:
             response.data = ack
             self.channel0.emit(response)
         else:
-            return unpack_status(ack)
+            pkt = Packet(ack)
+            if pkt:
+                return unpack_status(pkt.data)
 
     def get_ascii_cfg(self, cfg=None, response=None):
         if cfg is None:

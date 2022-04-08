@@ -70,6 +70,8 @@ class ADC(Core):
         self.started = False
 
         config = configparser.ConfigParser(inline_comment_prefixes=(';', '//'))
+        # TODO check size of SamplesPerChannel, that defines internal buffer size.
+        # full buffer size = SamplesPerChannel*2*num_chan shouldn't exceed 4Mb
         config.optionxform = str
 
         # read config from directory of launch
@@ -136,7 +138,6 @@ class ADC(Core):
                     self.channel0.emit(response.SerializeToString())
             except:
                 self.connected = False
-
 
     def ssh_output(self, timeout=None):
         if timeout is None:
