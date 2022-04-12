@@ -160,46 +160,52 @@ class ADC(Core):
             self.scp.put(os.path.join(self.wdir, 'cfg.ini'), '/home/embedded/examples/exam_adc.ini')
 
     def start(self, response=None):
-        self.started = True
-        self.isAcqComplete = False
-        if os.path.exists(os.path.join(self.wdir, self.file_base+'.bin')):
-            os.remove(os.path.join(self.wdir, self.file_base+'.bin'))
+        # separate function for ability start ADC(thread) "manually", not only by command in packet
+        self.send_config()
+        thrd = Thread(name='Thread-adc-start', target=self.run, args=(response,), daemon=True)
+        thrd.start()
 
-        # if connected run exam_adc
-        if self.connected:
-            self.ssh.send('/home/embedded/examples/exam_adc\n')
+    def run(self, response=None):
+            self.started = True
+            self.isAcqComplete = False
+            if os.path.exists(os.path.join(self.wdir, self.file_base+'.bin')):
+                os.remove(os.path.join(self.wdir, self.file_base+'.bin'))
 
-        # wait for exam_adc ending or stopping by user
-        while self.started:
-            pass
-
-        # if data acquired get adc memory dump file
-        if self.isAcqComplete:
+            # if connected run exam_adc
             if self.connected:
-                # if connected copy from adc
-                self.scp.get('/home/embedded/examples/data_0.bin', self.wdir)
+                self.ssh.send('/home/embedded/examples/exam_adc\n')
 
-                # wait for file transfer completes
-                while not(os.path.exists(os.path.join(self.wdir, self.file_base+'.bin'))):
-                    pass
-            # read dump from disk (generated or loaded from adc)
-            dump = np.fromfile(os.path.join(self.wdir, self.file_base + '.bin'), dtype=np.int16)
-        else:
-            dump = np.ndarray((0,))
+            # wait for exam_adc ending or stopping by user
+            while self.started:
+                pass
 
-        dump = dump.reshape((-1, self.boards[0].n_active_ch)).T
-        cols = (_ for _ in dump)
+            # if data acquired get adc memory dump file
+            if self.isAcqComplete:
+                if self.connected:
+                    # if connected copy from adc
+                    self.scp.get('/home/embedded/examples/data_0.bin', self.wdir)
 
-        for ch in self.boards[0].channels:
-            if ch.on:
-                ch.data = next(cols)
+                    # wait for file transfer completes
+                    while not(os.path.exists(os.path.join(self.wdir, self.file_base+'.bin'))):
+                        pass
+                # read dump from disk (generated or loaded from adc)
+                dump = np.fromfile(os.path.join(self.wdir, self.file_base + '.bin'), dtype=np.int16)
             else:
-                ch.data = np.ndarray((0,))
+                dump = np.ndarray((0,))
 
-        if response is not None:
-            response.data = dump.size.to_bytes(4, 'big')
-            if response.IsInitialized():
-                self.channel0.emit(response.SerializeToString())
+            dump = dump.reshape((-1, self.boards[0].n_active_ch)).T
+            cols = (_ for _ in dump)
+
+            for ch in self.boards[0].channels:
+                if ch.on:
+                    ch.data = next(cols)
+                else:
+                    ch.data = np.ndarray((0,))
+
+            if response is not None:
+                response.data = dump.size.to_bytes(4, 'big')
+                if response.IsInitialized():
+                    self.channel0.emit(response.SerializeToString())
 
     def channel0_slot(self, data: bytes):
         request = MainPacket()
@@ -211,20 +217,13 @@ class ADC(Core):
             if request.command == 0:
                 self.status_message(response)
             elif request.command == 1:
-                self.status_to_config(request.data)
-                self.status_message(response)
+                self.status_to_config(request.data, response)
             elif request.command == 2:
-                self.send_config()
-                self.run(response)
+                self.start(response)
             elif request.command == 3:
                 self.stop_waiting()
             elif request.command == 4:
                 self.reboot()
-
-    def run(self, response=None):
-        # separate function for ability run start thread "manually", not only by command in packet
-        thrd = Thread(name='Thread-adc-start', target=self.start, args=(response,), daemon=True)
-        thrd.start()
 
     def channel2_slot(self, data: bytes):
         pkt = BRD_ctrl()
@@ -328,7 +327,7 @@ class ADC(Core):
         else:
             return None
 
-    def status_to_config(self, status):
+    def status_to_config(self, status, response=None):
         if isinstance(status, bytes):
             data = status
             status = AdcStatus()
@@ -371,6 +370,9 @@ class ADC(Core):
         elif status.start == status.IN0:
             self.config['device0_fm814x250m0']['StartSource'] = '0'
             self.config['device0_fm814x250m0']['StartBaseSource'] = '7'
+
+        if response is not None:
+            self.status_message(response)
 
     def generate_data(self):
         samples = self.get_cfg_item('Option', 'MemSamplesPerChan')
