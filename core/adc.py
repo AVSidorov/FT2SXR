@@ -5,6 +5,7 @@ from scp import SCPClient
 import configparser
 import os
 import numpy as np
+import h5py
 from .core import Core
 from .sxr_protocol_pb2 import MainPacket, AdcStatus, SystemStatus
 from .sxr_protocol import packet_init
@@ -197,8 +198,10 @@ class ADC(Core):
                 else:
                     ch.data = np.ndarray((0,))
 
+            filename = self.snapshot()
+
             if response is not None:
-                response.data = dump.size.to_bytes(4, 'big')
+                response.data = filename.encode()
                 if response.IsInitialized():
                     self.channel0.emit(response.SerializeToString())
 
@@ -417,3 +420,43 @@ class ADC(Core):
         if response.IsInitialized():
             self.channel0.emit(response.SerializeToString())
         self.make_connection()
+
+    def snapshot(self, file=None):
+        timestamp = time.time()
+        if file is None:
+            curtime = datetime.datetime.fromtimestamp(timestamp)
+            file = f'adc{curtime.year-2000:02d}{curtime.month:02d}{curtime.day:02d}' \
+                     f'{curtime.hour:02d}{curtime.minute:02d}{curtime.second:02d}.h5'
+            file = os.path.join(self.wdir, file)
+        if os.path.exists(file):
+            hf = h5py.File(file, 'r+')
+        else:
+            hf = h5py.File(file, 'w')
+            hf.create_dataset('timestamp', data=timestamp)
+        if 'ADC' in hf:
+            adc = hf['ADC']
+        else:
+            adc = hf.create_group('ADC')
+
+        adc.attrs['name'] = 'InSys FM814X250M'
+        adc.attrs['bit'] = 14
+        adc.attrs['max_count'] = 2**15
+        adc.attrs['min_count'] = -2**15
+
+        if 'config' in adc:
+            cfg = adc['config']
+        else:
+            cfg = adc.create_group('config')
+
+        for sec in self.config:
+            cfg.create_group(sec)
+            for key in self.config[sec]:
+                cfg[sec][key] = self.config[sec][key]
+
+        for ch in self.boards[0].channels:
+            if ch.on:
+                dset = adc.create_dataset(f'channel{self.boards[0].channels.index(ch):02d}', shape=ch.data.shape,  compression="gzip", compression_opts=9, data=ch.data)
+                dset.attrs['units'] = 'counts'
+
+        hf.close()
+        return file
