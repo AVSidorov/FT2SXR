@@ -10,7 +10,7 @@ def dump_read(file='dump.bin'):
 
     pkts = list()
     from copy import copy
-    while len(data)>0:
+    while len(data) > 0:
         pktL = parse_header(data[:8])
         if pktL is not None:
             if check_packet(data[:pktL+8]):

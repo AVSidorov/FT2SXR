@@ -4,7 +4,7 @@ import numpy as np
 import os
 from core.sxr_protocol_pb2 import MainPacket, SystemStatus
 from core.sxr_protocol import packet_init
-from threading import Thread
+from threading import Thread, Lock
 import uuid
 from PyQt5 import QtNetwork
 import io
@@ -634,7 +634,7 @@ def acsii_cfg_load(fname='', structured=False):
 acsii_req_full = lambda cfg: '=?;'.join(cfg[np.where(cfg[:, 1])[0], 0]).replace(' ', '') + '=?;'
 ascii_resp = lambda req, cfg: ';'.join([f'{cmd}={cfg[cfg[:,0]==cmd,1][0]}'\
                                         for cmd in req.replace('=', '').replace('?', '').rstrip(';').split(';')]) + ';'
-
+ascii_rm_fields = lambda req, fields: ';'.join([_ for _ in req.rstrip(';').split(';') if not _.split('=')[0] in fields]) + ';'
 
 def pack_txt_cfg(req, obj=None):
     if obj is None:
@@ -733,6 +733,8 @@ class Protocol:
             if pktL is not None:
                 self.pkt_length = pktL+8
                 self.buf = b''
+            elif self.pkt_length == 0:  # given data with not recognized header and protocol doesn't collect data
+                resp = None
 
             # store in buffer only if full length determined
             if self.pkt_length > 0:
@@ -755,7 +757,7 @@ class Protocol:
 
                 if not recognized:
                     print("Don't recognized packet")
-                    print(self.buf)
+                    resp = False
 
                 self.buf = b''
                 self.pkt_length = 0
@@ -764,13 +766,16 @@ class Protocol:
 
 
 class PX5(Core):
-    def __init__(self, parent=None, px5_ip='192.168.0.239'):
+    def __init__(self, parent=None, px5_ip='192.168.0.239', mtu=520):
         super().__init__(parent)
         self.address = SystemStatus.PX5
 
+        self.px5_ip = px5_ip
+        self.px5_port = 10001
+        self.mtu = mtu
+
         self.udp_socket = socket(AF_INET, SOCK_DGRAM)
-        self.address_ip = (px5_ip, 10001)
-        self.ascii_cmd = acsii_cfg_load()
+        self.protocol = Protocol()
 
     def channel0_slot(self, data: bytes):
         request = MainPacket()
@@ -782,45 +787,37 @@ class PX5(Core):
             if request.command == 0:
                 self.init_from_px5(response)
             elif request.command == 1:
-                self.get_status(response)
+                thrd = Thread(name='Thread-px5send', target=self.send_to_px5, args=(request.data, response), daemon=True)
+                thrd.start()
 
     def init_from_px5(self, response=None):
-        cfg_to = self.get_ascii_cfg()
-        self.send_acsii_cmd(cfg_to, response)
+        cfg = acsii_cfg_load()
+        req = acsii_req_full(cfg)
+        req = ascii_rm_fields(req, 'GAIN')
+        resp = b''
+        while len(req) > 0:
+            pos = req[:self.mtu-8].rfind(';')
+            pkt = self.send_to_px5(request_txt_cfg_readback(req[:pos+1]))
+            pkt = Packet(pkt)
+            resp += pkt.data
+            req = req[pos+1:]
 
-    def get_status(self, response=None):
-        pkt = request_status()
-        self.udp_socket.sendto(pkt, self.address_ip)
-        ack, _ = self.udp_socket.recvfrom(1024)
-        if response is not None:
-            response.data = ack
-            self.channel0.emit(response)
-        else:
-            pkt = Packet(ack)
-            if pkt:
-                return unpack_status(pkt.data)
+        resp = b'RESC=YES;' + resp
+        while len(resp) > 0:
+            pos = resp[:self.mtu-8].rfind(b';')
+            self.send_to_px5(request_txt_cfg(resp[:pos+1]))
+            resp = resp[pos+1:]
 
-    def get_ascii_cfg(self, cfg=None, response=None):
-        if cfg is None:
-            cfg = '=?;'.join(self.ascii_cmd[np.where(self.ascii_cmd[:, 1])[0], 0]).replace(' ', '') + '=?;'
-        pkt = packet(b'\x20', b'\x03', cfg)
-        self.udp_socket.sendto(pkt, self.addr)
-        ack, _ = self.udp_socket.recvfrom(1024)
-        if response is not None:
-            response.data = ack
-            self.channel0.emit(response)
-        else:
-            return ack[6:-2]
-
-    def send_acsii_cmd(self, cfg, response=None):
-        pkt = packet(b'\x20', b'\x02', cfg)
-        self.udp_socket.sendto(pkt, self.addr)
-        ack, _ = self.udp_socket.recvfrom(1024)
-        if response is not None:
-            response.data = ack
-            self.channel0.emit(response)
-        else:
-            return ack
+    def send_to_px5(self, data, response=None):
+        # TODO check that data is px5 packet
+        self.udp_socket.sendto(data, (self.px5_ip, self.px5_port))
+        ex = False
+        while not ex:
+            ack, _ = self.udp_socket.recvfrom(self.mtu)
+            if self.protocol(ack) is not None:
+                ex = True
+        if response is None:
+            return self.protocol.request
 
 
 class PX5Imitator:
