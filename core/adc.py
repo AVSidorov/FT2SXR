@@ -12,6 +12,7 @@ from threading import Thread
 from dev.insys.bardy.getCodesNames import *
 from insys.EXAM.exam_adc.exam_protocol_pb2 import BRD_ctrl
 from core.netmanager_simple import NetManagerSimple
+from core.fileutils import work_dir, today_dir
 
 
 class Channel:
@@ -52,7 +53,7 @@ class Board:
 
 
 class ADC(Core):
-    def __init__(self, parent=None, nboards=1, connect=True):
+    def __init__(self, parent=None, nboards=1, connect=True, wdir=None):
         super().__init__(parent)
         self.address = 1
 
@@ -93,14 +94,8 @@ class ADC(Core):
                     self.boards[0].channels[ch_n].bias = float(bias)
 
         # make directory whit current date, to store adc memory dumps and  cfg.ini for sending
-        td = datetime.date.today()
-        wdir = format(td.year-2000, '02d')+format(td.month, '02d')+format(td.day, '02d')
-        wdir = os.path.join(self.wdir, wdir)
-
-        if not(os.path.exists(wdir)):
-            os.mkdir(wdir)
-
-        self.wdir = wdir
+        if wdir is None:
+            self.wdir = today_dir()
 
         if connect:
             self.make_connection()
