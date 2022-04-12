@@ -3,7 +3,7 @@ from ui.dump_plotter import DumpPlotter
 from core.core import Core
 from core.logger import Logger
 from core.adc_logger import ADCLogger
-from core.adc import ADC
+from core.ft2sxr import Ft2SXR
 from PyQt5 import QtWidgets
 import sys
 
@@ -13,12 +13,7 @@ def main():
 
     core = Core(app)
 
-
-    adc = ADC()
-    adc.channel0.connect(core.channel0)       # out Main Packets (commands)
-    adc.channel1.connect(core.channel1)       # out BRD_ctrl packets (from exam_adc)
-    core.channel0.connect(adc.channel0_slot)  # in Main Packets (commands)
-
+    system = Ft2SXR(core)
 
     mw = MainWindow()
     mw.channel0.connect(core.channel0)          # out Main Packets (commands)
@@ -29,7 +24,7 @@ def main():
     core.channel0.connect(logger.channel0_slot)
 
     plotter = DumpPlotter(app)
-    plotter.status = adc.status_message()
+    plotter.status = system.adc.status_message()
     core.channel0.connect(plotter.channel0_slot)
 
     mw.show()
