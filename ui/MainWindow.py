@@ -1,4 +1,5 @@
 import sys
+import os
 from ui.MainWindowUIDesign import Ui_MainWindow
 from ui.CentralWidgetUI import MainWidget
 from ui.ADCUI import ADCUIWidget
@@ -15,6 +16,7 @@ from core.sxr_protocol_pb2 import MainPacket
 from core.logger import Logger
 from core.adc_logger import ADCLogger
 from ui.ADCLogUI import AdcLog
+from ui.PlotterUI import PlotterWidget
 
 
 class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
@@ -150,12 +152,25 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         win.show()
 
     def open_sxr(self):
-        # dirlist = QtWidgets.QFileDialog.getExistingDirectory(self, "Выбрать папку измерения", ".")
-        files = QtWidgets.QFileDialog.getOpenFileNames(self,
-                                                       "Select one or more files to open",
-                                                       ".",
-                                                       "HDF5 Files (*.hdf *.hdf5 *.he5)")
+        win = QtWidgets.QMainWindow(self)
 
+        dirlist = QtWidgets.QFileDialog.getExistingDirectory(self, "Выбрать папку измерения", ".")
+
+        # files = QtWidgets.QFileDialog.getOpenFileNames(self,
+        #                                                "Select one or more files to open",
+        #                                                ".",
+        #                                                "HDF5 Files (*.hdf *.hdf5 *.he5)")
+
+        if os.listdir(dirlist) == ['cfg.ini', 'data_0.bin']:
+            win.setWindowTitle('SXR Plotter')
+            win._main = QtWidgets.QWidget()
+            win.setCentralWidget(win._main)
+            layout = QtWidgets.QVBoxLayout(win._main)
+
+            sxr_pltSettings = PlotterWidget()
+            layout.addWidget(sxr_pltSettings)
+
+            win.show()
 
     @QtCore.pyqtSlot(bytes)
     def channel0_slot(self, data: bytes):
