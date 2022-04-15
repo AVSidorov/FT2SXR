@@ -55,7 +55,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.channel1.connect(logger.channel0_slot)
         win_main.show()
 
-
     def action_adc_set(self):
         win = QtWidgets.QDialog(self)
         win.setModal(True)
@@ -154,20 +153,19 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def open_sxr(self):
         win = QtWidgets.QMainWindow(self)
 
-        dirlist = QtWidgets.QFileDialog.getExistingDirectory(self, "Выбрать папку измерения", ".")
+        # data_dir = QtWidgets.QFileDialog.getExistingDirectory(self, "Выбрать папку измерения", ".")
 
-        # files = QtWidgets.QFileDialog.getOpenFileNames(self,
-        #                                                "Select one or more files to open",
-        #                                                ".",
-        #                                                "HDF5 Files (*.hdf *.hdf5 *.he5)")
-
-        if os.listdir(dirlist) == ['cfg.ini', 'data_0.bin']:
+        data_file = QtWidgets.QFileDialog.getOpenFileName(self,
+                                                          "Select one or more files to open",
+                                                          ".",
+                                                          "SXR Files (*.hdf5 *.bin)")[0]
+        if data_file != '':
             win.setWindowTitle('SXR Plotter')
             win._main = QtWidgets.QWidget()
             win.setCentralWidget(win._main)
             layout = QtWidgets.QVBoxLayout(win._main)
 
-            sxr_pltSettings = PlotterWidget()
+            sxr_pltSettings = PlotterWidget(data_file=data_file)
             layout.addWidget(sxr_pltSettings)
 
             win.show()

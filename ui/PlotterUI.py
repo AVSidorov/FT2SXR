@@ -4,13 +4,14 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg, NavigationTool
 from matplotlib.figure import Figure
 import numpy as np
 from ui.PlotterUIDesign import Ui_Plotter
+from ui.reader import Reader
 
 
 class PlotterWidget (QtWidgets.QMainWindow, Ui_Plotter):
-    def __init__(self, parent=None, data_dir=None, x_unit='samples'):
+    def __init__(self, parent=None, data_file=None, x_unit='samples'):
         super().__init__(parent=parent)
         self.setupUi(self)
-        self.dir = data_dir
+        self.dir = data_file
         self.x_unit = x_unit
         if self.x_unit not in ('samples', 'msec'):
             self.x_unit = 'samples'
@@ -26,11 +27,26 @@ class PlotterWidget (QtWidgets.QMainWindow, Ui_Plotter):
         layout.addWidget(self.axis_groupBox)
 
         self.addToolBar(NavigationToolbar2QT(static_canvas, self))
-        self._static_ax = static_canvas.figure.subplots()
 
         # Plot will be here
-        t = np.linspace(0, 10, 501)
-        self._static_ax.plot(t, np.tan(t), ".")
+        # t = np.linspace(0, 10, 501)
+        # self._static_ax.plot(t, np.tan(t), ".")
+
+        reader = Reader()
+        reader.read(data_file)
+        if len(reader.meta) == len(reader.data):
+            n_plots = len(reader.meta)
+            for i in range(1, n_plots+1):
+                globals()[f"ax{i}"] = static_canvas.figure.add_subplot(n_plots, 1, i)
+                eval(f'ax{i}').set_title(f'ch {reader.meta[i-1][1]}')
+                eval(f'ax{i}').plot(reader.data[i-1])
+
+
+
+
+
+
+
 
 def main():
     app = QtWidgets.QApplication(sys.argv)
