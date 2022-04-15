@@ -402,12 +402,13 @@ class ADC(Core):
         self.started = False
     
     def reboot(self):
-        if self.connected:
+        if self.connected and os.path.exists('./root_key'):
             client = paramiko.SSHClient()
             client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
             client.connect(hostname="192.168.0.242", username="root", key_filename='root_key', password='root')
             ssh = client.invoke_shell()
             ssh.send('reboot\n')
+            client.close()
 
     def watchdog(self):
         transp = self.client.get_transport()
