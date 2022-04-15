@@ -101,6 +101,12 @@ class ADC(Core):
         if connect:
             self.make_connection()
 
+        # run watcher of udp packets from exam_adc
+        if self.connected:
+            adc_watcher = NetManagerSimple(self)
+            adc_watcher.channel0.connect(self.channel1)
+            adc_watcher.channel0.connect(self.channel2_slot)
+
     def make_connection(self):
         client = paramiko.SSHClient()
         self.client = client
@@ -128,12 +134,6 @@ class ADC(Core):
                 self.channel0.emit(response.SerializeToString())
         except:
             self.connected = False
-
-        # run watcher of udp packets from exam_adc
-        if self.connected:
-            adc_watcher = NetManagerSimple(self)
-            adc_watcher.channel0.connect(self.channel1)
-            adc_watcher.channel0.connect(self.channel2_slot)
 
     def ssh_output(self, timeout=None):
         if timeout is None:
@@ -402,20 +402,25 @@ class ADC(Core):
         self.started = False
     
     def reboot(self):
-        if self.connected and os.path.exists('./root_key'):
+        if self.connected and os.path.exists(os.path.join(work_dir(),'root_key')):
             client = paramiko.SSHClient()
             client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
             client.connect(hostname="192.168.0.242", username="root", key_filename='root_key', password='root')
             ssh = client.invoke_shell()
             ssh.send('reboot\n')
-            client.close()
+        else:
+            response = packet_init(0, self.address)
+            response.command = 0xFFFFFFFF
+            response.data = 'ADC disconnected or key file not found'.encode()
+            if response.IsInitialized():
+                self.channel0.emit(response.SerializeToString())
 
-    def watchdog(self):
+    def watchdog(self, timeout=2):
         transp = self.client.get_transport()
-        transp.set_keepalive(10)
+        transp.set_keepalive(timeout*2)
         while self.connected:
             self.connected = transp.is_alive()
-            time.sleep(5)
+            time.sleep(timeout)
 
         response = packet_init(0, self.address)
         response.command = 0xFFFFFFFF
