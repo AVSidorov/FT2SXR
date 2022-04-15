@@ -433,6 +433,7 @@ class ADC(Core):
         else:
             hf = h5py.File(file, 'w')
             hf.create_dataset('timestamp', data=timestamp)
+            hf['/'].attrs['timestamp'] = timestamp
         if 'ADC' in hf:
             adc = hf['ADC']
         else:
@@ -447,16 +448,19 @@ class ADC(Core):
             cfg = adc['config']
         else:
             cfg = adc.create_group('config')
+            cfg.attrs['timestamp'] = timestamp
 
         for sec in self.config:
-            cfg.create_group(sec)
-            for key in self.config[sec]:
-                cfg[sec][key] = self.config[sec][key]
+            if len(self.config[sec].keys()) > 0:
+                cfg.create_group(sec)
+                for key in self.config[sec]:
+                    cfg[sec][key] = self.config[sec][key]
 
         for ch in self.boards[0].channels:
             if ch.on:
                 dset = adc.create_dataset(f'channel{self.boards[0].channels.index(ch):02d}', shape=ch.data.shape,  compression="gzip", compression_opts=9, data=ch.data)
-                dset.attrs['units'] = 'counts'
+                dset.attrs['units'] = 'adc counts'
+                dset.attrs['timestamp'] = timestamp
 
         hf.close()
         return file
