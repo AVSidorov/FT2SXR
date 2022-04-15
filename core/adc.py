@@ -101,11 +101,9 @@ class ADC(Core):
         if connect:
             self.make_connection()
 
-        # run watcher of udp packets from exam_adc
-        if self.connected:
-            adc_watcher = NetManagerSimple(self)
-            adc_watcher.channel0.connect(self.channel1)
-            adc_watcher.channel0.connect(self.channel2_slot)
+        adc_watcher = NetManagerSimple(self)
+        adc_watcher.channel0.connect(self.channel1)
+        adc_watcher.channel0.connect(self.channel2_slot)
 
     def make_connection(self):
         client = paramiko.SSHClient()
