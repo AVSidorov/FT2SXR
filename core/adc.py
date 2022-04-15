@@ -101,39 +101,39 @@ class ADC(Core):
         if connect:
             self.make_connection()
 
+    def make_connection(self):
+        client = paramiko.SSHClient()
+        self.client = client
+        client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        try:
+            client.connect(hostname="192.168.0.242", username="adc_user", password="adc_user", look_for_keys=False,
+                           allow_agent=False)
+            self.connected = True
+            ssh = client.invoke_shell()
+            self.ssh = ssh
+            ssh.send('cd /home/embedded/examples\n')
+            self.ssh_output(0.5)
+
+            scp = SCPClient(client.get_transport())
+            self.scp = scp
+            self.send_config()
+
+            connection_watch = Thread(name='Thread-connection-watchdog', target=self.watchdog, daemon=True)
+            connection_watch.start()
+
+            response = packet_init(0, self.address)
+            response.command = 0xFFFFFFFF
+            response.data = 'ADC connected'.encode()
+            if response.IsInitialized():
+                self.channel0.emit(response.SerializeToString())
+        except:
+            self.connected = False
+
         # run watcher of udp packets from exam_adc
         if self.connected:
             adc_watcher = NetManagerSimple(self)
             adc_watcher.channel0.connect(self.channel1)
             adc_watcher.channel0.connect(self.channel2_slot)
-
-    def make_connection(self):
-            client = paramiko.SSHClient()
-            self.client = client
-            client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-            try:
-                client.connect(hostname="192.168.0.242", username="adc_user", password="adc_user", look_for_keys=False,
-                               allow_agent=False)
-                self.connected = True
-                ssh = client.invoke_shell()
-                self.ssh = ssh
-                ssh.send('cd /home/embedded/examples\n')
-                self.ssh_output(0.5)
-
-                scp = SCPClient(client.get_transport())
-                self.scp = scp
-                self.send_config()
-
-                connection_watch = Thread(name='Thread-connection-watchdog', target=self.watchdog, daemon=True)
-                connection_watch.start()
-
-                response = packet_init(0, self.address)
-                response.command = 0xFFFFFFFF
-                response.data = 'ADC connected'.encode()
-                if response.IsInitialized():
-                    self.channel0.emit(response.SerializeToString())
-            except:
-                self.connected = False
 
     def ssh_output(self, timeout=None):
         if timeout is None:
@@ -222,6 +222,8 @@ class ADC(Core):
                 self.stop_waiting()
             elif request.command == 4:
                 self.reboot()
+            elif request.command == 5:
+                self.make_connection()
 
     def channel2_slot(self, data: bytes):
         pkt = BRD_ctrl()
