@@ -47,11 +47,11 @@ class Storage:
             client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
             try:
                 client.connect(**self.params)
-                ssh = client.invoke_shell()
-                ssh.send(f'mkdir -p {ospath.join(self.path, ospath.split(path)[0])}\n')
+                _, stdout, stderr = client.exec_command(f'mkdir -p {ospath.join(self.path, ospath.split(path)[0])}\n')
                 time.sleep(1)
-                scp = SCPClient(client.get_transport())
-                scp.put(ospath.abspath(filename), ospath.join(self.path, path))
+                if len(stderr.read()) == 0:
+                    scp = SCPClient(client.get_transport())
+                    scp.put(ospath.abspath(filename), ospath.join(self.path, path))
             except:
                 pass
             finally:
@@ -64,21 +64,19 @@ class Storage:
 
         try:
             client.connect(**self.params)
-            ssh = client.invoke_shell()
-            ssh.send(f'ls -1ARl --color=never {self.path}\n')
+            _, stdout, stderr = client.exec_command(f'ls -1ARl --color=never {self.path}')
             time.sleep(1)
-
-            while ssh.recv_ready():
-                out += ssh.recv(1024).decode()
+            if len(stderr.read()) == 0:
+                out = stdout.read().decode()
         except:
             pass
         finally:
             client.close()
 
-        lines = out.split('\r\n')
+        lines = out.split('\n')
         tree = dict()
         p = None
-        for line in lines[1:-1]:
+        for line in lines:
             if all((len(line) != 0, line.find('total') != 0)):
                 if all((line[0] == '/', line[-1] == ':')):
                     p = tree
@@ -97,6 +95,7 @@ class Storage:
                         p[fields[8]]['date'] = fields[5:8]
                     elif fields[0][0] == 'l':
                         p[fields[8]] = fields[-1]
-        for dir_name in self.path.strip('/').rstrip(':').split('/'):
-            tree=tree[dir_name]
+        if len(tree) > 0:
+            for dir_name in self.path.strip('/').rstrip(':').split('/'):
+                tree = tree[dir_name]
         return tree

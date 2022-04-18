@@ -165,6 +165,8 @@ class ADC(Core):
             if os.path.exists(os.path.join(self.wdir, self.file_base+'.bin')):
                 os.remove(os.path.join(self.wdir, self.file_base+'.bin'))
 
+            #TODO remove using ssh shell. Use exec_command instead
+
             # if connected run exam_adc
             if self.connected:
                 self.ssh.send('/home/embedded/examples/exam_adc\n')
