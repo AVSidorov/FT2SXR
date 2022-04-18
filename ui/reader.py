@@ -1,8 +1,8 @@
 import numpy as np
-import h5py
 from os import path, listdir
 from core.core import Core
 import configparser
+import h5py as h5
 
 
 class Reader(Core):
@@ -38,11 +38,34 @@ class Reader(Core):
                                 meta.append(i)
                                 meta.append(conf_dict['samples'])
                                 meta.append(conf_dict['rate'])
-                        meta = np.array(np.array(meta)).reshape((-1, n_ch)).T
+                        meta = np.array(meta)
+                        meta = meta.reshape((n_ch, -1))
                         self.meta = meta
+
+                if path.splitext(data_file)[1] == '.h5':
+                    try:
+                        conf_dict, measurements = self.parse_h5(data_file)
+                    except KeyError:
+                        return
+
+                    n_ch = conf_dict['mask'].count("1")
+                    self.data = measurements
+
+                    meta = []
+                    str_mask = conf_dict['mask'][2:]
+                    for i in range(1, len(str_mask) + 1):
+                        if str_mask[-i] == '1':
+                            meta.append('shotid')
+                            meta.append(i)
+                            meta.append(conf_dict['samples'])
+                            meta.append(conf_dict['rate'])
+                    meta = np.array(meta)
+                    meta = meta.reshape((n_ch, -1))
+                    self.meta = meta
 
     def clear(self):
         self.data = None
+        self.meta = None
 
     def parse_ini(self, ini_path=None):
         if path.isabs(ini_path):
@@ -52,12 +75,42 @@ class Reader(Core):
             samples = int(config['Option']['MemSamplesPerChan'])
             device_section = config.sections().copy()
             device_section.remove('Option')
+            if 'DEFAULT' in device_section:
+                device_section.remove('DEFAULT')
             device_section = device_section[0]
             rate = int(config[device_section]['SamplingRate'])
             mask = bin(eval(config[device_section]['ChannelMask']))
 
+
+
             return {'samples': samples,
                     'rate': rate,
                     'mask': mask}
+        else:
+            return None
+
+    def parse_h5(self, h5_path):
+        if path.isabs(h5_path):
+            with h5.File(h5_path, 'r') as file:
+                config = file['ADC']['config']
+                samples = eval(config['Option']['MemSamplesPerChan'][()])
+                device_section = list(config.keys())
+                device_section.remove('Option')
+                if 'DEFAULT' in device_section:
+                    device_section.remove('DEFAULT')
+                device_section = device_section[0]
+                rate = eval(config[device_section]['SamplingRate'][()])
+                mask = bin(eval(config[device_section]['ChannelMask'][()]))
+
+                channels = list(file['ADC'].keys())
+                channels.remove('config')
+
+                for i in channels:
+                    globals()[i] = file['ADC'][i][()]
+                measurements = np.vstack([eval(i) for i in channels])
+
+                return {'samples': samples,
+                        'rate': rate,
+                        'mask': mask}, measurements
         else:
             return None

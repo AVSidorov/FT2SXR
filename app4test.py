@@ -23,9 +23,9 @@ def main():
     logger = Logger('log.txt', app)
     core.channel0.connect(logger.channel0_slot)
 
-    plotter = DumpPlotter(app)
-    plotter.status = system.adc.status_message()
-    core.channel0.connect(plotter.channel0_slot)
+    # plotter = DumpPlotter(app)
+    # plotter.status = system.adc.status_message()
+    # core.channel0.connect(plotter.channel0_slot)
 
     mw.show()
     sys.exit(app.exec_())

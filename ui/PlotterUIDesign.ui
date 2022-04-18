@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>472</width>
+    <width>471</width>
     <height>125</height>
    </rect>
   </property>
@@ -30,7 +30,7 @@
     <rect>
      <x>10</x>
      <y>10</y>
-     <width>454</width>
+     <width>451</width>
      <height>51</height>
     </rect>
    </property>
@@ -49,39 +49,104 @@
    <property name="title">
     <string>Measurement info</string>
    </property>
-   <widget class="QLabel" name="name_label">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>20</y>
-      <width>69</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Name:</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="no_label">
-    <property name="geometry">
-     <rect>
-      <x>50</x>
-      <y>20</y>
-      <width>48</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>000000_0</string>
-    </property>
-   </widget>
+   <layout class="QGridLayout" name="gridLayout">
+    <item row="0" column="0">
+     <widget class="QLabel" name="name_label">
+      <property name="text">
+       <string>Name:</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="1">
+     <widget class="QLabel" name="name_val_label">
+      <property name="text">
+       <string>000000_0</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="2">
+     <widget class="QLabel" name="rate_label">
+      <property name="text">
+       <string>Rate:</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="3">
+     <widget class="QLabel" name="rate_val_label">
+      <property name="text">
+       <string>00</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="4">
+     <widget class="QLabel" name="samples_label">
+      <property name="text">
+       <string>Samples:</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="5">
+     <widget class="QLabel" name="samples_val_label">
+      <property name="text">
+       <string>00</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="6">
+     <widget class="QLabel" name="channels_label">
+      <property name="text">
+       <string>Channels:</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="7">
+     <widget class="QLabel" name="channels_val_label">
+      <property name="text">
+       <string>0</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="8">
+     <widget class="QLabel" name="time_label">
+      <property name="text">
+       <string>Time:</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="9">
+     <widget class="QLabel" name="time_val_label">
+      <property name="text">
+       <string>0</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="10">
+     <widget class="QPushButton" name="select_shot_pushButton">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>80</width>
+        <height>22</height>
+       </size>
+      </property>
+      <property name="text">
+       <string>Select shot</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
   </widget>
   <widget class="QGroupBox" name="axis_groupBox">
    <property name="geometry">
     <rect>
      <x>10</x>
      <y>60</y>
-     <width>454</width>
+     <width>451</width>
      <height>51</height>
     </rect>
    </property>

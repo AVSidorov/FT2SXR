@@ -150,15 +150,16 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         adc_log.channel0.connect(self.channel0)  # make uplink for reboot
         win.show()
 
-    def open_sxr(self):
+    def open_sxr(self, data_file=None):
         win = QtWidgets.QMainWindow(self)
 
         # data_dir = QtWidgets.QFileDialog.getExistingDirectory(self, "Выбрать папку измерения", ".")
 
-        data_file = QtWidgets.QFileDialog.getOpenFileName(self,
-                                                          "Select one or more files to open",
-                                                          ".",
-                                                          "SXR Files (*.hdf5 *.bin)")[0]
+        if data_file is None:
+            data_file = QtWidgets.QFileDialog.getOpenFileName(self,
+                                                              "Select one or more files to open",
+                                                              ".",
+                                                              "SXR Files (*.h5 *.bin)")[0]
         if data_file != '':
             win.setWindowTitle('SXR Plotter')
             win._main = QtWidgets.QWidget()
@@ -173,6 +174,12 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     @QtCore.pyqtSlot(bytes)
     def channel0_slot(self, data: bytes):
         self.channel1.emit(data)
+
+        request = MainPacket()
+        request.ParseFromString(data)
+        if request.sender == 1:
+            if request.command == 2:
+                self.open_sxr(data_file=request.data)
 
 
 def main():

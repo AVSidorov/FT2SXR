@@ -9,11 +9,13 @@ import numpy as np
 
 
 class DumpPlotter(Core):
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, type='samples'):
         super().__init__(parent=parent)
         self.address = 12
         self._status = None
-        self.type = 'samples'  # 'samples' or 'msec'
+        self.type = type  # 'samples' or 'msec'
+        if self.type not in ('samples', 'msec'):
+            self.type = 'samples'
 
         td = datetime.date.today()
         wdir = format(td.year - 2000, '02d') + format(td.month, '02d') + format(td.day, '02d')
