@@ -101,39 +101,37 @@ class ADC(Core):
         if connect:
             self.make_connection()
 
-        # run watcher of udp packets from exam_adc
-        if self.connected:
-            adc_watcher = NetManagerSimple(self)
-            adc_watcher.channel0.connect(self.channel1)
-            adc_watcher.channel0.connect(self.channel2_slot)
+        adc_watcher = NetManagerSimple(self)
+        adc_watcher.channel0.connect(self.channel1)
+        adc_watcher.channel0.connect(self.channel2_slot)
 
     def make_connection(self):
-            client = paramiko.SSHClient()
-            self.client = client
-            client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-            try:
-                client.connect(hostname="192.168.0.242", username="adc_user", password="adc_user", look_for_keys=False,
-                               allow_agent=False)
-                self.connected = True
-                ssh = client.invoke_shell()
-                self.ssh = ssh
-                ssh.send('cd /home/embedded/examples\n')
-                self.ssh_output(0.5)
+        client = paramiko.SSHClient()
+        self.client = client
+        client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        try:
+            client.connect(hostname="192.168.0.242", username="adc_user", password="adc_user", look_for_keys=False,
+                           allow_agent=False)
+            self.connected = True
+            ssh = client.invoke_shell()
+            self.ssh = ssh
+            ssh.send('cd /home/embedded/examples\n')
+            self.ssh_output(0.5)
 
-                scp = SCPClient(client.get_transport())
-                self.scp = scp
-                self.send_config()
+            scp = SCPClient(client.get_transport())
+            self.scp = scp
+            self.send_config()
 
-                connection_watch = Thread(name='Thread-connection-watchdog', target=self.watchdog, daemon=True)
-                connection_watch.start()
+            connection_watch = Thread(name='Thread-connection-watchdog', target=self.watchdog, daemon=True)
+            connection_watch.start()
 
-                response = packet_init(0, self.address)
-                response.command = 0xFFFFFFFF
-                response.data = 'ADC connected'.encode()
-                if response.IsInitialized():
-                    self.channel0.emit(response.SerializeToString())
-            except:
-                self.connected = False
+            response = packet_init(0, self.address)
+            response.command = 0xFFFFFFFF
+            response.data = 'ADC connected'.encode()
+            if response.IsInitialized():
+                self.channel0.emit(response.SerializeToString())
+        except:
+            self.connected = False
 
     def ssh_output(self, timeout=None):
         if timeout is None:
@@ -222,6 +220,8 @@ class ADC(Core):
                 self.stop_waiting()
             elif request.command == 4:
                 self.reboot()
+            elif request.command == 5:
+                self.make_connection()
 
     def channel2_slot(self, data: bytes):
         pkt = BRD_ctrl()
@@ -400,19 +400,25 @@ class ADC(Core):
         self.started = False
     
     def reboot(self):
-        if self.connected:
+        if self.connected and os.path.exists(os.path.join(work_dir(),'root_key')):
             client = paramiko.SSHClient()
             client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
             client.connect(hostname="192.168.0.242", username="root", key_filename='root_key', password='root')
             ssh = client.invoke_shell()
             ssh.send('reboot\n')
+        else:
+            response = packet_init(0, self.address)
+            response.command = 0xFFFFFFFF
+            response.data = 'ADC disconnected or key file not found'.encode()
+            if response.IsInitialized():
+                self.channel0.emit(response.SerializeToString())
 
-    def watchdog(self):
+    def watchdog(self, timeout=2):
         transp = self.client.get_transport()
-        transp.set_keepalive(10)
+        transp.set_keepalive(timeout*2)
         while self.connected:
             self.connected = transp.is_alive()
-            time.sleep(5)
+            time.sleep(timeout)
 
         response = packet_init(0, self.address)
         response.command = 0xFFFFFFFF
@@ -433,6 +439,7 @@ class ADC(Core):
         else:
             hf = h5py.File(file, 'w')
             hf.create_dataset('timestamp', data=timestamp)
+            hf['/'].attrs['timestamp'] = timestamp
         if 'ADC' in hf:
             adc = hf['ADC']
         else:
@@ -447,16 +454,19 @@ class ADC(Core):
             cfg = adc['config']
         else:
             cfg = adc.create_group('config')
+            cfg.attrs['timestamp'] = timestamp
 
         for sec in self.config:
-            cfg.create_group(sec)
-            for key in self.config[sec]:
-                cfg[sec][key] = self.config[sec][key]
+            if len(self.config[sec].keys()) > 0:
+                cfg.create_group(sec)
+                for key in self.config[sec]:
+                    cfg[sec][key] = self.config[sec][key]
 
         for ch in self.boards[0].channels:
             if ch.on:
                 dset = adc.create_dataset(f'channel{self.boards[0].channels.index(ch):02d}', shape=ch.data.shape,  compression="gzip", compression_opts=9, data=ch.data)
-                dset.attrs['units'] = 'counts'
+                dset.attrs['units'] = 'adc counts'
+                dset.attrs['timestamp'] = timestamp
 
         hf.close()
         return file
