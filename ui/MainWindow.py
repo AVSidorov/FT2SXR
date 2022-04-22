@@ -179,7 +179,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         request.ParseFromString(data)
         if request.sender == 1:
             if request.command == 2:
-                self.open_sxr(data_file=request.data)
+                data_file = os.path.join(os.path.split(os.path.join(os.path.abspath('./'), request.data))[0], 'data_0.bin')
+                self.open_sxr(data_file=data_file)
 
 
 def main():
