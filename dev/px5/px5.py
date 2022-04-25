@@ -631,10 +631,11 @@ def acsii_cfg_load(fname='', structured=False):
     return ascii_cfg
 
 
-acsii_req_full = lambda cfg: '=?;'.join(cfg[np.where(cfg[:, 1])[0], 0]).replace(' ', '') + '=?;'
+ascii_req_full = lambda cfg: '=?;'.join(cfg[np.where(cfg[:, 1])[0], 0]).replace(' ', '') + '=?;'
 ascii_resp = lambda req, cfg: ';'.join([f'{cmd}={cfg[cfg[:,0]==cmd,1][0]}'\
                                         for cmd in req.replace('=', '').replace('?', '').rstrip(';').split(';')]) + ';'
 ascii_rm_fields = lambda req, fields: ';'.join([_ for _ in req.rstrip(';').split(';') if not _.split('=')[0] in fields]) + ';'
+
 
 def pack_txt_cfg(req, obj=None):
     if obj is None:
@@ -838,7 +839,7 @@ class PX5Imitator:
         self.FirmwareVer = 1
         self.FPGAVer = 2
         self.SerialNum = 1234
-        self.HV = -130
+        self.HV = -1
         self.DetectorTemp = 230
         self.BoardTemp = 23
         self.PresetRealTimeReached = 0
