@@ -6,8 +6,8 @@ AUO1,SCA8,AUX_OUT Selection,[#|ICR|PILEUP|MCSTB| ONESH|DETRES|MCAEN|PEAKH|SCA8],
 AUO1,SCA8,AUX_OUT Selection,[ICR|PILEUP|MCSTB|ONESH|DETRES|MCAEN|PEAKH|SCA8|RTDOS|VETO|LIVE],,ICR,,,06.08.02,,
 AUO2,ICR,AUX_OUT2 Selection,[#|ICR|DIAG|PEAKH|ONESH|RTDOS|RTDREJ|LIVE|VETO|STREAM],,ICR,,1;9,prior to 6.08.02,,
 AUO2,ICR,AUX_OUT2 Selection,[ICR|PILEUP|MCSTB|ONESH|DETRES|MCAEN|PEAKH|SCA8|RTDOS|VETO|LIVE|STREAM],,ICR,,,06.08.02,,
-BLRD,3,BLR Down Correction,[#],,0,,0;3,prior FW6.09.02/FP6.14 ,D;P;X;G;T,"‘D’ = DP5; ‘P’ = PX5, ‘X’ = DP5-X; ‘G’ = DP5G (GammaRad), ‘T’ = TB-5, ‘M’ = MCA8000D"
-BLRD,3,BLR Down Correction,[#],,0,,0;5,FW6.09.02/FP6.14 ,D;P;X;G;T,"‘D’ = DP5; ‘P’ = PX5, ‘X’ = DP5-X; ‘G’ = DP5G (GammaRad), ‘T’ = TB-5, ‘M’ = MCA8000D"
+BLRD,3,BLR Down Correction,[#],,0,,0;3,prior FW6.09.02/FP6.14 ,D;P;X;G;T,D = DP5; P = PX5; X = DP5-X; G = DP5G (GammaRad); T = TB-5; M = MCA8000D
+BLRD,3,BLR Down Correction,[#],,0,,0;5,FW6.09.02/FP6.14 ,D;P;X;G;T,
 BLRM,1,BLR Mode,[OF{F}|1],,OFF,,1,ALL,D;P;X;G;T,
 BLRU,1,BLR Up Correction,[#],,0,,0;3,ALL,D;P;X;G;T,
 BOOT,,Turn supplies on/off at power up,[ON|OF{F}],,,,,ALL,D,
