@@ -13,7 +13,8 @@ class Reader(Core):
         self.meta = None
 
     def read(self, data_file=None):
-        if path.isabs(data_file):
+        # print(type(data_file))
+        if isinstance(data_file, str) and path.isabs(data_file):
             if path.isdir(data_file):
                 print('not a file')
 

@@ -189,6 +189,8 @@ class ADC(Core):
             else:
                 dump = np.ndarray((0,))
 
+            # dump = self.generate_data()
+
             dump = dump.reshape((-1, self.boards[0].n_active_ch)).T
             cols = (_ for _ in dump)
 

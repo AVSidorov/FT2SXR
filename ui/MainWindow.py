@@ -4,7 +4,8 @@ from ui.MainWindowUIDesign import Ui_MainWindow
 from ui.CentralWidgetUI import MainWidget
 from ui.ADCUI import ADCUIWidget
 from ui.GSAUI import GSAWidget
-from ui.PX5UI import PX5Widget
+# from ui.PX5UI import PX5Widget
+from ui.PX5_bigUI import PX5Widget
 from ui.AmplifierUI import AmplifierWidget
 from ui.MeasurementSettingsUI import MeasurementSettingsWidget
 from ui.CalibrationSettingsUI import CalibrationSettingsWidget
@@ -40,8 +41,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
         width = QtWidgets.QApplication.desktop().screenGeometry().width()
         height = QtWidgets.QApplication.desktop().screenGeometry().height()
-        self.w = int(self.size().width() * 1366 / width)
-        self.h = int(self.size().height() * 768 / height)
+        self.w = int(self.size().width() * width / 1366)
+        self.h = int(self.size().height() * height / 768)
         self.resize(self.w, self.h)
 
         win_main = MainWidget(self.centralwidget)
@@ -152,10 +153,11 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
     def open_sxr(self, data_file=None):
         win = QtWidgets.QMainWindow(self)
+        # print(type(data_file))
 
         # data_dir = QtWidgets.QFileDialog.getExistingDirectory(self, "Выбрать папку измерения", ".")
 
-        if data_file is None:
+        if data_file is None or data_file is False:
             data_file = QtWidgets.QFileDialog.getOpenFileName(self,
                                                               "Select one or more files to open",
                                                               ".",
@@ -179,8 +181,9 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         request.ParseFromString(data)
         if request.sender == 1:
             if request.command == 2:
-                data_file = os.path.join(os.path.split(os.path.join(os.path.abspath('./'), request.data))[0], 'data_0.bin')
-                self.open_sxr(data_file=data_file)
+                if isinstance(request.data.decode('utf-8'), str):
+                    data_file = os.path.join(os.path.split(os.path.join(os.path.abspath('./'), request.data.decode('utf-8')))[0], 'data_0.bin')
+                    self.open_sxr(data_file=data_file)
 
 
 def main():
