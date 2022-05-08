@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>Form</class>
- <widget class="QWidget" name="Form">
+ <class>PX5Design</class>
+ <widget class="QWidget" name="PX5Design">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>454</width>
+    <width>455</width>
     <height>590</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string>PX5</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_8">
    <item>
@@ -38,7 +38,7 @@
            </widget>
           </item>
           <item row="0" column="1">
-           <widget class="QPushButton" name="enable_pushButton">
+           <widget class="QPushButton" name="MCAE_pushButton">
             <property name="text">
              <string>Enable</string>
             </property>
@@ -53,25 +53,18 @@
           <string>Режим запуска</string>
          </property>
          <layout class="QGridLayout" name="gridLayout_2">
-          <item row="0" column="0">
-           <widget class="QLabel" name="startsouece_label">
+          <item row="2" column="0">
+           <widget class="QLabel" name="spectrsource_label">
             <property name="text">
-             <string>Источник запуска</string>
+             <string>Источник спектра</string>
             </property>
            </widget>
           </item>
-          <item row="0" column="1">
-           <widget class="QComboBox" name="startsource_comboBox">
-            <item>
-             <property name="text">
-              <string>Токамак</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>АЦП</string>
-             </property>
-            </item>
+          <item row="3" column="0">
+           <widget class="QLabel" name="colltime_label">
+            <property name="text">
+             <string>Время сбора данных</string>
+            </property>
            </widget>
           </item>
           <item row="1" column="0">
@@ -81,29 +74,39 @@
             </property>
            </widget>
           </item>
-          <item row="1" column="1">
-           <widget class="QComboBox" name="tomeasure_comboBox">
-            <item>
-             <property name="text">
-              <string>Амплитуда</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>Интервал</string>
-             </property>
-            </item>
-           </widget>
-          </item>
-          <item row="2" column="0">
-           <widget class="QLabel" name="spectrsource_label">
+          <item row="0" column="0">
+           <widget class="QLabel" name="startsouece_label">
             <property name="text">
-             <string>Источник спектра</string>
+             <string>Источник запуска</string>
             </property>
            </widget>
           </item>
+          <item row="3" column="1">
+           <widget class="QComboBox" name="PRET_fast_comboBox">
+            <item>
+             <property name="text">
+              <string>MANUAL</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>NO LIMIT</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+          <item row="3" column="2">
+           <widget class="QLabel" name="label_100">
+            <property name="text">
+             <string>0 to 1677721.5S</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="3">
+           <widget class="QDoubleSpinBox" name="PRET_fast_doubleSpinBox"/>
+          </item>
           <item row="2" column="1">
-           <widget class="QComboBox" name="spectrsource_comboBox">
+           <widget class="QComboBox" name="MCAS_fast_comboBox">
             <item>
              <property name="text">
               <string comment="AAAAAAA" extracomment="BBBBBBBB">NORM</string>
@@ -126,15 +129,33 @@
             </item>
            </widget>
           </item>
-          <item row="3" column="0">
-           <widget class="QLabel" name="colltime_label">
-            <property name="text">
-             <string>Время сбора данных</string>
-            </property>
+          <item row="1" column="1">
+           <widget class="QComboBox" name="tomeasure_comboBox">
+            <item>
+             <property name="text">
+              <string>Амплитуда</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Интервал</string>
+             </property>
+            </item>
            </widget>
           </item>
-          <item row="3" column="1">
-           <widget class="QSpinBox" name="colltime_spinBox"/>
+          <item row="0" column="1">
+           <widget class="QComboBox" name="startsource_comboBox">
+            <item>
+             <property name="text">
+              <string>Токамак</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>АЦП</string>
+             </property>
+            </item>
+           </widget>
           </item>
          </layout>
         </widget>
@@ -148,22 +169,16 @@
           <item row="0" column="0">
            <widget class="QLabel" name="numberch_label">
             <property name="text">
-             <string>Число каналов</string>
+             <string>MCA channels</string>
             </property>
            </widget>
-          </item>
-          <item row="0" column="1">
-           <widget class="QSpinBox" name="numberch_spinBox"/>
           </item>
           <item row="1" column="0">
            <widget class="QLabel" name="label_6">
             <property name="text">
-             <string>Усиление сигнала</string>
+             <string>Total Gain</string>
             </property>
            </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="QDoubleSpinBox" name="doubleSpinBox"/>
           </item>
           <item row="2" column="0">
            <widget class="QLabel" name="flattop_label">
@@ -171,19 +186,6 @@
              <string>Flat Top Width</string>
             </property>
            </widget>
-          </item>
-          <item row="2" column="1">
-           <widget class="QDoubleSpinBox" name="flattop_doubleSpinBox"/>
-          </item>
-          <item row="3" column="0">
-           <widget class="QLabel" name="pktime_elabel">
-            <property name="text">
-             <string>Peaking Time</string>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="1">
-           <widget class="QDoubleSpinBox" name="pktime_doubleSpinBox"/>
           </item>
           <item row="4" column="0">
            <widget class="QLabel" name="pileup_label">
@@ -193,7 +195,7 @@
            </widget>
           </item>
           <item row="4" column="1">
-           <widget class="QComboBox" name="comboBox_36">
+           <widget class="QComboBox" name="PURE_fast_comboBox">
             <item>
              <property name="text">
               <string>ON</string>
@@ -206,6 +208,56 @@
             </item>
            </widget>
           </item>
+          <item row="3" column="0">
+           <widget class="QLabel" name="pktime_elabel">
+            <property name="text">
+             <string>Peaking Time</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="2">
+           <widget class="QLabel" name="label_96">
+            <property name="text">
+             <string>uS</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="3">
+           <widget class="QDoubleSpinBox" name="PURE_fast_doubleSpinBox"/>
+          </item>
+          <item row="3" column="3">
+           <widget class="QDoubleSpinBox" name="TPEA_fast_doubleSpinBox"/>
+          </item>
+          <item row="2" column="3">
+           <widget class="QDoubleSpinBox" name="TFLA_fast_doubleSpinBox"/>
+          </item>
+          <item row="3" column="2">
+           <widget class="QLabel" name="label_97">
+            <property name="text">
+             <string>uS</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="2">
+           <widget class="QLabel" name="label_98">
+            <property name="text">
+             <string>uS</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="3">
+           <widget class="QDoubleSpinBox" name="GAIN_fast_doubleSpinBox"/>
+          </item>
+          <item row="1" column="2">
+           <widget class="QLabel" name="label_99">
+            <property name="text">
+             <string>0.75 to 500</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QComboBox" name="MCAC_fast_comboBox"/>
+          </item>
          </layout>
         </widget>
        </item>
@@ -215,6 +267,16 @@
           <string>Вызодные сигналы</string>
          </property>
          <layout class="QGridLayout" name="gridLayout_4">
+          <item row="3" column="0">
+           <widget class="QLabel" name="aux2_label">
+            <property name="text">
+             <string>AUX2</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <widget class="QComboBox" name="AUO2_fast_comboBox"/>
+          </item>
           <item row="0" column="0">
            <widget class="QLabel" name="outputdac_label">
             <property name="text">
@@ -222,8 +284,22 @@
             </property>
            </widget>
           </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="aux1_label">
+            <property name="text">
+             <string>AUX1</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="dacoffdet_label">
+            <property name="text">
+             <string>DAC offset</string>
+            </property>
+           </widget>
+          </item>
           <item row="0" column="1">
-           <widget class="QComboBox" name="outputdac_comboBox">
+           <widget class="QComboBox" name="DACO_fast_comboBox">
             <item>
              <property name="text">
               <string>OFF</string>
@@ -251,72 +327,48 @@
             </item>
            </widget>
           </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="dacoffdet_label">
+          <item row="2" column="2">
+           <widget class="QLabel" name="label_92">
             <property name="text">
-             <string>DAC offset</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="QDoubleSpinBox" name="dacoffset_doubleSpinBox"/>
-          </item>
-          <item row="2" column="0">
-           <widget class="QLabel" name="aux1_label">
-            <property name="text">
-             <string>AUX1</string>
+             <string>1-8</string>
             </property>
            </widget>
           </item>
           <item row="2" column="1">
-           <widget class="QComboBox" name="aux1_comboBox">
-            <item>
-             <property name="text">
-              <string>DAC</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>AUXOUT1</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>AUXIN1</string>
-             </property>
-            </item>
-           </widget>
+           <widget class="QComboBox" name="AUO1_fast_comboBox"/>
           </item>
-          <item row="3" column="0">
-           <widget class="QLabel" name="aux2_label">
+          <item row="3" column="2">
+           <widget class="QLabel" name="label_93">
             <property name="text">
-             <string>AUX2</string>
+             <string>1-8</string>
             </property>
            </widget>
           </item>
-          <item row="3" column="1">
-           <widget class="QComboBox" name="aux2_comboBox">
-            <item>
-             <property name="text">
-              <string>AUXOUT2</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>AUXIN2</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>GATEH</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>GATEL</string>
-             </property>
-            </item>
+          <item row="2" column="3">
+           <widget class="QSpinBox" name="AUO1_fast_spinBox"/>
+          </item>
+          <item row="3" column="3">
+           <widget class="QSpinBox" name="AUO2_fast_spinBox"/>
+          </item>
+          <item row="1" column="2">
+           <widget class="QLabel" name="label_94">
+            <property name="text">
+             <string>-500 to 499 mV</string>
+            </property>
            </widget>
+          </item>
+          <item row="0" column="2">
+           <widget class="QLabel" name="label_95">
+            <property name="text">
+             <string>1-8</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="3">
+           <widget class="QSpinBox" name="DACO_fast_spinBox"/>
+          </item>
+          <item row="1" column="3">
+           <widget class="QSpinBox" name="DACF_fast_spinBox"/>
           </item>
          </layout>
         </widget>
@@ -339,7 +391,7 @@
          <property name="title">
           <string>Standart</string>
          </property>
-         <layout class="QGridLayout" name="gridLayout_6">
+         <layout class="QGridLayout" name="gridLayout_5">
           <item row="0" column="0">
            <widget class="QLabel" name="label">
             <property name="text">
@@ -347,8 +399,70 @@
             </property>
            </widget>
           </item>
-          <item row="0" column="2">
-           <widget class="QComboBox" name="comboBox">
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_2">
+            <property name="text">
+             <string>Slow threshold</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="2">
+           <widget class="QLabel" name="label_4">
+            <property name="text">
+             <string>0 to 24.9%</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="3">
+           <widget class="QDoubleSpinBox" name="THSL_doubleSpinBox">
+            <property name="decimals">
+             <number>3</number>
+            </property>
+            <property name="maximum">
+             <double>24.899999999999999</double>
+            </property>
+            <property name="singleStep">
+             <double>0.001000000000000</double>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="label_3">
+            <property name="text">
+             <string>Preset acquision time</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QComboBox" name="PRET_comboBox">
+            <item>
+             <property name="text">
+              <string>ON</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>OFF</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+          <item row="2" column="2">
+           <widget class="QLabel" name="label_5">
+            <property name="text">
+             <string>0 to 1677721.5S</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="3">
+           <widget class="QDoubleSpinBox" name="PRET_doubleSpinBox">
+            <property name="decimals">
+             <number>1</number>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QComboBox" name="MCAC_comboBox">
             <item>
              <property name="text">
               <string>8192</string>
@@ -381,61 +495,6 @@
             </item>
            </widget>
           </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="label_2">
-            <property name="text">
-             <string>Slow threshold</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="QLabel" name="label_4">
-            <property name="text">
-             <string>0 to 24.9%</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="2">
-           <widget class="QDoubleSpinBox" name="doubleSpinBox_2">
-            <property name="decimals">
-             <number>3</number>
-            </property>
-            <property name="maximum">
-             <double>24.899999999999999</double>
-            </property>
-            <property name="singleStep">
-             <double>0.001000000000000</double>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="0">
-           <widget class="QLabel" name="label_3">
-            <property name="text">
-             <string>Preset acquision time</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="1">
-           <widget class="QLabel" name="label_5">
-            <property name="text">
-             <string>TextLabel</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="2">
-           <layout class="QGridLayout" name="gridLayout_5">
-            <item row="0" column="0">
-             <widget class="QComboBox" name="comboBox_2"/>
-            </item>
-            <item row="0" column="1">
-             <widget class="QDoubleSpinBox" name="doubleSpinBox_3">
-              <property name="decimals">
-               <number>1</number>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
          </layout>
         </widget>
        </item>
@@ -444,29 +503,46 @@
          <property name="title">
           <string>Advanced</string>
          </property>
-         <layout class="QGridLayout" name="gridLayout_7">
-          <item row="0" column="0">
-           <widget class="QLabel" name="label_7">
+         <layout class="QGridLayout" name="gridLayout_6">
+          <item row="8" column="1">
+           <widget class="QComboBox" name="MCAS_comboBox"/>
+          </item>
+          <item row="9" column="0">
+           <widget class="QLabel" name="label_16">
             <property name="text">
-             <string>Preset Count</string>
+             <string>MCS timebase</string>
             </property>
            </widget>
           </item>
-          <item row="0" column="1">
-           <widget class="QComboBox" name="comboBox_3">
-            <item>
-             <property name="text">
-              <string>ON</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>OFF</string>
-             </property>
-            </item>
+          <item row="9" column="2">
+           <widget class="QLabel" name="label_85">
+            <property name="text">
+             <string>0 to 655.35S</string>
+            </property>
            </widget>
           </item>
-          <item row="0" column="2">
+          <item row="5" column="0">
+           <widget class="QLabel" name="label_13">
+            <property name="text">
+             <string>Spectrum Offset</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <widget class="QLabel" name="label_11">
+            <property name="text">
+             <string>Gate Control</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_88">
+            <property name="text">
+             <string>Preset Count Channels</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1" colspan="3">
            <layout class="QHBoxLayout" name="horizontalLayout_2">
             <item>
              <widget class="QLabel" name="label_8">
@@ -490,59 +566,36 @@
             </item>
            </layout>
           </item>
-          <item row="1" column="0">
+          <item row="2" column="0">
            <widget class="QLabel" name="label_10">
             <property name="text">
              <string>Preset Real Time</string>
             </property>
            </widget>
           </item>
-          <item row="1" column="1">
-           <widget class="QComboBox" name="comboBox_4">
-            <item>
-             <property name="text">
-              <string>ON</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>OFF</string>
-             </property>
-            </item>
-           </widget>
-          </item>
-          <item row="1" column="2">
-           <widget class="QSpinBox" name="spinBox_3"/>
-          </item>
-          <item row="2" column="0">
-           <widget class="QLabel" name="label_11">
+          <item row="2" column="2">
+           <widget class="QLabel" name="label_89">
             <property name="text">
-             <string>Gate Control</string>
+             <string>0 to 4294967.29</string>
             </property>
            </widget>
           </item>
-          <item row="2" column="1">
-           <widget class="QComboBox" name="comboBox_5"/>
-          </item>
-          <item row="3" column="0">
+          <item row="4" column="0">
            <widget class="QLabel" name="label_12">
             <property name="text">
              <string>Peak Detect Mode</string>
             </property>
            </widget>
           </item>
-          <item row="3" column="1">
-           <widget class="QComboBox" name="comboBox_6"/>
-          </item>
-          <item row="4" column="0">
-           <widget class="QLabel" name="label_13">
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_7">
             <property name="text">
-             <string>Spectrum Offset</string>
+             <string>Preset Counsts</string>
             </property>
            </widget>
           </item>
-          <item row="4" column="1">
-           <widget class="QComboBox" name="comboBox_7">
+          <item row="2" column="1">
+           <widget class="QComboBox" name="PRER_comboBox">
             <item>
              <property name="text">
               <string>ON</string>
@@ -555,62 +608,134 @@
             </item>
            </widget>
           </item>
-          <item row="4" column="2">
-           <widget class="QSpinBox" name="spinBox_4"/>
+          <item row="0" column="2">
+           <widget class="QLabel" name="label_87">
+            <property name="text">
+             <string>0 to 4294967295cnt</string>
+            </property>
+           </widget>
           </item>
-          <item row="5" column="0">
+          <item row="5" column="2">
+           <widget class="QLabel" name="label_91">
+            <property name="text">
+             <string>+/- channels</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="3">
+           <widget class="QSpinBox" name="PREC_spinBox"/>
+          </item>
+          <item row="5" column="3">
+           <widget class="QDoubleSpinBox" name="SOFF_doubleSpinBox"/>
+          </item>
+          <item row="7" column="0">
            <widget class="QLabel" name="label_14">
             <property name="text">
              <string>Low Level Descriminator</string>
             </property>
            </widget>
           </item>
-          <item row="5" column="1">
-           <widget class="QComboBox" name="comboBox_8"/>
+          <item row="7" column="1">
+           <widget class="QComboBox" name="TLLD_comboBox">
+            <item>
+             <property name="text">
+              <string>ON</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>OFF</string>
+             </property>
+            </item>
+           </widget>
           </item>
-          <item row="6" column="0">
+          <item row="3" column="1">
+           <widget class="QComboBox" name="comboBox_5"/>
+          </item>
+          <item row="4" column="1">
+           <widget class="QComboBox" name="PDMD_comboBox"/>
+          </item>
+          <item row="2" column="3">
+           <widget class="QDoubleSpinBox" name="PRER_doubleSpinBox"/>
+          </item>
+          <item row="7" column="2">
+           <widget class="QLabel" name="label_90">
+            <property name="text">
+             <string>CH</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QComboBox" name="PREC_comboBox">
+            <item>
+             <property name="text">
+              <string>ON</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>OFF</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+          <item row="5" column="1">
+           <widget class="QComboBox" name="SOFF_comboBox">
+            <item>
+             <property name="text">
+              <string>ON</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>OFF</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+          <item row="8" column="0">
            <widget class="QLabel" name="label_15">
             <property name="text">
              <string>MCA Source</string>
             </property>
            </widget>
           </item>
-          <item row="6" column="1">
-           <widget class="QComboBox" name="comboBox_9"/>
-          </item>
-          <item row="7" column="0">
-           <widget class="QLabel" name="label_16">
-            <property name="text">
-             <string>MCA timebase</string>
-            </property>
-           </widget>
-          </item>
-          <item row="7" column="1">
-           <widget class="QDoubleSpinBox" name="doubleSpinBox_4"/>
-          </item>
-          <item row="7" column="2">
+          <item row="10" column="1" colspan="3">
            <layout class="QHBoxLayout" name="horizontalLayout_3">
             <item>
              <widget class="QLabel" name="label_17">
               <property name="text">
-               <string>Low CH</string>
+               <string>Low</string>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="QSpinBox" name="spinBox_5"/>
+             <widget class="QSpinBox" name="MCSL_spinBox"/>
             </item>
             <item>
              <widget class="QLabel" name="label_18">
               <property name="text">
-               <string>High CH</string>
+               <string>High</string>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="QSpinBox" name="spinBox_6"/>
+             <widget class="QSpinBox" name="MCSH_spinBox"/>
             </item>
            </layout>
+          </item>
+          <item row="10" column="0">
+           <widget class="QLabel" name="label_86">
+            <property name="text">
+             <string>MCS Channels</string>
+            </property>
+           </widget>
+          </item>
+          <item row="9" column="3">
+           <widget class="QDoubleSpinBox" name="MCST_doubleSpinBox"/>
+          </item>
+          <item row="7" column="3">
+           <widget class="QDoubleSpinBox" name="TLLD_doubleSpinBox"/>
           </item>
          </layout>
         </widget>
@@ -628,11 +753,21 @@
           <string>Standart</string>
          </property>
          <layout class="QGridLayout" name="gridLayout_8">
-          <item row="2" column="1">
-           <widget class="QDoubleSpinBox" name="doubleSpinBox_6"/>
+          <item row="2" column="3">
+           <widget class="QDoubleSpinBox" name="TFLA_doubleSpinBox"/>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="label_21">
+            <property name="text">
+             <string>FlatTop Width</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="3">
+           <widget class="QDoubleSpinBox" name="TPEA_doubleSpinBox"/>
           </item>
           <item row="0" column="1">
-           <widget class="QComboBox" name="comboBox_10">
+           <widget class="QComboBox" name="PURE_comboBox">
             <item>
              <property name="text">
               <string>ON</string>
@@ -645,9 +780,6 @@
             </item>
            </widget>
           </item>
-          <item row="1" column="1">
-           <widget class="QDoubleSpinBox" name="doubleSpinBox_5"/>
-          </item>
           <item row="1" column="0">
            <widget class="QLabel" name="label_20">
             <property name="text">
@@ -655,17 +787,34 @@
             </property>
            </widget>
           </item>
-          <item row="2" column="0">
-           <widget class="QLabel" name="label_21">
-            <property name="text">
-             <string>FlatTop Width</string>
-            </property>
-           </widget>
-          </item>
           <item row="0" column="0">
            <widget class="QLabel" name="label_19">
             <property name="text">
              <string>Pile-Up Rejection</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="3">
+           <widget class="QDoubleSpinBox" name="PURE_doubleSpinBox"/>
+          </item>
+          <item row="0" column="2">
+           <widget class="QLabel" name="label_76">
+            <property name="text">
+             <string>uS</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="2">
+           <widget class="QLabel" name="label_77">
+            <property name="text">
+             <string>uS</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="2">
+           <widget class="QLabel" name="label_78">
+            <property name="text">
+             <string>uS</string>
             </property>
            </widget>
           </item>
@@ -678,6 +827,236 @@
           <string>Advanced</string>
          </property>
          <layout class="QGridLayout" name="gridLayout_9">
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_22">
+            <property name="text">
+             <string>Fast Threshold</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="2">
+           <widget class="QLabel" name="label_23">
+            <property name="text">
+             <string>0 to 255.93</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="3">
+           <widget class="QDoubleSpinBox" name="THFA_doubleSpinBox"/>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_24">
+            <property name="text">
+             <string>Fast Peaking Time</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="3">
+           <widget class="QComboBox" name="TPFA_comboBox">
+            <item>
+             <property name="text">
+              <string>50</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>100</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>200</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>400</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>800</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+          <item row="2" column="0" colspan="4">
+           <widget class="Line" name="line">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0" colspan="2">
+           <widget class="QLabel" name="label_25">
+            <property name="text">
+             <string>Baseline REstoration (BLR) Mode</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="2">
+           <widget class="QComboBox" name="BLRM_comboBox">
+            <item>
+             <property name="text">
+              <string>ON</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>OFF</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+          <item row="4" column="0">
+           <widget class="QLabel" name="label_27">
+            <property name="text">
+             <string>BLR Correction</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="2">
+           <widget class="QLabel" name="label_28">
+            <property name="text">
+             <string>0 to 3</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="3">
+           <layout class="QHBoxLayout" name="horizontalLayout_4">
+            <item>
+             <widget class="QLabel" name="label_29">
+              <property name="text">
+               <string>Down</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QSpinBox" name="BLRD_spinBox"/>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_30">
+              <property name="text">
+               <string>Up</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QSpinBox" name="BLRU_spinBox"/>
+            </item>
+           </layout>
+          </item>
+          <item row="5" column="0" colspan="4">
+           <widget class="Line" name="line_2">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+           </widget>
+          </item>
+          <item row="6" column="0" colspan="2">
+           <widget class="QLabel" name="label_31">
+            <property name="text">
+             <string>Rise Time Discrimination (RTD)</string>
+            </property>
+           </widget>
+          </item>
+          <item row="6" column="2">
+           <widget class="QComboBox" name="RTDE_comboBox">
+            <item>
+             <property name="text">
+              <string>ON</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>OFF</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+          <item row="7" column="0">
+           <widget class="QLabel" name="label_32">
+            <property name="text">
+             <string>RTD Threshold</string>
+            </property>
+           </widget>
+          </item>
+          <item row="7" column="2">
+           <widget class="QLabel" name="label_33">
+            <property name="text">
+             <string>0 to 49.9%</string>
+            </property>
+           </widget>
+          </item>
+          <item row="7" column="3">
+           <widget class="QDoubleSpinBox" name="RTDT_doubleSpinBox"/>
+          </item>
+          <item row="8" column="0">
+           <widget class="QLabel" name="label_34">
+            <property name="text">
+             <string>RTD Sensivity</string>
+            </property>
+           </widget>
+          </item>
+          <item row="8" column="2">
+           <widget class="QLabel" name="label_35">
+            <property name="text">
+             <string>0 to 398%</string>
+            </property>
+           </widget>
+          </item>
+          <item row="8" column="3">
+           <widget class="QDoubleSpinBox" name="RTDS_doubleSpinBox"/>
+          </item>
+          <item row="9" column="0" colspan="4">
+           <widget class="Line" name="line_3">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+           </widget>
+          </item>
+          <item row="10" column="0" rowspan="2">
+           <widget class="QLabel" name="label_36">
+            <property name="text">
+             <string>Non-Trapezoidal Shiping</string>
+            </property>
+           </widget>
+          </item>
+          <item row="11" column="1" colspan="2">
+           <layout class="QHBoxLayout" name="horizontalLayout_6">
+            <item>
+             <widget class="QComboBox" name="CUSP_comboBox">
+              <item>
+               <property name="text">
+                <string>ON</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>OFF</string>
+               </property>
+              </item>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_37">
+              <property name="text">
+               <string>-99 to 99%</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item row="11" column="3">
+           <widget class="QSpinBox" name="CUSP_spinBox"/>
+          </item>
+          <item row="12" column="0" colspan="4">
+           <widget class="Line" name="line_4">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+           </widget>
+          </item>
           <item row="13" column="0">
            <widget class="QLabel" name="label_38">
             <property name="text">
@@ -686,7 +1065,14 @@
            </widget>
           </item>
           <item row="13" column="2">
-           <widget class="QComboBox" name="comboBox_14">
+           <widget class="QLabel" name="label_39">
+            <property name="text">
+             <string>MHz</string>
+            </property>
+           </widget>
+          </item>
+          <item row="13" column="3">
+           <widget class="QComboBox" name="CLCK_comboBox">
             <item>
              <property name="text">
               <string>80</string>
@@ -699,199 +1085,6 @@
             </item>
            </widget>
           </item>
-          <item row="13" column="1">
-           <widget class="QLabel" name="label_39">
-            <property name="text">
-             <string>MHz</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1">
-           <widget class="QLabel" name="label_23">
-            <property name="text">
-             <string>0 to 511.93</string>
-            </property>
-           </widget>
-          </item>
-          <item row="7" column="0">
-           <widget class="QLabel" name="label_31">
-            <property name="text">
-             <string>Rise Time Discrimination (RTD)</string>
-            </property>
-           </widget>
-          </item>
-          <item row="8" column="0">
-           <widget class="QLabel" name="label_32">
-            <property name="text">
-             <string>RTD Threshold</string>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="0">
-           <widget class="QLabel" name="label_25">
-            <property name="text">
-             <string>Baseline REstoration (BLR) Mode</string>
-            </property>
-           </widget>
-          </item>
-          <item row="9" column="0">
-           <widget class="QLabel" name="label_34">
-            <property name="text">
-             <string>RTD Sensivity</string>
-            </property>
-           </widget>
-          </item>
-          <item row="7" column="1">
-           <widget class="QComboBox" name="comboBox_13">
-            <item>
-             <property name="text">
-              <string>ON</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>OFF</string>
-             </property>
-            </item>
-           </widget>
-          </item>
-          <item row="11" column="1">
-           <widget class="QLabel" name="label_37">
-            <property name="text">
-             <string>-99 to 99%</string>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="1">
-           <widget class="QComboBox" name="comboBox_12">
-            <item>
-             <property name="text">
-              <string>ON</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>OFF</string>
-             </property>
-            </item>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="label_24">
-            <property name="text">
-             <string>Fast Peaking Time</string>
-            </property>
-           </widget>
-          </item>
-          <item row="9" column="1">
-           <widget class="QLabel" name="label_35">
-            <property name="text">
-             <string>0 to 398%</string>
-            </property>
-           </widget>
-          </item>
-          <item row="9" column="2">
-           <widget class="QDoubleSpinBox" name="doubleSpinBox_9"/>
-          </item>
-          <item row="0" column="2">
-           <widget class="QDoubleSpinBox" name="doubleSpinBox_7"/>
-          </item>
-          <item row="11" column="0">
-           <widget class="QLabel" name="label_36">
-            <property name="text">
-             <string>Non-Trapezoidal Shiping</string>
-            </property>
-           </widget>
-          </item>
-          <item row="4" column="0">
-           <widget class="QLabel" name="label_27">
-            <property name="text">
-             <string>BLR Correction</string>
-            </property>
-           </widget>
-          </item>
-          <item row="4" column="1">
-           <widget class="QLabel" name="label_28">
-            <property name="text">
-             <string>0 to 3</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="0">
-           <widget class="QLabel" name="label_22">
-            <property name="text">
-             <string>Fast Threshold</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="2">
-           <widget class="QComboBox" name="comboBox_11"/>
-          </item>
-          <item row="8" column="1">
-           <widget class="QLabel" name="label_33">
-            <property name="text">
-             <string>0 to 49.9%</string>
-            </property>
-           </widget>
-          </item>
-          <item row="8" column="2">
-           <widget class="QDoubleSpinBox" name="doubleSpinBox_8"/>
-          </item>
-          <item row="11" column="2">
-           <widget class="QSpinBox" name="spinBox_9"/>
-          </item>
-          <item row="5" column="0" colspan="3">
-           <widget class="Line" name="line_2">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="0" colspan="3">
-           <widget class="Line" name="line">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-           </widget>
-          </item>
-          <item row="10" column="0" colspan="3">
-           <widget class="Line" name="line_3">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-           </widget>
-          </item>
-          <item row="4" column="2">
-           <layout class="QHBoxLayout" name="horizontalLayout_4">
-            <item>
-             <widget class="QLabel" name="label_29">
-              <property name="text">
-               <string>Down</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QSpinBox" name="spinBox_7"/>
-            </item>
-            <item>
-             <widget class="QLabel" name="label_30">
-              <property name="text">
-               <string>Up</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QSpinBox" name="spinBox_8"/>
-            </item>
-           </layout>
-          </item>
-          <item row="12" column="0" colspan="3">
-           <widget class="Line" name="line_4">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-           </widget>
-          </item>
          </layout>
          <widget class="QLabel" name="label_26">
           <property name="geometry">
@@ -899,7 +1092,7 @@
             <x>10</x>
             <y>110</y>
             <width>47</width>
-            <height>13</height>
+            <height>16</height>
            </rect>
           </property>
           <property name="text">
@@ -920,7 +1113,13 @@
          <property name="minimumSize">
           <size>
            <width>412</width>
-           <height>189</height>
+           <height>40</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>150</height>
           </size>
          </property>
          <property name="title">
@@ -942,7 +1141,7 @@
            </widget>
           </item>
           <item row="0" column="2">
-           <widget class="QDoubleSpinBox" name="doubleSpinBox_10"/>
+           <widget class="QDoubleSpinBox" name="GAIN_doubleSpinBox"/>
           </item>
          </layout>
         </widget>
@@ -961,7 +1160,28 @@
            </widget>
           </item>
           <item row="0" column="1">
-           <widget class="QComboBox" name="comboBox_15"/>
+           <widget class="QComboBox" name="PAPZ_comboBox">
+            <item>
+             <property name="text">
+              <string>ON</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>OFF</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+          <item row="0" column="2">
+           <widget class="QLabel" name="label_80">
+            <property name="text">
+             <string>34.5 to 8773 uS</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="3">
+           <widget class="QDoubleSpinBox" name="PAPZ_doubleSpinBox"/>
           </item>
           <item row="1" column="0">
            <widget class="QLabel" name="label_43">
@@ -970,8 +1190,34 @@
             </property>
            </widget>
           </item>
+          <item row="1" column="1">
+           <widget class="QComboBox" name="INOF_comboBox">
+            <item>
+             <property name="text">
+              <string>DEF</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>AUTO</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>MANUAL</string>
+             </property>
+            </item>
+           </widget>
+          </item>
           <item row="1" column="2">
-           <widget class="QComboBox" name="comboBox_16"/>
+           <widget class="QLabel" name="label_79">
+            <property name="text">
+             <string>-2047 to 2047mV</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="3">
+           <widget class="QDoubleSpinBox" name="INOF_doubleSpinBox"/>
           </item>
           <item row="2" column="0">
            <widget class="QLabel" name="label_44">
@@ -980,8 +1226,19 @@
             </property>
            </widget>
           </item>
-          <item row="2" column="2">
-           <widget class="QComboBox" name="comboBox_17"/>
+          <item row="2" column="1">
+           <widget class="QComboBox" name="AINP_comboBox">
+            <item>
+             <property name="text">
+              <string>POS</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>NEG</string>
+             </property>
+            </item>
+           </widget>
           </item>
           <item row="3" column="0">
            <widget class="QLabel" name="label_45">
@@ -990,15 +1247,61 @@
             </property>
            </widget>
           </item>
-          <item row="3" column="1">
+          <item row="3" column="2">
            <widget class="QLabel" name="label_46">
             <property name="text">
              <string>1 to 3226 uS</string>
             </property>
            </widget>
           </item>
-          <item row="3" column="2">
-           <widget class="QDoubleSpinBox" name="doubleSpinBox_11"/>
+          <item row="3" column="1">
+           <widget class="QComboBox" name="RESL_comboBox">
+            <item>
+             <property name="text">
+              <string>OFF</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>25.6</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>51.2</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>102.4</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>204.8</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>409.6</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>819.2</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>1638.4</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>3276.8</string>
+             </property>
+            </item>
+           </widget>
           </item>
          </layout>
         </widget>
@@ -1024,14 +1327,28 @@
            </widget>
           </item>
           <item row="0" column="1">
+           <widget class="QComboBox" name="TECS_comboBox">
+            <item>
+             <property name="text">
+              <string>ON</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>OFF</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+          <item row="0" column="2">
            <widget class="QLabel" name="label_48">
             <property name="text">
              <string>0 to 299K</string>
             </property>
            </widget>
           </item>
-          <item row="0" column="2">
-           <widget class="QSpinBox" name="spinBox_10"/>
+          <item row="0" column="3">
+           <widget class="QSpinBox" name="TECS_spinBox"/>
           </item>
           <item row="1" column="0">
            <widget class="QLabel" name="label_49">
@@ -1041,16 +1358,30 @@
            </widget>
           </item>
           <item row="1" column="1">
+           <widget class="QComboBox" name="HVSE_comboBox">
+            <item>
+             <property name="text">
+              <string>ON</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>OFF</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+          <item row="1" column="2">
            <widget class="QLabel" name="label_50">
             <property name="text">
              <string>-1500 to 1500</string>
             </property>
            </widget>
           </item>
-          <item row="1" column="2">
+          <item row="1" column="3">
            <layout class="QHBoxLayout" name="horizontalLayout_5">
             <item>
-             <widget class="QComboBox" name="comboBox_18">
+             <widget class="QComboBox" name="HVSE_sign_comboBox">
               <item>
                <property name="text">
                 <string>-</string>
@@ -1064,7 +1395,7 @@
              </widget>
             </item>
             <item>
-             <widget class="QSpinBox" name="spinBox_11"/>
+             <widget class="QSpinBox" name="HVSE_spinBox"/>
             </item>
            </layout>
           </item>
@@ -1085,14 +1416,30 @@
            </widget>
           </item>
           <item row="0" column="1">
+           <widget class="QComboBox" name="PAPS_comboBox">
+            <item>
+             <property name="text">
+              <string>8.5</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>5</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>OFF</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+          <item row="0" column="2">
            <widget class="QLabel" name="label_52">
             <property name="text">
              <string>V</string>
             </property>
            </widget>
-          </item>
-          <item row="0" column="2">
-           <widget class="QDoubleSpinBox" name="doubleSpinBox_12"/>
           </item>
          </layout>
         </widget>
@@ -1110,106 +1457,15 @@
           <string>Advanced</string>
          </property>
          <layout class="QGridLayout" name="gridLayout_14">
-          <item row="2" column="0" colspan="3">
-           <widget class="Line" name="line_5">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-           </widget>
-          </item>
-          <item row="10" column="0" colspan="3">
-           <widget class="Line" name="line_7">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-           </widget>
-          </item>
-          <item row="19" column="2">
-           <widget class="QSpinBox" name="spinBox_14"/>
-          </item>
-          <item row="18" column="2">
-           <widget class="QSpinBox" name="spinBox_13"/>
-          </item>
-          <item row="19" column="0">
-           <widget class="QLabel" name="label_69">
+          <item row="11" column="0">
+           <widget class="QLabel" name="label_62">
             <property name="text">
-             <string>Gain</string>
-            </property>
-           </widget>
-          </item>
-          <item row="18" column="0">
-           <widget class="QLabel" name="label_68">
-            <property name="text">
-             <string>Trigger Position</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="0">
-           <widget class="QLabel" name="label_53">
-            <property name="text">
-             <string>DAC Analog Out</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="2">
-           <widget class="QComboBox" name="comboBox_19"/>
-          </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="label_54">
-            <property name="text">
-             <string>Output Offset</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="QLabel" name="label_55">
-            <property name="text">
-             <string>-500 to 499 mV</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="2">
-           <widget class="QSpinBox" name="spinBox_12"/>
-          </item>
-          <item row="3" column="0">
-           <widget class="QLabel" name="label_56">
-            <property name="text">
-             <string>AUX1</string>
-            </property>
-           </widget>
-          </item>
-          <item row="4" column="0">
-           <widget class="QLabel" name="label_57">
-            <property name="text">
-             <string>Test Pulser</string>
-            </property>
-           </widget>
-          </item>
-          <item row="6" column="2">
-           <widget class="QComboBox" name="comboBox_23"/>
-          </item>
-          <item row="7" column="0">
-           <widget class="QLabel" name="label_60">
-            <property name="text">
-             <string>Connector2</string>
-            </property>
-           </widget>
-          </item>
-          <item row="5" column="2">
-           <widget class="QComboBox" name="comboBox_22"/>
-          </item>
-          <item row="7" column="2">
-           <widget class="QComboBox" name="comboBox_24"/>
-          </item>
-          <item row="9" column="0">
-           <widget class="QLabel" name="label_61">
-            <property name="text">
-             <string>PX5 Speaker</string>
+             <string>Genral Purpose Counter Edge</string>
             </property>
            </widget>
           </item>
           <item row="9" column="1">
-           <widget class="QComboBox" name="comboBox_25">
+           <widget class="QComboBox" name="VOLU_comboBox">
             <item>
              <property name="text">
               <string>ON</string>
@@ -1222,23 +1478,96 @@
             </item>
            </widget>
           </item>
-          <item row="11" column="0">
-           <widget class="QLabel" name="label_62">
-            <property name="text">
-             <string>Genral Purpose Counter (GPC) Edge</string>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="2">
-           <widget class="QComboBox" name="comboBox_20"/>
-          </item>
-          <item row="4" column="1">
-           <widget class="QComboBox" name="comboBox_21"/>
-          </item>
           <item row="5" column="0">
            <widget class="QLabel" name="label_58">
             <property name="text">
-             <string>Aux2</string>
+             <string>AUX2</string>
+            </property>
+           </widget>
+          </item>
+          <item row="10" column="0" colspan="4">
+           <widget class="Line" name="line_7">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0" colspan="4">
+           <widget class="Line" name="line_5">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+           </widget>
+          </item>
+          <item row="18" column="0">
+           <widget class="QLabel" name="label_68">
+            <property name="text">
+             <string>Trigger Position</string>
+            </property>
+           </widget>
+          </item>
+          <item row="18" column="3">
+           <widget class="QSpinBox" name="SCOT_spinBox"/>
+          </item>
+          <item row="19" column="0">
+           <widget class="QLabel" name="label_69">
+            <property name="text">
+             <string>Gain</string>
+            </property>
+           </widget>
+          </item>
+          <item row="19" column="3">
+           <widget class="QSpinBox" name="SCOG_spinBox"/>
+          </item>
+          <item row="1" column="3">
+           <widget class="QSpinBox" name="DACF_spinBox"/>
+          </item>
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_53">
+            <property name="text">
+             <string>DAC Analog Out</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_54">
+            <property name="text">
+             <string>Output Offset</string>
+            </property>
+           </widget>
+          </item>
+          <item row="7" column="0">
+           <widget class="QLabel" name="label_60">
+            <property name="text">
+             <string>Connector2</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="0">
+           <widget class="QLabel" name="label_57">
+            <property name="text">
+             <string>Test Pulser</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <widget class="QLabel" name="label_56">
+            <property name="text">
+             <string>AUX1</string>
+            </property>
+           </widget>
+          </item>
+          <item row="9" column="0">
+           <widget class="QLabel" name="label_61">
+            <property name="text">
+             <string>PX5 Speaker</string>
+            </property>
+           </widget>
+          </item>
+          <item row="17" column="0">
+           <widget class="QLabel" name="label_67">
+            <property name="text">
+             <string>Scope Trigger Edge</string>
             </property>
            </widget>
           </item>
@@ -1249,6 +1578,9 @@
             </property>
            </widget>
           </item>
+          <item row="14" column="1">
+           <widget class="QComboBox" name="GPMC_comboBox"/>
+          </item>
           <item row="12" column="0">
            <widget class="QLabel" name="label_63">
             <property name="text">
@@ -1256,36 +1588,10 @@
             </property>
            </widget>
           </item>
-          <item row="14" column="1">
-           <widget class="QComboBox" name="comboBox_29"/>
-          </item>
-          <item row="17" column="0">
-           <widget class="QLabel" name="label_67">
-            <property name="text">
-             <string>Scope Trigger Edge</string>
-            </property>
-           </widget>
-          </item>
-          <item row="17" column="2">
-           <widget class="QComboBox" name="comboBox_31"/>
-          </item>
-          <item row="12" column="2">
-           <widget class="QComboBox" name="comboBox_27"/>
-          </item>
           <item row="15" column="0">
            <widget class="QLabel" name="label_66">
             <property name="text">
              <string>Counter Input</string>
-            </property>
-           </widget>
-          </item>
-          <item row="11" column="2">
-           <widget class="QComboBox" name="comboBox_26"/>
-          </item>
-          <item row="13" column="0">
-           <widget class="QLabel" name="label_64">
-            <property name="text">
-             <string>GPC Uses Gate?</string>
             </property>
            </widget>
           </item>
@@ -1296,25 +1602,106 @@
             </property>
            </widget>
           </item>
-          <item row="15" column="2">
-           <widget class="QComboBox" name="comboBox_30"/>
+          <item row="13" column="0">
+           <widget class="QLabel" name="label_64">
+            <property name="text">
+             <string>GPC Uses Gate?</string>
+            </property>
+           </widget>
           </item>
           <item row="13" column="1">
-           <widget class="QComboBox" name="comboBox_28"/>
+           <widget class="QComboBox" name="GPGA_comboBox"/>
           </item>
-          <item row="8" column="0" colspan="3">
+          <item row="8" column="0" colspan="4">
            <widget class="Line" name="line_6">
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
             </property>
            </widget>
           </item>
-          <item row="16" column="0" colspan="3">
+          <item row="16" column="0" colspan="4">
            <widget class="Line" name="line_8">
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
             </property>
            </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QComboBox" name="DACO_comboBox"/>
+          </item>
+          <item row="0" column="3">
+           <widget class="QSpinBox" name="DACO_spinBox"/>
+          </item>
+          <item row="0" column="2">
+           <widget class="QLabel" name="label_81">
+            <property name="text">
+             <string>1 to 8</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="2">
+           <widget class="QLabel" name="label_55">
+            <property name="text">
+             <string>-500 to 499 mV</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <widget class="QComboBox" name="AUO1_comboBox"/>
+          </item>
+          <item row="3" column="2">
+           <widget class="QLabel" name="label_82">
+            <property name="text">
+             <string>1 to 8</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="3">
+           <widget class="QSpinBox" name="AUO1_spinBox"/>
+          </item>
+          <item row="4" column="1">
+           <widget class="QComboBox" name="TPMO_comboBox"/>
+          </item>
+          <item row="5" column="1">
+           <widget class="QComboBox" name="AUO2_comboBox"/>
+          </item>
+          <item row="5" column="2">
+           <widget class="QLabel" name="label_83">
+            <property name="text">
+             <string>1 to 8</string>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="3">
+           <widget class="QSpinBox" name="AUO2_spinBox"/>
+          </item>
+          <item row="6" column="1">
+           <widget class="QComboBox" name="CON1_comboBox"/>
+          </item>
+          <item row="7" column="1">
+           <widget class="QComboBox" name="CON2_comboBox"/>
+          </item>
+          <item row="15" column="1">
+           <widget class="QComboBox" name="GPIN_comboBox"/>
+          </item>
+          <item row="15" column="2">
+           <widget class="QLabel" name="label_84">
+            <property name="text">
+             <string>1 to 8</string>
+            </property>
+           </widget>
+          </item>
+          <item row="15" column="3">
+           <widget class="QSpinBox" name="GPIN_spinBox"/>
+          </item>
+          <item row="11" column="1">
+           <widget class="QComboBox" name="GPED_comboBox"/>
+          </item>
+          <item row="12" column="1">
+           <widget class="QComboBox" name="GPME_comboBox"/>
+          </item>
+          <item row="17" column="1">
+           <widget class="QComboBox" name="SCOE_comboBox"/>
           </item>
          </layout>
         </widget>
@@ -1349,9 +1736,6 @@
             </property>
            </widget>
           </item>
-          <item row="1" column="2">
-           <widget class="QComboBox" name="comboBox_33"/>
-          </item>
           <item row="2" column="0">
            <widget class="QLabel" name="label_72">
             <property name="text">
@@ -1360,17 +1744,17 @@
            </widget>
           </item>
           <item row="2" column="2">
-           <widget class="QSpinBox" name="spinBox_15"/>
+           <widget class="QSpinBox" name="SCAL_spinBox"/>
           </item>
           <item row="3" column="0">
            <widget class="QLabel" name="label_73">
             <property name="text">
-             <string>Hogh Threshold</string>
+             <string>High Threshold</string>
             </property>
            </widget>
           </item>
           <item row="3" column="2">
-           <widget class="QSpinBox" name="spinBox_16"/>
+           <widget class="QSpinBox" name="SCAH_spinBox"/>
           </item>
           <item row="4" column="0">
            <widget class="QLabel" name="label_74">
@@ -1379,9 +1763,6 @@
             </property>
            </widget>
           </item>
-          <item row="4" column="2">
-           <widget class="QComboBox" name="comboBox_34"/>
-          </item>
           <item row="5" column="0">
            <widget class="QLabel" name="label_75">
             <property name="text">
@@ -1389,8 +1770,14 @@
             </property>
            </widget>
           </item>
-          <item row="5" column="2">
-           <widget class="QComboBox" name="comboBox_35"/>
+          <item row="1" column="1">
+           <widget class="QComboBox" name="SCAI_comboBox"/>
+          </item>
+          <item row="4" column="1">
+           <widget class="QComboBox" name="SCAO_comboBox"/>
+          </item>
+          <item row="5" column="1">
+           <widget class="QComboBox" name="SCAW_comboBox"/>
           </item>
          </layout>
         </widget>
@@ -1419,6 +1806,104 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>tabWidget</tabstop>
+  <tabstop>MCAE_pushButton</tabstop>
+  <tabstop>startsource_comboBox</tabstop>
+  <tabstop>tomeasure_comboBox</tabstop>
+  <tabstop>PRET_fast_doubleSpinBox</tabstop>
+  <tabstop>MCAS_fast_comboBox</tabstop>
+  <tabstop>PRET_fast_comboBox</tabstop>
+  <tabstop>GAIN_fast_doubleSpinBox</tabstop>
+  <tabstop>PURE_fast_comboBox</tabstop>
+  <tabstop>TFLA_fast_doubleSpinBox</tabstop>
+  <tabstop>TPEA_fast_doubleSpinBox</tabstop>
+  <tabstop>DACO_fast_comboBox</tabstop>
+  <tabstop>MCAC_fast_comboBox</tabstop>
+  <tabstop>DACO_fast_spinBox</tabstop>
+  <tabstop>AUO1_fast_comboBox</tabstop>
+  <tabstop>DACF_fast_spinBox</tabstop>
+  <tabstop>AUO2_fast_comboBox</tabstop>
+  <tabstop>AUO2_fast_spinBox</tabstop>
+  <tabstop>MCAC_comboBox</tabstop>
+  <tabstop>THSL_doubleSpinBox</tabstop>
+  <tabstop>PRET_comboBox</tabstop>
+  <tabstop>PRET_doubleSpinBox</tabstop>
+  <tabstop>PREC_comboBox</tabstop>
+  <tabstop>PREC_spinBox</tabstop>
+  <tabstop>spinBox</tabstop>
+  <tabstop>spinBox_2</tabstop>
+  <tabstop>PRER_comboBox</tabstop>
+  <tabstop>PRER_doubleSpinBox</tabstop>
+  <tabstop>comboBox_5</tabstop>
+  <tabstop>PDMD_comboBox</tabstop>
+  <tabstop>SOFF_comboBox</tabstop>
+  <tabstop>SOFF_doubleSpinBox</tabstop>
+  <tabstop>TLLD_comboBox</tabstop>
+  <tabstop>TLLD_doubleSpinBox</tabstop>
+  <tabstop>MCAS_comboBox</tabstop>
+  <tabstop>MCST_doubleSpinBox</tabstop>
+  <tabstop>MCSL_spinBox</tabstop>
+  <tabstop>MCSH_spinBox</tabstop>
+  <tabstop>PURE_comboBox</tabstop>
+  <tabstop>PURE_doubleSpinBox</tabstop>
+  <tabstop>TPEA_doubleSpinBox</tabstop>
+  <tabstop>TFLA_doubleSpinBox</tabstop>
+  <tabstop>THFA_doubleSpinBox</tabstop>
+  <tabstop>TPFA_comboBox</tabstop>
+  <tabstop>BLRM_comboBox</tabstop>
+  <tabstop>BLRD_spinBox</tabstop>
+  <tabstop>BLRU_spinBox</tabstop>
+  <tabstop>RTDE_comboBox</tabstop>
+  <tabstop>RTDT_doubleSpinBox</tabstop>
+  <tabstop>RTDS_doubleSpinBox</tabstop>
+  <tabstop>CUSP_comboBox</tabstop>
+  <tabstop>CUSP_spinBox</tabstop>
+  <tabstop>CLCK_comboBox</tabstop>
+  <tabstop>GAIN_doubleSpinBox</tabstop>
+  <tabstop>PAPZ_comboBox</tabstop>
+  <tabstop>PAPZ_doubleSpinBox</tabstop>
+  <tabstop>INOF_comboBox</tabstop>
+  <tabstop>INOF_doubleSpinBox</tabstop>
+  <tabstop>AINP_comboBox</tabstop>
+  <tabstop>RESL_comboBox</tabstop>
+  <tabstop>TECS_comboBox</tabstop>
+  <tabstop>TECS_spinBox</tabstop>
+  <tabstop>HVSE_comboBox</tabstop>
+  <tabstop>HVSE_sign_comboBox</tabstop>
+  <tabstop>HVSE_spinBox</tabstop>
+  <tabstop>PAPS_comboBox</tabstop>
+  <tabstop>DACO_comboBox</tabstop>
+  <tabstop>DACO_spinBox</tabstop>
+  <tabstop>DACF_spinBox</tabstop>
+  <tabstop>AUO1_comboBox</tabstop>
+  <tabstop>AUO1_spinBox</tabstop>
+  <tabstop>TPMO_comboBox</tabstop>
+  <tabstop>AUO2_comboBox</tabstop>
+  <tabstop>AUO2_spinBox</tabstop>
+  <tabstop>CON1_comboBox</tabstop>
+  <tabstop>CON2_comboBox</tabstop>
+  <tabstop>VOLU_comboBox</tabstop>
+  <tabstop>GPED_comboBox</tabstop>
+  <tabstop>GPME_comboBox</tabstop>
+  <tabstop>GPGA_comboBox</tabstop>
+  <tabstop>GPMC_comboBox</tabstop>
+  <tabstop>GPIN_comboBox</tabstop>
+  <tabstop>GPIN_spinBox</tabstop>
+  <tabstop>SCOE_comboBox</tabstop>
+  <tabstop>SCOT_spinBox</tabstop>
+  <tabstop>SCOG_spinBox</tabstop>
+  <tabstop>comboBox_32</tabstop>
+  <tabstop>SCAI_comboBox</tabstop>
+  <tabstop>SCAL_spinBox</tabstop>
+  <tabstop>SCAH_spinBox</tabstop>
+  <tabstop>SCAO_comboBox</tabstop>
+  <tabstop>SCAW_comboBox</tabstop>
+  <tabstop>pushButton_2</tabstop>
+  <tabstop>pushButton</tabstop>
+  <tabstop>AUO1_fast_spinBox</tabstop>
+  <tabstop>PURE_fast_doubleSpinBox</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>
