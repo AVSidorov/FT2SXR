@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>471</width>
-    <height>125</height>
+    <width>247</width>
+    <height>335</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -28,99 +28,29 @@
   <widget class="QGroupBox" name="shot_groupBox">
    <property name="geometry">
     <rect>
-     <x>10</x>
-     <y>10</y>
-     <width>451</width>
-     <height>51</height>
+     <x>20</x>
+     <y>30</y>
+     <width>171</width>
+     <height>251</height>
     </rect>
    </property>
    <property name="minimumSize">
     <size>
-     <width>0</width>
-     <height>51</height>
+     <width>171</width>
+     <height>200</height>
     </size>
    </property>
    <property name="maximumSize">
     <size>
-     <width>16777215</width>
-     <height>51</height>
+     <width>190</width>
+     <height>16777215</height>
     </size>
    </property>
    <property name="title">
     <string>Measurement info</string>
    </property>
-   <layout class="QGridLayout" name="gridLayout">
-    <item row="0" column="0">
-     <widget class="QLabel" name="name_label">
-      <property name="text">
-       <string>Name:</string>
-      </property>
-     </widget>
-    </item>
-    <item row="0" column="1">
-     <widget class="QLabel" name="name_val_label">
-      <property name="text">
-       <string>000000_0</string>
-      </property>
-     </widget>
-    </item>
-    <item row="0" column="2">
-     <widget class="QLabel" name="rate_label">
-      <property name="text">
-       <string>Rate:</string>
-      </property>
-     </widget>
-    </item>
-    <item row="0" column="3">
-     <widget class="QLabel" name="rate_val_label">
-      <property name="text">
-       <string>00</string>
-      </property>
-     </widget>
-    </item>
-    <item row="0" column="4">
-     <widget class="QLabel" name="samples_label">
-      <property name="text">
-       <string>Samples:</string>
-      </property>
-     </widget>
-    </item>
-    <item row="0" column="5">
-     <widget class="QLabel" name="samples_val_label">
-      <property name="text">
-       <string>00</string>
-      </property>
-     </widget>
-    </item>
-    <item row="0" column="6">
-     <widget class="QLabel" name="channels_label">
-      <property name="text">
-       <string>Channels:</string>
-      </property>
-     </widget>
-    </item>
-    <item row="0" column="7">
-     <widget class="QLabel" name="channels_val_label">
-      <property name="text">
-       <string>0</string>
-      </property>
-     </widget>
-    </item>
-    <item row="0" column="8">
-     <widget class="QLabel" name="time_label">
-      <property name="text">
-       <string>Time:</string>
-      </property>
-     </widget>
-    </item>
-    <item row="0" column="9">
-     <widget class="QLabel" name="time_val_label">
-      <property name="text">
-       <string>0</string>
-      </property>
-     </widget>
-    </item>
-    <item row="0" column="10">
+   <layout class="QFormLayout" name="formLayout">
+    <item row="0" column="0" colspan="2">
      <widget class="QPushButton" name="select_shot_pushButton">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -139,77 +69,110 @@
       </property>
      </widget>
     </item>
+    <item row="1" column="0">
+     <widget class="QLabel" name="x_ax_label">
+      <property name="maximumSize">
+       <size>
+        <width>100</width>
+        <height>16777215</height>
+       </size>
+      </property>
+      <property name="text">
+       <string>X unit:</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="1">
+     <widget class="QComboBox" name="x_ax_comboBox">
+      <property name="maximumSize">
+       <size>
+        <width>100</width>
+        <height>16777215</height>
+       </size>
+      </property>
+      <item>
+       <property name="text">
+        <string>samples</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>ms</string>
+       </property>
+      </item>
+     </widget>
+    </item>
+    <item row="2" column="0">
+     <widget class="QLabel" name="name_label">
+      <property name="text">
+       <string>Name:</string>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="1">
+     <widget class="QLabel" name="name_val_label">
+      <property name="text">
+       <string>000000_0</string>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="0">
+     <widget class="QLabel" name="rate_label">
+      <property name="text">
+       <string>Rate:</string>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="1">
+     <widget class="QLabel" name="rate_val_label">
+      <property name="text">
+       <string>00</string>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="0">
+     <widget class="QLabel" name="samples_label">
+      <property name="text">
+       <string>Samples:</string>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="1">
+     <widget class="QLabel" name="samples_val_label">
+      <property name="text">
+       <string>00</string>
+      </property>
+     </widget>
+    </item>
+    <item row="5" column="0">
+     <widget class="QLabel" name="channels_label">
+      <property name="text">
+       <string>Channels:</string>
+      </property>
+     </widget>
+    </item>
+    <item row="5" column="1">
+     <widget class="QLabel" name="channels_val_label">
+      <property name="text">
+       <string>0</string>
+      </property>
+     </widget>
+    </item>
+    <item row="6" column="0">
+     <widget class="QLabel" name="time_label">
+      <property name="text">
+       <string>Time:</string>
+      </property>
+     </widget>
+    </item>
+    <item row="6" column="1">
+     <widget class="QLabel" name="time_val_label">
+      <property name="text">
+       <string>0</string>
+      </property>
+     </widget>
+    </item>
    </layout>
-  </widget>
-  <widget class="QGroupBox" name="axis_groupBox">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>60</y>
-     <width>451</width>
-     <height>51</height>
-    </rect>
-   </property>
-   <property name="minimumSize">
-    <size>
-     <width>0</width>
-     <height>51</height>
-    </size>
-   </property>
-   <property name="maximumSize">
-    <size>
-     <width>16777215</width>
-     <height>51</height>
-    </size>
-   </property>
-   <property name="title">
-    <string>Axis</string>
-   </property>
-   <widget class="QLabel" name="x_ax_label">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>20</y>
-      <width>51</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="maximumSize">
-     <size>
-      <width>100</width>
-      <height>16777215</height>
-     </size>
-    </property>
-    <property name="text">
-     <string>X units</string>
-    </property>
-   </widget>
-   <widget class="QComboBox" name="x_ax_comboBox">
-    <property name="geometry">
-     <rect>
-      <x>50</x>
-      <y>20</y>
-      <width>65</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="maximumSize">
-     <size>
-      <width>100</width>
-      <height>16777215</height>
-     </size>
-    </property>
-    <item>
-     <property name="text">
-      <string>samples</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>ms</string>
-     </property>
-    </item>
-   </widget>
   </widget>
  </widget>
  <resources/>

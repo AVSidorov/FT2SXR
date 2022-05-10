@@ -21,14 +21,14 @@ class PlotterWidget(QtWidgets.QMainWindow, Ui_Plotter):
 
         self._main = QtWidgets.QWidget()
         self.setCentralWidget(self._main)
-        layout = QtWidgets.QVBoxLayout(self._main)
+        layout = QtWidgets.QHBoxLayout(self._main)
 
         self.static_canvas = FigureCanvasQTAgg(Figure(tight_layout=True))
         self.addToolBar(NavigationToolbar2QT(self.static_canvas, self))
 
         layout.addWidget(self.static_canvas)
         layout.addWidget(self.shot_groupBox)
-        layout.addWidget(self.axis_groupBox)
+        # layout.addWidget(self.axis_groupBox)
 
         self.x_ax_comboBox.currentTextChanged.connect(self.change_ax)
         self.select_shot_pushButton.clicked.connect(self.select_shot)
@@ -87,6 +87,7 @@ class PlotterWidget(QtWidgets.QMainWindow, Ui_Plotter):
             if path.isabs(data_file):
                 self.dir = data_file
                 self.make_plot(data_file=self.dir)
+                self.change_ax()
 
 
 def main():
