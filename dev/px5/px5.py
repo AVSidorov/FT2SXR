@@ -184,8 +184,8 @@ def response_txt_cfg_readback(pkt, obj=None):
 
     if pkt.pid1 == b'\x20' and pkt.pid2 == b'\x03':
         req = pkt.data.decode()
-        data = pack_txt_cfg(req, obj)
-
+        # data = pack_txt_cfg(req, obj)
+        data = b''
         if isinstance(data, (tuple, list, np.ndarray)):
             return [packet(b'\x82', b'\x07', _) for _ in data]
         else:
@@ -643,7 +643,7 @@ def ascii_req_full(cfg) -> str:
     return '=?;'.join(cfg[np.where(cfg[:, 1])[0], 0]).replace(' ', '') + '=?;'
 
 
-def ascii_resp (req: str, cfg) -> str:
+def ascii_resp(req: str, cfg) -> str:
     return ';'.join([f'{cmd}={cfg[cfg[:, 0] == cmd, 1][0]}' \
                                         for cmd in req.replace('=', '').replace('?', '').rstrip(';').split(';')]) + ';'
 
@@ -1035,7 +1035,7 @@ class Retranslator:
 
 
 class PX5Configuration:
-    def __new__(cls, cfg=None, obj: PX5Imitator = None):
+    def __new__(cls, cfg=None, obj: PX5Imitator = None, fw=None):
         cfg_obj = super().__new__(cls)
 
         if cfg is None:
@@ -1052,6 +1052,11 @@ class PX5Configuration:
 
         if obj is not None:
             fw = obj.fw
+        elif fw is not None:
+            if isinstance(fw, str):
+                fw = str2ver(fw)
+            elif isinstance(fw, int) and fw< 4095:
+                fw = fw
         else:
             fw = 0
 
