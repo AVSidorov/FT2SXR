@@ -8,14 +8,28 @@ class GSAWidget(QtWidgets.QWidget, Ui_GSAWidgetDesign):
         super().__init__(parent=parent)
         self.setupUi(self)
 
+        # hardware
+        amp_list = (('22', '58', '78', '114', '134', '167', '187', '223'), 'mV')
+        edge = ('22', 'ns')
+        freq = ('626', 'Hz')
+
         # GSA initial values
-        self.amplitude = 0
+        self.amplitude = None
 
         # signals
-        self.amplitude_doubleSpinBox.valueChanged.connect(self.setamplitude)
+        self.amp_comboBox.currentTextChanged.connect(self.setamplitude)
+
+        self.edge_val_label.setText(edge[0])
+        self.edge_type_label.setText(edge[1])
+        self.freq_val_label.setText(freq[0])
+        self.freq_type_label.setText(freq[1])
+        for i in amp_list[0]:
+            self.amp_comboBox.addItem(i)
+        self.amp_type_label.setText(amp_list[1])
 
     def setamplitude(self):
-        self.amplitude = self.amplitude_doubleSpinBox.value()
+        self.amplitude = int(self.amp_comboBox.currentText())
+        print(self.amplitude)
 
 
 def main():
