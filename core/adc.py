@@ -170,6 +170,9 @@ class ADC(Core):
             # if connected run exam_adc
             if self.connected:
                 self.ssh.send('/home/embedded/examples/exam_adc\n')
+            else:
+                self.started = False
+                self.isAcqComplete = True
 
             # wait for exam_adc ending or stopping by user
             while self.started:
@@ -184,12 +187,13 @@ class ADC(Core):
                     # wait for file transfer completes
                     while not(os.path.exists(os.path.join(self.wdir, self.file_base+'.bin'))):
                         pass
+                else:
+                    self.generate_data()
                 # read dump from disk (generated or loaded from adc)
                 dump = np.fromfile(os.path.join(self.wdir, self.file_base + '.bin'), dtype=np.int16)
+
             else:
                 dump = np.ndarray((0,))
-
-            # dump = self.generate_data()
 
             dump = dump.reshape((-1, self.boards[0].n_active_ch)).T
             cols = (_ for _ in dump)
@@ -394,8 +398,6 @@ class ADC(Core):
         dump = dump.reshape((-1, 1)).squeeze()
         with open(os.path.join(self.wdir, self.file_base + '.bin'), 'w') as f:
             dump.tofile(f)
-        self.isAcqComplete = True
-        self.started = False
         return dump
 
     def stop_waiting(self):
