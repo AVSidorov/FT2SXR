@@ -19,16 +19,19 @@ class PlotterWidget(QtWidgets.QMainWindow, Ui_Plotter):
             self.x_unit = 'samples'
         self.reader = Reader()
 
+        self.statusbar = self.statusBar()
+        self.statusbar.show()
+
         self._main = QtWidgets.QWidget()
         self.setCentralWidget(self._main)
-        layout = QtWidgets.QHBoxLayout(self._main)
+        Hlayout = QtWidgets.QHBoxLayout(self._main)
 
         self.static_canvas = FigureCanvasQTAgg(Figure(tight_layout=True))
         self.addToolBar(NavigationToolbar2QT(self.static_canvas, self))
 
-        layout.addWidget(self.static_canvas)
-        layout.addWidget(self.shot_groupBox)
-        # layout.addWidget(self.axis_groupBox)
+        Hlayout.addWidget(self.static_canvas)
+        Hlayout.addWidget(self.shot_groupBox)
+        # Hlayout.addWidget(self.axis_groupBox)
 
         self.x_ax_comboBox.currentTextChanged.connect(self.change_ax)
         self.select_shot_pushButton.clicked.connect(self.select_shot)
@@ -50,7 +53,7 @@ class PlotterWidget(QtWidgets.QMainWindow, Ui_Plotter):
                 n_plots = len(self.reader.meta)
                 if new is True:
                     lable = str(self.reader.meta[0][0])
-                    samples = str(int(int(self.reader.meta[0][2]) / 1e6)) + 'Msps'
+                    samples = str(round(int(self.reader.meta[0][2]) / 1e6, 2)) + 'Msps'
                     rate = str(int(int(self.reader.meta[0][3]) / 1e6)) + 'MHz'
                     time_ms = str(int(int(self.reader.meta[0][2]) / int(self.reader.meta[0][3]) * 1e3)) + 'ms'
                     self.name_val_label.setText(lable)
@@ -72,6 +75,12 @@ class PlotterWidget(QtWidgets.QMainWindow, Ui_Plotter):
                                             self.reader.data[i - 1])
 
                 self.static_canvas.draw()
+                self.statusbar.showMessage('Plotted', 10000)
+
+            else:
+                self.statusbar.showMessage('Can\'t plot', 10000)
+        else:
+            self.statusbar.showMessage('Can\'t plot', 10000)
 
     def change_ax(self):
 

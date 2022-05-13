@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>566</width>
-    <height>529</height>
+    <width>664</width>
+    <height>566</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -46,6 +46,24 @@
      <layout class="QGridLayout" name="gridLayout">
       <item row="0" column="0">
        <widget class="QPushButton" name="Init_pushButton">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="mouseTracking">
+         <bool>false</bool>
+        </property>
         <property name="text">
          <string>Init</string>
         </property>
@@ -53,6 +71,12 @@
       </item>
       <item row="1" column="0">
        <widget class="QPushButton" name="manual_pushButton">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="text">
          <string>Manual start:
 Calibration</string>
@@ -61,6 +85,12 @@ Calibration</string>
       </item>
       <item row="2" column="0">
        <widget class="QPushButton" name="periodic_pushButton">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="text">
          <string>Periodic start:
 Calibration</string>
@@ -69,6 +99,12 @@ Calibration</string>
       </item>
       <item row="3" column="0">
        <widget class="QPushButton" name="external_pushButton">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="text">
          <string>External trigger:
 Calibration</string>
@@ -77,6 +113,12 @@ Calibration</string>
       </item>
       <item row="4" column="0">
        <widget class="QPushButton" name="stop_pushButton">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="text">
          <string>Stop waiting</string>
         </property>
@@ -84,6 +126,12 @@ Calibration</string>
       </item>
       <item row="5" column="0">
        <widget class="QPushButton" name="save_pushButton">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="text">
          <string>Save data</string>
         </property>
@@ -91,6 +139,12 @@ Calibration</string>
       </item>
       <item row="6" column="0">
        <widget class="QPushButton" name="enableMiniX2_pushButton">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="text">
          <string>Mini-X2:
 OFF</string>
@@ -155,7 +209,7 @@ OFF</string>
           <enum>Qt::ScrollBarAsNeeded</enum>
          </property>
          <property name="sizeAdjustPolicy">
-          <enum>QAbstractScrollArea::AdjustToContentsOnFirstShow</enum>
+          <enum>QAbstractScrollArea::AdjustToContents</enum>
          </property>
          <property name="editTriggers">
           <set>QAbstractItemView::NoEditTriggers</set>
@@ -199,11 +253,11 @@ OFF</string>
          <attribute name="horizontalHeaderCascadingSectionResizes">
           <bool>false</bool>
          </attribute>
-         <attribute name="horizontalHeaderMinimumSectionSize">
-          <number>39</number>
-         </attribute>
          <attribute name="horizontalHeaderDefaultSectionSize">
           <number>80</number>
+         </attribute>
+         <attribute name="horizontalHeaderMinimumSectionSize">
+          <number>100</number>
          </attribute>
          <attribute name="horizontalHeaderShowSortIndicator" stdset="0">
           <bool>false</bool>
@@ -275,17 +329,17 @@ OFF</string>
          </item>
          <item row="0" column="1">
           <property name="text">
-           <string>1</string>
+           <string/>
           </property>
          </item>
          <item row="1" column="0">
           <property name="text">
-           <string>Saved</string>
+           <string/>
           </property>
          </item>
          <item row="2" column="0">
           <property name="text">
-           <string>Disable</string>
+           <string/>
           </property>
          </item>
          <item row="3" column="0">
@@ -295,7 +349,7 @@ OFF</string>
          </item>
          <item row="6" column="0">
           <property name="text">
-           <string>Disable</string>
+           <string/>
           </property>
          </item>
         </widget>
