@@ -1,5 +1,5 @@
 import sys
-from PyQt5 import QtWidgets, QtCore
+from PyQt5 import QtWidgets
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg, NavigationToolbar2QT
 from matplotlib.figure import Figure
 import numpy as np
@@ -31,7 +31,6 @@ class PlotterWidget(QtWidgets.QMainWindow, Ui_Plotter):
 
         Hlayout.addWidget(self.static_canvas)
         Hlayout.addWidget(self.shot_groupBox)
-        # Hlayout.addWidget(self.axis_groupBox)
 
         self.x_ax_comboBox.currentTextChanged.connect(self.change_ax)
         self.select_shot_pushButton.clicked.connect(self.select_shot)
@@ -70,8 +69,8 @@ class PlotterWidget(QtWidgets.QMainWindow, Ui_Plotter):
                     elif x_unit == 'ms':
                         # samples = int(self.reader.meta[0][2])
                         rate = int(self.reader.meta[0][3])
-                        eval(f'ax{i}').plot(np.linspace(0, len(self.reader.data[i - 1]) / rate,
-                                                        len(self.reader.data[i - 1]), dtype=np.float16) * 1000,
+                        eval(f'ax{i}').plot(np.linspace(0, len(self.reader.data[i - 1]) / rate * 1000,
+                                                        len(self.reader.data[i - 1]), dtype=np.float64),
                                             self.reader.data[i - 1])
 
                 self.static_canvas.draw()
