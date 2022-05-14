@@ -10,7 +10,7 @@ class GSAWidget(QtWidgets.QWidget, Ui_GSAWidgetDesign):
 
         # hardware
         amp_list = (('22', '58', '78', '114', '134', '167', '187', '223'), 'mV')
-        edge = ('22', 'ns')
+        edge = ('24', 'ns')
         freq = ('626', 'Hz')
 
         # GSA initial values
@@ -29,7 +29,6 @@ class GSAWidget(QtWidgets.QWidget, Ui_GSAWidgetDesign):
 
     def setamplitude(self):
         self.amplitude = int(self.amp_comboBox.currentText())
-        print(self.amplitude)
 
 
 def main():
