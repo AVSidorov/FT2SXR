@@ -1,6 +1,6 @@
 from core.core import Core
 from core.sxr_protocol_pb2 import SystemStatus, MainPacket
-from core.adc import ADC
+from dev.insys.adc import ADC
 from dev.px5.px5 import PX5
 
 
