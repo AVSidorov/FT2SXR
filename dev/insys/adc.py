@@ -6,9 +6,9 @@ import configparser
 import os
 import numpy as np
 import h5py
-from .core import Core
-from .sxr_protocol_pb2 import MainPacket, AdcStatus, SystemStatus
-from .sxr_protocol import packet_init
+from core.core import Core
+from core.sxr_protocol_pb2 import MainPacket, AdcStatus, SystemStatus
+from core.sxr_protocol import packet_init
 from threading import Thread
 from dev.insys.bardy.getCodesNames import *
 from insys.EXAM.exam_adc.exam_protocol_pb2 import BRD_ctrl
