@@ -1,11 +1,13 @@
+import time
 from core.core import Core
-from core.sxr_protocol_pb2 import SystemStatus, MainPacket
-from core.adc import ADC
-from dev.px5.px5 import PX5
+from core.sxr_protocol_pb2 import SystemStatus
+from dev.insys.adc import ADC
+from dev.amptek.px5 import PX5
+from core.fileutils import today_dir
 
 
 class Ft2SXR(Core):
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, wdir=None):
         super().__init__(parent)
         core = None
         if parent is not None:
@@ -13,10 +15,16 @@ class Ft2SXR(Core):
                 core = parent
 
         self.address = 0
+        if wdir is None:
+            self.wdir = today_dir()
+        else:
+            self.wdir = wdir
+
         self.adc = ADC(self)
         self.px5 = PX5(self)
         self.state = SystemStatus.IDLE
         self.devs = list().append(self.adc)
+        self.laststart = None
 
         if core is not None:
             self.adc.channel0.connect(core.channel0)       # out Main Packets (commands)
@@ -44,5 +52,8 @@ class Ft2SXR(Core):
             self.status_message(response)
 
     def start(self, response=None):
+        self.laststart = time.time()
+
         for dev in self.devs:
             dev.start(response)
+
