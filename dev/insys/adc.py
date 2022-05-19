@@ -225,7 +225,7 @@ class ADC(Core):
             elif request.command == 2:
                 self.start(response)
             elif request.command == 3:
-                self.stop_waiting()
+                self.stop()
             elif request.command == 4:
                 self.reboot()
             elif request.command == 5:
@@ -400,7 +400,7 @@ class ADC(Core):
             dump.tofile(f)
         return dump
 
-    def stop_waiting(self):
+    def stop(self):
         if self.connected:
             self.ssh.send(b'\x1B')
         self.started = False
@@ -433,7 +433,7 @@ class ADC(Core):
             self.channel0.emit(response.SerializeToString())
         self.make_connection()
 
-    def snapshot(self, file=None):
+    def snapshot(self, file: str = None):
         timestamp = time.time()
         if file is None:
             curtime = datetime.datetime.fromtimestamp(timestamp)
