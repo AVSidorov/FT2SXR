@@ -1,4 +1,3 @@
-from __future__ import annotations
 from PyQt5 import QtCore
 from core.sxr_protocol_pb2 import MainPacket
 

@@ -1,8 +1,6 @@
 from ui.MainWindow import MainWindow
-from ui.dump_plotter import DumpPlotter
 from core.core import Core
 from core.logger import Logger
-from core.adc_logger import ADCLogger
 from core.ft2sxr import Ft2SXR
 from PyQt5 import QtWidgets
 import sys
@@ -22,10 +20,6 @@ def main():
 
     logger = Logger('log.txt', app)
     core.channel0.connect(logger.channel0_slot)
-
-    # plotter = DumpPlotter(app)
-    # plotter.status = system.adc.status_message()
-    # core.channel0.connect(plotter.channel0_slot)
 
     mw.show()
     sys.exit(app.exec_())
