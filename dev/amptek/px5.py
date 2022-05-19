@@ -8,8 +8,8 @@ from core.sxr_protocol_pb2 import MainPacket, SystemStatus
 from core.sxr_protocol import packet_init
 from dev.amptek.protocol import Protocol
 from dev.amptek.ascii import *
-from dev.amptek.netfinder import *
-
+from dev.amptek.netfinder import Packet as Netfinder_packet
+from dev.amptek.netfinder import netfinder_response
 
 class PX5(Dev):
     def __init__(self, parent=None, px5_ip='192.168.0.239', mtu=520):
