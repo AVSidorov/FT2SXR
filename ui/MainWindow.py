@@ -13,7 +13,7 @@ from ui.MiniX2UI import MiniX2Widget
 from ui.WarningUI import WarningWidget
 from PyQt5 import QtWidgets, QtCore
 from core.sxr_protocol import packet_init
-from core.sxr_protocol_pb2 import MainPacket
+from core.sxr_protocol_pb2 import MainPacket, SystemStatus, Commands
 from core.logger import Logger
 from core.adc_logger import ADCLogger
 from ui.ADCLogUI import AdcLog
@@ -69,8 +69,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         win.verticalLayout.addWidget(adcSettings)
 
         win.show()
-        request = packet_init(1, adcSettings.address)
-        request.command = 0
+        request = packet_init(SystemStatus.ADC, adcSettings.address)
+        request.command = Commands.STATUS
         if request.IsInitialized():
             self.channel0.emit(request.SerializeToString())
 
@@ -179,8 +179,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
         request = MainPacket()
         request.ParseFromString(data)
-        if request.sender == 1:
-            if request.command == 2:
+        if request.sender == SystemStatus.ADC:
+            if request.command == Commands.START:
                 if isinstance(request.data.decode('utf-8'), str):
                     data_file = os.path.join(os.path.split(os.path.join(os.path.abspath('./'), request.data.decode('utf-8')))[0], 'data_0.bin')
                     self.open_sxr(data_file=data_file)

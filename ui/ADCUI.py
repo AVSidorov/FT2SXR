@@ -2,7 +2,7 @@ import sys
 from PyQt5 import QtWidgets, QtCore
 from math import trunc
 from ui.ADCUIDesign import Ui_ADCWidgetDesign
-from core.sxr_protocol_pb2 import MainPacket, AdcStatus
+from core.sxr_protocol_pb2 import MainPacket, AdcStatus, SystemStatus, Commands
 from core.sxr_protocol import packet_init
 
 
@@ -43,8 +43,8 @@ class ADCUIWidget (QtWidgets.QWidget, Ui_ADCWidgetDesign):
     def channel0_slot(self, data: bytes):
         request = MainPacket()
         request.ParseFromString(data)
-        if request.sender == 1:  # 1 is reserved address for ADC
-            if request.command in (0, 1):
+        if request.sender == SystemStatus.ADC:  # 1 is reserved address for ADC
+            if request.command in (Commands.STATUS, Commands.SET):
                 self.blockSignals(True)
                 self.status = request.data
                 self.status2ui()
@@ -146,8 +146,8 @@ class ADCUIWidget (QtWidgets.QWidget, Ui_ADCWidgetDesign):
 
         self.status2ui()
 
-        request = packet_init(1, self.address)
-        request.command = 1
+        request = packet_init(SystemStatus.ADC, self.address)
+        request.command = Commands.SET
         if self.status.IsInitialized():
             request.data = self.status.SerializeToString()
         if request.IsInitialized():

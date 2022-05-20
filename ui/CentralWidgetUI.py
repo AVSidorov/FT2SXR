@@ -1,7 +1,7 @@
 from PyQt5 import QtWidgets, QtCore
 from ui.CentralWidgetUIDesign import Ui_MainWidgetDesign
 from core.sxr_protocol import packet_init
-from core.sxr_protocol_pb2 import MainPacket
+from core.sxr_protocol_pb2 import MainPacket, SystemStatus, Commands
 
 
 class MainWidget(QtWidgets.QWidget, Ui_MainWidgetDesign):
@@ -21,14 +21,14 @@ class MainWidget(QtWidgets.QWidget, Ui_MainWidgetDesign):
         self.stop_pushButton.clicked.connect(self.stop_adc)
 
     def start_adc(self):
-        request = packet_init(1, 0)
-        request.command = 2
+        request = packet_init(SystemStatus.ADC, 0)
+        request.command = Commands.START
         if request.IsInitialized():
             self.channel0.emit(request.SerializeToString())
 
     def stop_adc(self):
-        request = packet_init(1, 0)
-        request.command = 3
+        request = packet_init(SystemStatus.ADC, 0)
+        request.command = Commands.STOP
         if request.IsInitialized():
             self.channel0.emit(request.SerializeToString())
 

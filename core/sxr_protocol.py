@@ -1,6 +1,7 @@
 from core.sxr_protocol_pb2 import MainPacket
 import warnings
 
+
 def packet_init(address, sender):
     request = MainPacket()
     request.address = address

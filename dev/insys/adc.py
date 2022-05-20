@@ -6,8 +6,8 @@ import configparser
 import os
 import numpy as np
 import h5py
-from core.core import Core
-from core.sxr_protocol_pb2 import MainPacket, AdcStatus, SystemStatus
+from core.core import Dev
+from core.sxr_protocol_pb2 import MainPacket, AdcStatus, SystemStatus, Commands
 from core.sxr_protocol import packet_init
 from threading import Thread
 from dev.insys.bardy.getCodesNames import *
@@ -53,10 +53,10 @@ class Board:
             mask >>= 1
 
 
-class ADC(Core):
+class ADC(Dev):
     def __init__(self, parent=None, nboards=1, connect=True, wdir=None):
         super().__init__(parent)
-        self.address = 1
+        self.address = SystemStatus.ADC
 
         self.boards = [Board() for _ in range(nboards)]
 
@@ -218,17 +218,17 @@ class ADC(Core):
             response = packet_init(request.sender, self.address)
             response.command = request.command
 
-            if request.command == 0:
+            if request.command == Commands.STATUS:
                 self.status_message(response)
-            elif request.command == 1:
+            elif request.command == Commands.SET:
                 self.status_to_config(request.data, response)
-            elif request.command == 2:
+            elif request.command == Commands.START:
                 self.start(response)
-            elif request.command == 3:
+            elif request.command == Commands.STOP:
                 self.stop()
-            elif request.command == 4:
+            elif request.command == Commands.REBOOT:
                 self.reboot()
-            elif request.command == 5:
+            elif request.command == Commands.CONNECT:
                 self.make_connection()
 
     def channel2_slot(self, data: bytes):
