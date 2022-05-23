@@ -80,6 +80,7 @@ message SystemStatus{
 
   enum EnumDev{
     option allow_alias = true;
+    SXR = 0;
     ADC = 1;
     PX5 = 2;
     AMP = 3;

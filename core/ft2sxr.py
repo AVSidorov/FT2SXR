@@ -1,6 +1,7 @@
 import time
 from core.core import Core
-from core.sxr_protocol_pb2 import SystemStatus
+from core.sxr_protocol_pb2 import MainPacket, SystemStatus, Commands
+from core.sxr_protocol import packet_init
 from dev.insys.adc import ADC
 from dev.amptek.px5 import PX5
 from core.fileutils import today_dir
@@ -9,10 +10,7 @@ from core.fileutils import today_dir
 class Ft2SXR(Core):
     def __init__(self, parent=None, wdir=None):
         super().__init__(parent)
-        core = None
-        if parent is not None:
-            if isinstance(parent, Core):
-                core = parent
+        core = self.get_origin_core()
 
         self.address = 0
         if wdir is None:
@@ -54,5 +52,14 @@ class Ft2SXR(Core):
     def start(self, response=None):
         self.laststart = time.time()
 
+        request = packet_init(0, SystemStatus.SXR)
+
         for dev in self.devs:
-            dev.start(response)
+            request.address = dev
+            request.command = Commands.START
+            if request.IsInitialized():
+                self.channel0.emit(request.SerializeToString())
+
+        if response is not None:
+            if response.IsInitialized():
+                self.channel0.emit(response.SerializeToString())
