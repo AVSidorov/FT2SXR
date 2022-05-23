@@ -204,7 +204,7 @@ class ADC(Dev):
                 else:
                     ch.data = np.ndarray((0,))
 
-            filename = self.snapshot()
+            filename = self.snapshot(f'/SXR@{self.wdir}/?')
 
             if response is not None:
                 response.data = filename.encode()
@@ -433,23 +433,8 @@ class ADC(Dev):
             self.channel0.emit(response.SerializeToString())
         self.make_connection()
 
-    def snapshot(self, file: str = None):
-        timestamp = time.time()
-        if file is None:
-            curtime = datetime.datetime.fromtimestamp(timestamp)
-            file = f'adc{curtime.year-2000:02d}{curtime.month:02d}{curtime.day:02d}' \
-                     f'{curtime.hour:02d}{curtime.minute:02d}{curtime.second:02d}.h5'
-            file = os.path.join(self.wdir, file)
-        if os.path.exists(file):
-            hf = h5py.File(file, 'r+')
-        else:
-            hf = h5py.File(file, 'w')
-            hf.create_dataset('timestamp', data=timestamp)
-            hf['/'].attrs['timestamp'] = timestamp
-        if 'ADC' in hf:
-            adc = hf['ADC']
-        else:
-            adc = hf.create_group('ADC')
+    def snapshot(self, request: MainPacket = None, response: MainPacket = None):
+        hf, adc = super().snapshot(request, response)
 
         adc.attrs['name'] = 'InSys FM814X250M'
         adc.attrs['bit'] = 14
@@ -460,7 +445,6 @@ class ADC(Dev):
             cfg = adc['config']
         else:
             cfg = adc.create_group('config')
-            cfg.attrs['timestamp'] = timestamp
 
         for sec in self.config:
             if len(self.config[sec].keys()) > 0:
@@ -472,7 +456,10 @@ class ADC(Dev):
             if ch.on:
                 dset = adc.create_dataset(f'channel{self.boards[0].channels.index(ch):02d}', shape=ch.data.shape,  compression="gzip", compression_opts=1, data=ch.data)
                 dset.attrs['units'] = 'adc counts'
-                dset.attrs['timestamp'] = timestamp
 
+        filename = hf.filename
         hf.close()
-        return file
+
+        self._response(response, filename.encode())
+
+        return filename

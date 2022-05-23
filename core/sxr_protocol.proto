@@ -98,10 +98,13 @@ enum Commands{
   STATUS = 1;
   GET = 1;
   GET_STATUS = 1;
-  SET = 2;
-  SET_STATUS = 2;
-  START = 3;
-  STOP = 4;
-  REBOOT = 5;
-  CONNECT = 6;
+  GET_SETTINGS = 1;
+  SET = 3;
+  SET_STATUS = 3;
+  SETTINGS = 3;
+  START = 4;
+  STOP = 5;
+  REBOOT = 6;
+  CONNECT = 7;
+  SNAPSHOT = 8;
 }
