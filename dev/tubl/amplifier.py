@@ -20,6 +20,7 @@ class Amplifier(Dev):
             fname = field[0].name
             val = field[1]
             dset = amp.create_dataset(f'{fname}', data=val, track_times=True)
+            amp.attrs[fname] = val
             if fname in ('gainA', 'gainB'):
                 dset.attrs['units'] = 'wheel units'
             elif fname in ('tail',):
