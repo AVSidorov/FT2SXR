@@ -69,6 +69,12 @@ message AdcStatus{
 
 }
 
+message AmpStatus{
+  required float gainA = 1;
+  required float gainB= 2;
+  required uint32 tail = 3;
+}
+
 message SystemStatus{
   enum EnumState{
     IDLE = 0;
@@ -88,6 +94,8 @@ message SystemStatus{
     MINIX2 = 6;
     XRAY = 6;
     SOURCE = 6;
+    FE55 = 7;
+    TOKAMAK = 8;
   }
   repeated EnumDev devs = 2;
 }
@@ -96,9 +104,9 @@ enum Commands{
   option allow_alias = true;
   INFO = 0;
   STATUS = 1;
-  GET = 1;
   GET_STATUS = 1;
-  GET_SETTINGS = 1;
+  GET = 2;
+  GET_SETTINGS = 2;
   SET = 3;
   SET_STATUS = 3;
   SETTINGS = 3;

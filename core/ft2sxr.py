@@ -1,18 +1,20 @@
 import time
-from core.core import Core
+from core.core import Dev
 from core.sxr_protocol_pb2 import MainPacket, SystemStatus, Commands
 from core.sxr_protocol import packet_init
 from dev.insys.adc import ADC
 from dev.amptek.px5 import PX5
+from dev.tubl.amplifier import Amplifier
 from core.fileutils import today_dir
+import os
 
 
-class Ft2SXR(Core):
+class Ft2SXR(Dev):
     def __init__(self, parent=None, wdir=None):
         super().__init__(parent)
         core = self.get_origin_core()
 
-        self.address = 0
+        self.address = SystemStatus.SXR
         if wdir is None:
             self.wdir = today_dir()
         else:
@@ -20,8 +22,9 @@ class Ft2SXR(Core):
 
         self.adc = ADC(self)
         self.px5 = PX5(self)
+        self.amp = Amplifier(self)
         self.state = SystemStatus.IDLE
-        self.devs = list().append(self.adc)
+        self.devs = list()
         self.laststart = None
 
         if core is not None:
@@ -63,3 +66,20 @@ class Ft2SXR(Core):
         if response is not None:
             if response.IsInitialized():
                 self.channel0.emit(response.SerializeToString())
+
+    def snapshot(self, request: MainPacket = None, response: MainPacket = None):
+        hf, sxr = super().snapshot(f'{self.wdir}/?', response)
+        sxr.attrs['name'] = 'SXR diagnostics'
+        filename = os.path.abspath(os.path.join(self.wdir, hf.filename))
+        hf.close()
+
+        for dev in self.devs:
+            request.address = dev
+            request.command = Commands.SNAPSHOT
+            request.data = f'/SXR@{filename}'.encode()
+            if request.IsInitialized():
+                self.channel0.emit(request.SerializeToString())
+
+        self._response(response, f'/SXR@{filename}'.encode())
+
+        return f'/SXR@{filename}'
