@@ -132,7 +132,7 @@ class Dev(Core):
             if request.command == Commands.STATUS:
                 self.get_status(response)
             elif request.command == Commands.SET:
-                self.set_settings(response)
+                self.set_settings(request, response)
             elif request.command == Commands.START:
                 self.start(response)
             elif request.command == Commands.STOP:
@@ -141,3 +141,5 @@ class Dev(Core):
                 self.reboot(response)
             elif request.command == Commands.CONNECT:
                 self.make_connection(response)
+            elif request.command == Commands.SNAPSHOT:
+                self.snapshot(request, response)
