@@ -55,8 +55,8 @@ class Board:
 
 class ADC(Dev):
     def __init__(self, parent=None, nboards=1, connect=True, wdir=None):
-        super().__init__(parent)
         self.address = SystemStatus.ADC
+        super().__init__(parent)
 
         self.boards = [Board() for _ in range(nboards)]
 
@@ -93,6 +93,9 @@ class ADC(Dev):
                 bias = self.get_cfg_item('device0_fm814x250m0', f'Bias{ch_n}')
                 if bias is not None:
                     self.boards[0].channels[ch_n].bias = float(bias)
+
+        self.status = AdcStatus()
+        self.get_status()
 
         # make directory whit current date, to store adc memory dumps and  cfg.ini for sending
         if wdir is None:
@@ -211,26 +214,6 @@ class ADC(Dev):
                 if response.IsInitialized():
                     self.channel0.emit(response.SerializeToString())
 
-    def channel0_slot(self, data: bytes):
-        request = MainPacket()
-        request.ParseFromString(data)
-        if request.address == self.address:
-            response = packet_init(request.sender, self.address)
-            response.command = request.command
-
-            if request.command == Commands.STATUS:
-                self.status_message(response)
-            elif request.command == Commands.SET:
-                self.status_to_config(request.data, response)
-            elif request.command == Commands.START:
-                self.start(response)
-            elif request.command == Commands.STOP:
-                self.stop()
-            elif request.command == Commands.REBOOT:
-                self.reboot()
-            elif request.command == Commands.CONNECT:
-                self.make_connection()
-
     def channel2_slot(self, data: bytes):
         pkt = BRD_ctrl()
         pkt.command = 0
@@ -247,80 +230,79 @@ class ADC(Dev):
                 elif cmd == 'BRDctrl_STREAM_CBUF_FREE':
                     self.started = False
 
-    def status_message(self, response=None):
-        status = AdcStatus()
+    def get_status(self, response: MainPacket = None):
 
         name = self.get_cfg_item('Option', 'AdcServiceName')
         if name is not None:
-            status.name = name
+            self.status.name = name
 
-        status.connected = self.connected
+        self.status.connected = self.connected
 
         rate = self.get_cfg_item('device0_fm814x250m0', 'SamplingRate')
         if rate is not None:
-            status.sampling_rate = int(rate)
+            self.status.sampling_rate = int(rate)
 
         samples = self.get_cfg_item('Option', 'MemSamplesPerChan')
         if samples is not None:
-            status.samples = int(samples)
+            self.status.samples = int(samples)
 
         start = self.get_cfg_item('device0_fm814x250m0', 'StartSource')
         if start is not None:
             if int(start) == 0:
-                status.start = AdcStatus.IN0
+                self.status.start = AdcStatus.IN0
             elif int(start) == 2:
-                status.start = AdcStatus.EXTSTART
+                self.status.start = AdcStatus.EXTSTART
             elif int(start) == 3:
-                status.start = AdcStatus.SOFTSTART
+                self.status.start = AdcStatus.SOFTSTART
 
         stop = self.get_cfg_item('device0_fm814x250m0', 'StopSource')
         if stop is not None:
             if int(stop) == 0:
-                status.stop = AdcStatus.SOFTSTART
+                self.status.stop = AdcStatus.SOFTSTART
 
         stop = self.get_cfg_item('device0_fm814x250m0', 'StopSource')
         if stop is not None:
             if int(stop) == 0:
-                status.stop = AdcStatus.SOFTSTART
+                self.status.stop = AdcStatus.SOFTSTART
 
         clock = self.get_cfg_item('device0_fm814x250m0', 'ClockSource')
         if clock is not None:
             if int(clock, 16) == 0:
-                status.clock_source = AdcStatus.CLOCKOFF
+                self.status.clock_source = AdcStatus.CLOCKOFF
             elif int(clock, 16) == 1:
-                status.clock_source = AdcStatus.CLOCKINT
+                self.status.clock_source = AdcStatus.CLOCKINT
             elif int(clock, 16) == 2:
-                status.clock_source = AdcStatus.CLOCKEXT
+                self.status.clock_source = AdcStatus.CLOCKEXT
 
         memory = self.get_cfg_item('Option', 'DaqIntoMemory')
         if memory is not None:
             if int(memory) == 0:
-                status.memory_type = AdcStatus.MEMHOST
+                self.status.memory_type = AdcStatus.MEMHOST
             elif int(memory) == 1:
-                status.memory_type = AdcStatus.MEMINT
+                self.status.memory_type = AdcStatus.MEMINT
             elif int(memory) == 2:
-                status.memory_type = AdcStatus.MEMFIFO
+                self.status.memory_type = AdcStatus.MEMFIFO
 
         ch_mask = self.get_cfg_item('device0_fm814x250m0', 'ChannelMask')
         if ch_mask is not None:
-            if len(status.board_status) < 1:
-                status.board_status.add()
-            status.board_status[0].channel_mask = self.boards[0].channel_mask.to_bytes(1, 'big')
+            if len(self.status.board_status) < 1:
+                self.status.board_status.add()
+            self.status.board_status[0].channel_mask = self.boards[0].channel_mask.to_bytes(1, 'big')
 
         for ch_n in range(len(self.boards[0].channels)):
             bias = self.get_cfg_item('device0_fm814x250m0', f'Bias{ch_n}')
-            if len(status.board_status) < 1:
-                status.board_status.add()
+            if len(self.status.board_status) < 1:
+                self.status.board_status.add()
             if bias is not None:
-                if len(status.board_status[0].channel_status) < ch_n+1:
-                    status.board_status[0].channel_status.add()
-                status.board_status[0].channel_status[ch_n].enabled = self.boards[0].channels[ch_n].on
-                status.board_status[0].channel_status[ch_n].bias = float(bias)
+                if len(self.status.board_status[0].channel_status) < ch_n+1:
+                    self.status.board_status[0].channel_status.add()
+                self.status.board_status[0].channel_status[ch_n].enabled = self.boards[0].channels[ch_n].on
+                self.status.board_status[0].channel_status[ch_n].bias = float(bias)
 
         if response is None:
-            return status.SerializeToString()
+            return self.status.SerializeToString()
         else:
-            response.data = status.SerializeToString()
+            response.data = self.status.SerializeToString()
             if response.IsInitialized():
                 self.channel0.emit(response.SerializeToString())
 
@@ -333,11 +315,16 @@ class ADC(Dev):
         else:
             return None
 
-    def status_to_config(self, status, response=None):
-        if isinstance(status, bytes):
-            data = status
-            status = AdcStatus()
-            status.ParseFromString(data)
+    def set_settings(self, request: MainPacket = None, response: MainPacket = None):
+        if isinstance(request, MainPacket):
+            request = request.data
+
+        if isinstance(request, AdcStatus):
+            self.status = request
+        elif isinstance(request, (bytes, bytearray)):
+            self.status.ParseFromString(request)
+
+        status = self.status
 
         self.config['Option']['DaqIntoMemory'] = str(status.memory_type)
         self.config['Option']['MemSamplesPerChan'] = str(status.samples)
@@ -378,7 +365,7 @@ class ADC(Dev):
             self.config['device0_fm814x250m0']['StartBaseSource'] = '7'
 
         if response is not None:
-            self.status_message(response)
+            self.get_status(response)
 
     def generate_data(self):
         samples = self.get_cfg_item('Option', 'MemSamplesPerChan')

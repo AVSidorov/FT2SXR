@@ -11,10 +11,10 @@ import os
 
 class Ft2SXR(Dev):
     def __init__(self, parent=None, wdir=None):
+        self.address = SystemStatus.SXR
         super().__init__(parent)
         core = self.get_origin_core()
 
-        self.address = SystemStatus.SXR
         if wdir is None:
             self.wdir = today_dir()
         else:

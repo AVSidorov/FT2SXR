@@ -37,7 +37,8 @@ class Core(QtCore.QObject):
 class Dev(Core):
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.address = -1
+        self.response = MainPacket()
+        self.response.sender = self.address
 
     @property
     def name(self):
@@ -126,20 +127,20 @@ class Dev(Core):
         request = MainPacket()
         request.ParseFromString(data)
         if request.address == self.address:
-            response = packet_init(request.sender, self.address)
-            response.command = request.command
+            self.response.address = request.sender
+            self.response.command = request.command
 
             if request.command == Commands.STATUS:
-                self.get_status(response)
+                self.get_status(self.response)
             elif request.command == Commands.SET:
-                self.set_settings(request, response)
+                self.set_settings(request, self.response)
             elif request.command == Commands.START:
-                self.start(response)
+                self.start(self.response)
             elif request.command == Commands.STOP:
-                self.stop(response)
+                self.stop(self.response)
             elif request.command == Commands.REBOOT:
-                self.reboot(response)
+                self.reboot(self.response)
             elif request.command == Commands.CONNECT:
-                self.make_connection(response)
+                self.make_connection(self.response)
             elif request.command == Commands.SNAPSHOT:
-                self.snapshot(request, response)
+                self.snapshot(request, self.response)

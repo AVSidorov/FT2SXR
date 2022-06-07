@@ -4,8 +4,8 @@ from core.sxr_protocol_pb2 import MainPacket, SystemStatus, Commands, AmpStatus
 
 class Amplifier(Dev):
     def __init__(self, parent = None):
-        super().__init__(parent)
         self.address = SystemStatus.AMP
+        super().__init__(parent)
 
         self.state = AmpStatus()
 

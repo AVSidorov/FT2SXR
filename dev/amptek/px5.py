@@ -11,10 +11,11 @@ from dev.amptek.ascii import *
 from dev.amptek.netfinder import Packet as Netfinder_packet
 from dev.amptek.netfinder import netfinder_response
 
+
 class PX5(Dev):
     def __init__(self, parent=None, px5_ip='192.168.0.239', mtu=520):
-        super().__init__(parent)
         self.address = SystemStatus.PX5
+        super().__init__(parent)
 
         self.px5_ip = px5_ip
         self.px5_port = 10001
