@@ -23,41 +23,41 @@ class Ft2SXR(Dev):
         self.adc = ADC(self)
         self.px5 = PX5(self)
         self.amp = Amplifier(self)
+
         self.state = SystemStatus.IDLE
-        self.devs = list()
+        self.state = SystemStatus()
         self.laststart = None
 
+        # connect devs to message system
         if core is not None:
             self.adc.channel0.connect(core.channel0)       # out Main Packets (commands)
             self.adc.channel1.connect(core.channel1)       # out BRD_ctrl packets (from exam_adc)
             core.channel0.connect(self.adc.channel0_slot)  # in Main Packets (commands)
 
-    def status_message(self, response=None):
-        status = SystemStatus()
-        status.state = self.state
-        for dev in self.devs:
-            if dev == self.adc:
-                status.devs.append(SystemStatus.ADC)
-            elif dev == self.px5:
-                status.devs.append(SystemStatus.PX5)
+            self.px5.channel0.connect(core.channel0)       # out Main Packets (commands)
+            core.channel0.connect(self.px5.channel0_slot)  # in Main Packets (commands)
 
-    def status_to_config(self, status, response=None):
-        self.devs = list()
-        for dev in status:
-            if dev == SystemStatus.ADC:
-                self.devs.append(self.adc)
-            elif dev == SystemStatus.PX5:
-                self.devs.append(self.px5)
+            self.amp.channel0.connect(core.channel0)       # out Main Packets (commands)
+            core.channel0.connect(self.amp.channel0_slot)  # in Main Packets (commands)
 
-        if response is not None:
-            self.status_message(response)
+    def get_status(self, response: MainPacket = None):
+        self._response(response, self.state)
+        if response is None:
+            return self.state
+
+    def set_settings(self, request: MainPacket = None, response: MainPacket = None):
+        if isinstance(request, MainPacket):
+            request = request.data
+
+        if isinstance(request, SystemStatus):
+            self.state = request
 
     def start(self, response=None):
         self.laststart = time.time()
 
         request = packet_init(0, SystemStatus.SXR)
 
-        for dev in self.devs:
+        for dev in self.state.devs:
             request.address = dev
             request.command = Commands.START
             if request.IsInitialized():
@@ -73,7 +73,7 @@ class Ft2SXR(Dev):
         filename = os.path.abspath(os.path.join(self.wdir, hf.filename))
         hf.close()
 
-        for dev in self.devs:
+        for dev in self.state.devs:
             request.address = dev
             request.command = Commands.SNAPSHOT
             request.data = f'/SXR@{filename}'.encode()
@@ -83,3 +83,5 @@ class Ft2SXR(Dev):
         self._response(response, f'/SXR@{filename}'.encode())
 
         return f'/SXR@{filename}'
+
+
