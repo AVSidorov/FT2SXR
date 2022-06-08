@@ -19,18 +19,17 @@ class MainWidget(QtWidgets.QWidget, Ui_MainWidgetDesign):
 
         self.manual_pushButton.clicked.connect(self.start_adc)
         self.stop_pushButton.clicked.connect(self.stop_adc)
+        self.request = packet_init(SystemStatus.SXR, 12)
 
     def start_adc(self):
-        request = packet_init(SystemStatus.ADC, 0)
-        request.command = Commands.START
-        if request.IsInitialized():
-            self.channel0.emit(request.SerializeToString())
+        self.request.command = Commands.START
+        if self.request.IsInitialized():
+            self.channel0.emit(self.request.SerializeToString())
 
     def stop_adc(self):
-        request = packet_init(SystemStatus.ADC, 0)
-        request.command = Commands.STOP
-        if request.IsInitialized():
-            self.channel0.emit(request.SerializeToString())
+        self.request.command = Commands.STOP
+        if self.request.IsInitialized():
+            self.channel0.emit(self.request.SerializeToString())
 
     @QtCore.pyqtSlot(bytes)
     def channel0_slot(self, data: bytes):

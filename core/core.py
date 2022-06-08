@@ -37,6 +37,7 @@ class Core(QtCore.QObject):
 class Dev(Core):
     def __init__(self, parent=None):
         super().__init__(parent)
+        self.request = MainPacket()
         self.response = MainPacket()
         self.response.sender = self.address
 
@@ -124,8 +125,8 @@ class Dev(Core):
         return hf, group
 
     def channel0_slot(self, data: bytes):
-        request = MainPacket()
-        request.ParseFromString(data)
+        self.request.ParseFromString(data)
+        request = self.request
         if request.address == self.address:
             self.response.address = request.sender
             self.response.command = request.command
