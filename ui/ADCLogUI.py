@@ -2,6 +2,7 @@ from PyQt5 import QtWidgets, QtCore
 from ui.ADCLogUIDesign import Ui_AdcStatusWin
 import sys
 from core.sxr_protocol import packet_init
+from core.sxr_protocol_pb2 import Commands, SystemStatus
 
 
 class AdcLog (QtWidgets.QWidget, Ui_AdcStatusWin):
@@ -15,8 +16,8 @@ class AdcLog (QtWidgets.QWidget, Ui_AdcStatusWin):
         self.reboot_pushButton.clicked.connect(self.reboot)
 
     def reboot(self):
-        request = packet_init(1, 0)
-        request.command = 4
+        request = packet_init(SystemStatus.ADC, 13)
+        request.command = Commands.REBOOT
         if request.IsInitialized():
             self.channel0.emit(request.SerializeToString())
 

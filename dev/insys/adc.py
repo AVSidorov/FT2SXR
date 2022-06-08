@@ -387,18 +387,20 @@ class ADC(Dev):
             dump.tofile(f)
         return dump
 
-    def stop(self):
-        if self.connected:
-            self.ssh.send(b'\x1B')
+    def stop(self, response: MainPacket = None):
+        if self.started:
+            if self.connected:
+                self.ssh.send(b'\x1B')
         self.started = False
     
-    def reboot(self):
-        if self.connected and os.path.exists(os.path.join(work_dir(),'root_key')):
+    def reboot(self, response: MainPacket = None):
+        if self.connected and os.path.exists(os.path.join(work_dir(), 'root_key')):
             client = paramiko.SSHClient()
             client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
             client.connect(hostname="192.168.0.242", username="root", key_filename='root_key', password='root')
             ssh = client.invoke_shell()
             ssh.send('reboot\n')
+            self._response(response)
         else:
             response = packet_init(0, self.address)
             response.command = 0xFFFFFFFF
