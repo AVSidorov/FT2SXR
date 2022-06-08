@@ -43,7 +43,7 @@ class Dev(Core):
     @property
     def name(self):
         if self.address >= 0:
-            return SystemStatus.EnumDev.keys()[self.address]
+            return SystemStatus.EnumDev.Name(self.address)
         else:
             return None
 
