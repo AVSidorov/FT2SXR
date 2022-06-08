@@ -2,21 +2,37 @@ import io
 from PyQt5 import QtCore, QtWidgets
 import datetime
 from .core import Core
-from .sxr_protocol_pb2 import MainPacket
+from .sxr_protocol_pb2 import MainPacket, Commands, SystemStatus
 
 
 class Logger(Core):
     def __init__(self, out=None, parent=None):
         super().__init__(parent)
         self.out = out
+        self.pck = MainPacket()
 
     @QtCore.pyqtSlot(bytes)
     def channel0_slot(self, data: bytes):
-        pck = MainPacket()
-        pck.ParseFromString(data)
+        self.pck.ParseFromString(data)
+        pck = self.pck
 
         head = f'[{datetime.datetime.now().strftime("%d.%m.%Y %H:%M:%S")}] '
-        data = head + f' To: {pck.address} From: {pck.sender} Command: {pck.command} data length={len(pck.data)}'
+        if pck.address in SystemStatus.EnumDev.values():
+            dev = SystemStatus.EnumDev.Name(pck.address)
+        else:
+            dev = pck.address
+
+        if pck.sender in SystemStatus.EnumDev.values():
+            sender = SystemStatus.EnumDev.Name(pck.sender)
+        else:
+            sender = pck.sender
+
+        if pck.command in Commands.values():
+            cmd = Commands.Name(pck.command)
+        else:
+            cmd = pck.command
+
+        data = head + f' To: {dev} From: {sender} Command: {cmd} data length={len(pck.data)}'
         if pck.command == 0xFFFFFFFF:
             data += '\n' + head + pck.data.decode()
 
