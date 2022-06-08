@@ -403,7 +403,7 @@ class ADC(Dev):
             self._response(response)
         else:
             response = packet_init(0, self.address)
-            response.command = 0xFFFFFFFF
+            response.command = Commands.INFO
             response.data = 'ADC disconnected or key file not found'.encode()
             if response.IsInitialized():
                 self.channel0.emit(response.SerializeToString())
@@ -416,7 +416,7 @@ class ADC(Dev):
             time.sleep(timeout)
 
         response = packet_init(0, self.address)
-        response.command = 0xFFFFFFFF
+        response.command = Commands.INFO
         response.data = 'ADC disconnected'.encode()
         if response.IsInitialized():
             self.channel0.emit(response.SerializeToString())
