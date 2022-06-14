@@ -44,6 +44,7 @@ class Ft2SXR(Dev):
 
         self.state.devs.append(SystemStatus.ADC)
         self.state.devs.append(SystemStatus.AMP)
+        self.state.devs.append(SystemStatus.PX5)
 
     def get_status(self, response: MainPacket = None):
         self._response(response, self.state)
