@@ -98,9 +98,10 @@ def request_spectrum_clear():
 
 
 def response_spectrum_clear(pkt, obj=None):
-    if not check_packet(pkt):
+    pkt = Packet(pkt)
+    if pkt is None:
         return None
-    if pkt[2:4] == b'\x02\x02':
+    if pkt.pkt[2:4] == b'\x02\x02':
         data = pack_spectrum(obj)
         pid2 = spec_len2pidI(len(data))
         clear_spectrum(obj)
@@ -187,7 +188,7 @@ def response_txt_cfg_readback(pkt, obj=None):
 
 
 def request_enable_mca():
-    packet(b'\xf0', b'\x02')
+    return packet(b'\xf0', b'\x02')
 
 
 def response_enable_mca(pkt, obj):
@@ -200,7 +201,7 @@ def response_enable_mca(pkt, obj):
 
 
 def request_disable_mca():
-    packet(b'\xf0', b'\x03')
+    return packet(b'\xf0', b'\x03')
 
 
 def response_disable_mca(pkt, obj):
@@ -381,12 +382,13 @@ def unpack_eth_settings(pkt):
 class Packet:
 
     def __new__(cls, pkt=None, **kwargs):
-        obj = super().__new__(cls)
         if pkt is not None:
             if isinstance(pkt, (bytes, bytearray)):
-                if not check_packet(pkt):
-                    obj = None
-        return obj
+                if check_packet(pkt):
+                    return super().__new__(cls)
+        else:
+            return super().__new__(cls)
+        return None
 
     def __init__(self, pkt=None, *, pid1=b'\x00', pid2=b'\x00', data=b''):
         if pkt is None:
@@ -444,12 +446,15 @@ class Protocol:
 
         self.responses['response_txt_cfg'] = response_txt_cfg
 
+        self.requests['request_txt_cfg_readback'] = request_txt_cfg_readback
         self.responses['response_txt_cfg_readback'] = response_txt_cfg_readback
 
         self.responses['response_ok'] = response_ok
 
+        self.requests['request_enable_mca'] = request_enable_mca
         self.responses['response_enable_mca'] = response_enable_mca
 
+        self.requests['request_disable_mca'] = request_disable_mca
         self.responses['response_disable_mca'] = response_disable_mca
 
     def __call__(self, pkt, obj=None):
