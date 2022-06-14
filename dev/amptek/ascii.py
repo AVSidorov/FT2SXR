@@ -29,12 +29,13 @@ def ascii_cfg_load(fname: str = '', structured=False):
 
 
 def ascii_req_split(req: str) -> np.ndarray:
-    return np.array([cmd.split('=') for cmd in req.rstrip(';').split(';')])
+    return np.array([cmd.split('=') for cmd in req.rstrip(';').split(';') if len(cmd.split('='))==2])
 
 
 def ascii_req_full(cfg: np.ndarray) -> str:
     cfg = cfg[np.argsort(cfg[:, 6])]    # sort by order column
-    return '=?;'.join(cfg[:, 0]).replace(' ', '') + '=?;'
+    req = '=?;'.join(cfg[:, 0]).replace(' ', '') + '=?;'
+    return ascii_rm_fields(req, 'RESC')
 
 
 def ascii_resp(req: str, cfg) -> str:
@@ -74,6 +75,8 @@ def str2ver(version: str = '', limits=False, prefix='FW'):
         if version.find('prior') >= 0:
             ver_max = ver - 1
             ver_min = 0
+    else:
+        ver = 0
     if limits:
         return ver_min, ver_max
     else:
@@ -104,6 +107,16 @@ def parse_options(options: str) -> list:
     for opt in re.findall(r'(?:(?:[^\|\{\}]+)|(?:\{.+?\})){1,2}', options.rstrip('|')+'|'):
         options_full += parse_option(opt)
     return options_full
+
+
+def check_option_value(value: str, options: list) -> bool:
+    if value in options:
+        return True
+    for opt in options:
+        if '#' in opt:
+            if re.match(r'^'+r'\d+'.join(re.split(r'#+', opt.replace('+',r'\+')))+r'$', value) is not None:
+                return True
+    return False
 
 
 class PX5Configuration:
@@ -137,7 +150,17 @@ class PX5Configuration:
             ver_min, ver_max = str2ver(row[-3], limits=True)
             if all((any((len(row[-2]) == 0, devsCfg[dev] in row[-2].split(';'))),
                      all((ver_min <= fw, fw <= ver_max)))):
-                cfg_new = np.vstack((cfg_new, row))
+                # check duplicates
+                if cfg_new.shape[0] > 0:
+                    if row[0] in cfg_new[:, 0]:
+                        mask = cfg_new[:, 0] == row[0]
+                        ver_min0, ver_max0 = str2ver(cfg_new[mask, -3][0], limits=True)
+                        if ver_min > ver_min0:
+                            cfg_new[mask, :] = row
+                    else:
+                        cfg_new = np.vstack((cfg_new, row))
+                else:
+                    cfg_new = np.vstack((cfg_new, row))
 
         if cfg_new.size <= 0:
             return None
@@ -153,9 +176,15 @@ class PX5Configuration:
     def __call__(self):
         return self.cfg
 
-    def get_options(self, cmd):
+    def get_options(self, cmd: str) -> list:
         if cmd in self.cfg[:, 0]:
             return parse_options(self.cfg[self.cfg[:, 0] == cmd, 3][0])
 
+    def check_option_value(self, cmd: str, value: str) -> bool:
+        if cmd in self.cfg[:, 0]:
+            return check_option_value(value, self.get_options(cmd))
+        else:
+            return None
+
     def full_req(self):
-        ascii_req_full(self.cfg)
+        return ascii_req_full(self.cfg)
