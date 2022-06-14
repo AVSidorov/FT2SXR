@@ -1,12 +1,14 @@
 from socket import socket, AF_INET, SOCK_DGRAM
+from socket import error as sockerr
+from socket import timeout as socktimeout
 from threading import Thread
 import sys
 import io
 
 from core.core import Dev
-from core.sxr_protocol_pb2 import MainPacket, SystemStatus
+from core.sxr_protocol_pb2 import MainPacket, SystemStatus, Commands
 from core.sxr_protocol import packet_init
-from dev.amptek.protocol import Protocol
+from dev.amptek.protocol import Protocol, Packet, unpack_status, request_txt_cfg_readback
 from dev.amptek.ascii import *
 from dev.amptek.netfinder import Packet as Netfinder_packet
 from dev.amptek.netfinder import netfinder_response
@@ -22,30 +24,94 @@ class PX5(Dev):
         self.mtu = mtu
 
         self.udp_socket = socket(AF_INET, SOCK_DGRAM)
+        self.udp_socket.settimeout(1)
         self.protocol = Protocol()
+        self.cfg = PX5Configuration()
 
-    def channel0_slot(self, data: bytes):
-        request = MainPacket()
-        request.ParseFromString(data)
-        if request.address == self.address:
-            response = packet_init(request.sender, self.address)
-            response.command = request.command
-
-            if request.command == 1:
-                thrd = Thread(name='Thread-px5send', target=self.send_to_px5, args=(request.data, response),
-                              daemon=True)
-                thrd.start()
+    def run_send_thread(self, request: MainPacket = None, response: MainPacket = None):
+        thrd = Thread(name='Thread-px5send', target=self.send_to_px5, args=(request.data, response),
+                      daemon=True)
+        thrd.start()
 
     def send_to_px5(self, data, response=None):
         # TODO check that data is amptek packet
         self.udp_socket.sendto(data, (self.px5_ip, self.px5_port))
         ex = False
         while not ex:
-            ack, _ = self.udp_socket.recvfrom(self.mtu)
-            if self.protocol(ack) is not None:
-                ex = True
-        if response is None:
-            return self.protocol.request
+            try:
+                ack, _ = self.udp_socket.recvfrom(self.mtu)
+                if self.protocol(ack) is not None:
+                    res = Packet(self.protocol.request).data
+                    ex = True
+            except sockerr as err:
+                if isinstance(err, socktimeout):
+                    if response is None:
+                        res = 'Socket timeout'
+                        ex = True
+                    else:
+                        response.command = Commands.INFO
+
+        return self._response(response, res)
+
+    def start(self, response: MainPacket = None):
+        return self.send_to_px5(self.protocol('request_enable_mca'), response)
+
+    def stop(self, response: MainPacket = None):
+        return self.send_to_px5(self.protocol('request_disable_mca'), response)
+
+    def get_status(self, response: MainPacket = None):
+        status = self.send_to_px5(self.protocol('request_status'), response)
+        if isinstance(status, (bytes, bytearray)):
+            return unpack_status(status)
+        else:
+            return status
+
+    def get_settings(self, response: MainPacket = None):
+        return self.send_to_px5(request_txt_cfg_readback(self.cfg.full_req()))
+
+    def snapshot(self, request: MainPacket = None, response: MainPacket = None):
+        hf, px5 = super().snapshot(request, response)
+
+        status = self.get_status()
+        group_status = px5.create_group('status')
+        if isinstance(status, dict):
+            for key in ('DeviceID', 'SerialNum'):
+                px5.attrs[key] = status[key]
+            for field in status:
+                group_status.create_dataset(field, data=status[field])
+                group_status.attrs[field] = status[field]
+
+        req = self.cfg.full_req()
+        ex = False
+
+        count_tries = 0
+        group_cfg = px5.create_group('config_ascii')
+        while all((not ex, count_tries < 4)):
+            count_tries += 1
+            ascii_cfg = self.send_to_px5(request_txt_cfg_readback(req))
+            if isinstance(ascii_cfg, (bytes, bytearray)):
+                ascii_cfg = ascii_req_split(ascii_cfg.decode())
+                # remove bad fields
+                ascii_cfg = np.array([(row[0], row[1]) for row in ascii_cfg if self.cfg.check_option_value(row[0], row[1])])
+                for field in ascii_cfg:
+                    if field[0] not in group_cfg:
+                        group_cfg.create_dataset(field[0], shape=(1,), data=str(field[1]))
+                        group_cfg.attrs[field[0]] = str(field[1])
+
+                if ascii_req_split(req).shape[0] > ascii_cfg.shape[0]:
+                    req = ''
+                    for field in ascii_req_split(self.cfg.full_req()):
+                        if field[0] not in ascii_cfg[:, 0]:
+                            req += f'{field[0]}=?;'
+                else:
+                    ex = True
+
+        filename = hf.filename
+        hf.close()
+
+        self._response(response, filename.encode())
+
+        return filename
 
 
 class PX5Imitator:
