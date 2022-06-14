@@ -54,6 +54,8 @@ class Dev(Core):
                 response.data = data
             if response.IsInitialized():
                 self.channel0.emit(response.SerializeToString())
+        else:
+            return data
 
     def get_status(self, response: MainPacket = None):
         self._response(response)
@@ -129,7 +131,7 @@ class Dev(Core):
         request = self.request
         if request.address == self.address:
             self.response.address = request.sender
-            self.response.command = request.command
+            self.response.command = request.command ^ 0xFFFFFFFF
 
             if request.command == Commands.STATUS:
                 self.get_status(self.response)

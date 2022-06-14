@@ -29,11 +29,13 @@ class Logger(Core):
 
         if pck.command in Commands.values():
             cmd = Commands.Name(pck.command)
+        elif pck.command ^ 0xFFFFFFFF in Commands.values():
+            cmd = Commands.Name(pck.command ^ 0xFFFFFFFF)+'_ACK'
         else:
             cmd = pck.command
 
         data = head + f' To: {dev} From: {sender} Command: {cmd} data length={len(pck.data)}'
-        if pck.command == 0xFFFFFFFF:
+        if pck.command == Commands.INFO:
             data += '\n' + head + pck.data.decode()
 
         if data[-1] != '\n':
