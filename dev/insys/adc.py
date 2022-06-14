@@ -128,11 +128,11 @@ class ADC(Dev):
             connection_watch = Thread(name='Thread-connection-watchdog', target=self.watchdog, daemon=True)
             connection_watch.start()
 
-            response = packet_init(0, self.address)
-            response.command = 0xFFFFFFFF
-            response.data = 'ADC connected'.encode()
-            if response.IsInitialized():
-                self.channel0.emit(response.SerializeToString())
+            self.response.address = SystemStatus.SXR
+            self.response.command = Commands.INFO
+            self.response.data = 'ADC connected'.encode()
+            if self.response.IsInitialized():
+                self.channel0.emit(self.response.SerializeToString())
         except:
             self.connected = False
 
@@ -207,12 +207,12 @@ class ADC(Dev):
                 else:
                     ch.data = np.ndarray((0,))
 
-            filename = self.snapshot(f'/SXR@{self.wdir}/?')
-
-            if response is not None:
-                response.data = filename.encode()
-                if response.IsInitialized():
-                    self.channel0.emit(response.SerializeToString())
+            self._response(response)
+            self.request.address = SystemStatus.SXR
+            self.request.sender = self.address
+            self.request.command = Commands.SNAPSHOT
+            if self.request.IsInitialized():
+                self.channel0.emit(self.request.SerializeToString())
 
     def channel2_slot(self, data: bytes):
         pkt = BRD_ctrl()
@@ -440,6 +440,7 @@ class ADC(Dev):
                 cfg.create_group(sec)
                 for key in self.config[sec]:
                     cfg[sec][key] = self.config[sec][key]
+                    cfg.attrs[key] = self.config[sec][key]
 
         adc.attrs['num_active_ch'] = self.boards[0].n_active_ch
         for ch in self.boards[0].channels:

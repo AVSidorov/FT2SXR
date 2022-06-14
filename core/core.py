@@ -90,7 +90,7 @@ class Dev(Core):
         group = f'/{self.name}'
 
         if isinstance(request, MainPacket):
-            file_origin = MainPacket.data.decode()
+            file_origin = request.data.decode()
 
         if isinstance(request, str):
             file_origin = request
@@ -117,21 +117,25 @@ class Dev(Core):
             hf['/'].attrs['datetime'] = datetime_str
 
         if group in hf:
-            if isinstance(group, h5py.Group):
+            if isinstance(group, str):
                 group = hf[group]
         else:
             group = hf.create_group(group)
 
-        group.attrs['timestamp'] = timestamp
-        group.attrs['datetime'] = datetime_str
-        return hf, group
+        if isinstance(group, h5py.Group):
+            group.attrs['timestamp'] = timestamp
+            group.attrs['datetime'] = datetime_str
+            return hf, group
+        else:
+            return hf, None
 
     def channel0_slot(self, data: bytes):
         self.request.ParseFromString(data)
         request = self.request
         if request.address == self.address:
-            self.response.address = request.sender
-            self.response.command = request.command ^ 0xFFFFFFFF
+            if request.command in Commands.values():
+                self.response.address = request.sender
+                self.response.command = request.command ^ 0xFFFFFFFF
 
             if request.command == Commands.STATUS:
                 self.get_status(self.response)

@@ -180,7 +180,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         request = MainPacket()
         request.ParseFromString(data)
         if request.sender == SystemStatus.ADC:
-            if request.command == Commands.START ^ 0xFFFFFFFF:
+            if request.command == Commands.SNAPSHOT ^ 0xFFFFFFFF:
                 if isinstance(request.data.decode('utf-8'), str):
                     data_file = os.path.join(os.path.split(os.path.join(os.path.abspath('./'), request.data.decode('utf-8')))[0], 'data_0.bin')
                     self.open_sxr(data_file=data_file)

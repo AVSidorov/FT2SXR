@@ -43,6 +43,7 @@ class Ft2SXR(Dev):
             core.channel0.connect(self.amp.channel0_slot)  # in Main Packets (commands)
 
         self.state.devs.append(SystemStatus.ADC)
+        self.state.devs.append(SystemStatus.AMP)
 
     def get_status(self, response: MainPacket = None):
         self._response(response, self.state)
@@ -56,20 +57,14 @@ class Ft2SXR(Dev):
         if isinstance(request, SystemStatus):
             self.state = request
 
-    def channel0_slot(self, data: bytes):
-        self.request.ParseFromString(data)
-        # system accepts commands only from user or scenarios (wich aren't listed in Devices)
-        if self.request.sender not in SystemStatus.EnumDev.values():
-            super().channel0_slot(data)
-
     def command_to_devs(self, command: Commands = None, response: MainPacket = None):
-        request = packet_init(0, SystemStatus.SXR)
-
         for dev in self.state.devs:
-            request.address = dev
-            request.command = command
-            if request.IsInitialized():
-                self.channel0.emit(request.SerializeToString())
+            self.request.address = dev
+            self.request.sender = self.address
+            self.request.command = command
+
+            if self.request.IsInitialized():
+                self.channel0.emit(self.request.SerializeToString())
 
         self._response(response)
 
@@ -86,11 +81,12 @@ class Ft2SXR(Dev):
         hf.close()
 
         for dev in self.state.devs:
-            request.address = dev
-            request.command = Commands.SNAPSHOT
-            request.data = f'/SXR@{filename}'.encode()
-            if request.IsInitialized():
-                self.channel0.emit(request.SerializeToString())
+            self.request.address = dev
+            self.request.sender = self.address
+            self.request.command = Commands.SNAPSHOT
+            self.request.data = f'/SXR@{filename}'.encode()
+            if self.request.IsInitialized():
+                self.channel0.emit(self.request.SerializeToString())
 
         self._response(response, f'/SXR@{filename}'.encode())
 
