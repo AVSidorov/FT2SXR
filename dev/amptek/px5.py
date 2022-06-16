@@ -18,8 +18,7 @@ from dev.amptek.netfinder import netfinder_response
 
 class PX5(Dev):
     def __init__(self, parent=None, px5_ip='192.168.0.239', mtu=520):
-        self.address = SystemStatus.PX5
-        super().__init__(parent)
+        super().__init__(parent, SystemStatus.PX5)
 
         self.px5_ip = px5_ip
         self.px5_port = 10001

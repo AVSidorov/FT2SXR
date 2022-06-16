@@ -55,8 +55,7 @@ class Board:
 
 class ADC(Dev):
     def __init__(self, parent=None, nboards=1, connect=True, wdir=None):
-        self.address = SystemStatus.ADC
-        super().__init__(parent)
+        super().__init__(parent, SystemStatus.ADC)
 
         self.boards = [Board() for _ in range(nboards)]
 
