@@ -12,6 +12,14 @@ class Core(QtCore.QObject):
     channel1 = QtCore.pyqtSignal(bytes)
     channel2 = QtCore.pyqtSignal(bytes)
 
+    def __init__(self, parent=None, address=0):
+        super().__init__(parent)
+        self.address = address
+        self.request = MainPacket()
+        self.response = MainPacket()
+        self.response.sender = self.address
+
+
     @QtCore.pyqtSlot(bytes)
     def channel0_slot(self, data: bytes):
         pass
@@ -35,16 +43,11 @@ class Core(QtCore.QObject):
 
 
 class Dev(Core):
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        self.request = MainPacket()
-        self.response = MainPacket()
-        self.response.sender = self.address
-
     @property
     def name(self):
-        if self.address >= 0:
-            return SystemStatus.EnumDev.Name(self.address)
+        if self.address > 0:
+            if self.address in SystemStatus.EnumDev.values():
+                return SystemStatus.EnumDev.Name(self.address)
         else:
             return None
 
