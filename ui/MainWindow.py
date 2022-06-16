@@ -102,10 +102,18 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         win.setWindowTitle('Amplifier')
 
         amplifierSettings = AmplifierWidget(win)
+        amplifierSettings.channel0.connect(self.channel0)
+        self.channel1.connect(amplifierSettings.channel0_slot)
+
         win.verticalLayout = QtWidgets.QVBoxLayout(win)
         win.verticalLayout.addWidget(amplifierSettings)
 
         win.show()
+
+        request = packet_init(SystemStatus.ADC, amplifierSettings.address)
+        request.command = Commands.STATUS
+        if request.IsInitialized():
+            self.channel0.emit(request.SerializeToString())
 
     def action_calibration_set(self):
         win = QtWidgets.QDialog(self)

@@ -3,19 +3,35 @@ import sys
 import os
 from PyQt5 import QtWidgets
 from ui.AmplifierUIDesign import Ui_AmplifierWidgetDesign
+from core.sxr_protocol_pb2 import MainPacket, AmpStatus, SystemStatus, Commands
+from core.sxr_protocol import packet_init
+from PyQt5 import QtWidgets, QtCore
 
 
 class AmplifierWidget(QtWidgets.QWidget, Ui_AmplifierWidgetDesign):
+    channel0 = QtCore.pyqtSignal(bytes)
 
     def __init__(self, parent=None):
         super().__init__(parent=parent)
         self.setupUi(self)
 
         # Amplifier initial values
-        self.gainA = 0
-        self.gainB = 0
-        self.decay = 0
+        self.gainA = 0.0
+        self.gainB = 0.0
+        self.decay = 0.0
         self.switch_state = 0b0000
+        self.status = AmpStatus()
+        self.address = 14
+
+        last_file = {}
+        with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'amp_last.csv'), newline='') as file:
+            cal = csv.DictReader(file, delimiter=',')
+            for i in cal:
+                last_file = i
+        self.gainA = float(last_file['gainA'])
+        self.gainB = float(last_file['gainB'])
+        self.switch_state = bin(int(last_file['switch_state']))
+        print(self.switch_state)
 
         # signals
         self.gainA_doubleSpinBox.valueChanged.connect(self.setgainA)
@@ -33,6 +49,9 @@ class AmplifierWidget(QtWidgets.QWidget, Ui_AmplifierWidgetDesign):
         self.cal_textBrowser.setText(self.make_table(cal_file))
 
         self.setdecay()
+
+        self.status2ui()
+        self.ui2status()
 
     def make_table(self, cal_file):
         table = '<!DOCTYPE HTML>' \
@@ -65,10 +84,12 @@ class AmplifierWidget(QtWidgets.QWidget, Ui_AmplifierWidgetDesign):
         return table
 
     def setgainA(self):
-        self.gainA = self.gainA_doubleSpinBox.value()
+        self.gainA = round(self.gainA_doubleSpinBox.value(), 2)
+        self.ui2status()
 
     def setgainB(self):
-        self.gainB = self.gainB_doubleSpinBox.value()
+        self.gainB = round(self.gainB_doubleSpinBox.value(), 2)
+        self.ui2status()
 
     def setdecay(self):
         self.time45_checkBox.setDisabled(True)
@@ -108,6 +129,42 @@ class AmplifierWidget(QtWidgets.QWidget, Ui_AmplifierWidgetDesign):
         self.time13_checkBox.setEnabled(True)
         self.time17_checkBox.setEnabled(True)
 
+        self.ui2status()
+
+    def status2ui(self):
+        self.gainA_doubleSpinBox.setValue(self.gainA)
+        self.gainB_doubleSpinBox.setValue(self.gainB)
+
+        state = bin(int(self.switch_state))
+        # if state
+
+    def ui2status(self):
+        self.status.gainA = self.gainA
+        self.status.gainB = self.gainB
+        self.status.tail = self.switch_state
+
+        request = packet_init(SystemStatus.AMP, self.address)
+        request.command = Commands.SET
+        if self.status.IsInitialized():
+            request.data = self.status.SerializeToString()
+        if request.IsInitialized():
+            self.channel0.emit(request.SerializeToString())
+
+        with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'amp_last.csv'), 'w', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerow(('gainA', 'gainB', 'switch_state'))
+            writer.writerow((self.gainA, self.gainB, self.switch_state))
+
+    @QtCore.pyqtSlot(bytes)
+    def channel0_slot(self, data: bytes):
+        request = MainPacket()
+        request.ParseFromString(data)
+        if request.sender == SystemStatus.AMP:
+            if request.command in (Commands.STATUS ^ 0xFFFFFFFF, Commands.SET ^ 0xFFFFFFFF):
+                self.blockSignals(True)
+                self.status = request.data
+                self.status2ui()
+                self.blockSignals(False)
 
 def main():
     app = QtWidgets.QApplication(sys.argv)

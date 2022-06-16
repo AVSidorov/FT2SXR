@@ -40,11 +40,9 @@ class Amplifier(Dev):
 
     def set_settings(self, request: MainPacket = None, response: MainPacket = None):
         if isinstance(request, MainPacket):
-            request = request.data
+            data = request.data
+            request = AmpStatus()
+            request.ParseFromString(data)
 
         if isinstance(request, AmpStatus):
             self.state = request
-
-
-
-
