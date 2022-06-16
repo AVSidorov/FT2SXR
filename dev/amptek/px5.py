@@ -5,6 +5,8 @@ from threading import Thread
 import sys
 import io
 
+import h5py
+
 from core.core import Dev
 from core.sxr_protocol_pb2 import MainPacket, SystemStatus, Commands
 from core.sxr_protocol import packet_init
@@ -67,25 +69,38 @@ class PX5(Dev):
             return status
 
     def get_settings(self, response: MainPacket = None):
+        #TODO split full request in two parts to avoid Serial Num reset and bad fields in response
         return self.send_to_px5(request_txt_cfg_readback(self.cfg.full_req()))
 
     def snapshot(self, request: MainPacket = None, response: MainPacket = None):
-        hf, px5 = super().snapshot(request, response)
+        hf, px5_group = super().snapshot(request, response)
 
-        status = self.get_status()
-        group_status = px5.create_group('status')
-        if isinstance(status, dict):
+        data = self.send_to_px5(self.protocol('request_spectrum_status'))
+
+        if isinstance(data, (bytes, bytearray)): # if socket error str will be returned
+            spectrum, status = self.protocol.responses['response_spectrum_status'](self.protocol.request)
+
+            if 'status' not in px5_group:
+                group_status = px5_group.create_group('status')
+            elif isinstance(px5_group['status'], h5py.Group):
+                group_status = px5_group['status']
+
             for key in ('DeviceID', 'SerialNum'):
-                px5.attrs[key] = status[key]
+                px5_group.attrs[key] = status[key]
             for field in status:
                 group_status.create_dataset(field, data=status[field])
                 group_status.attrs[field] = status[field]
+
+            if 'spectrum' not in px5_group:
+                px5_group.create_dataset('spectrum', data=spectrum)
+            else:
+                px5_group['spectrum'] = spectrum
 
         req = self.cfg.full_req()
         ex = False
 
         count_tries = 0
-        group_cfg = px5.create_group('config_ascii')
+        group_cfg = px5_group.create_group('config_ascii')
         while all((not ex, count_tries < 4)):
             count_tries += 1
             ascii_cfg = self.send_to_px5(request_txt_cfg_readback(req))
