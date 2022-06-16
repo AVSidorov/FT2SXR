@@ -20,6 +20,11 @@ class Ft2SXR(Dev):
         else:
             self.wdir = wdir
 
+        self.request_to_dev = MainPacket()
+        self.request_to_dev.sender = self.address
+
+        self.devs_que = list()
+
         self.adc = ADC(self)
         self.px5 = PX5(self)
         self.amp = Amplifier(self)
@@ -48,8 +53,6 @@ class Ft2SXR(Dev):
 
     def get_status(self, response: MainPacket = None):
         self._response(response, self.state)
-        if response is None:
-            return self.state
 
     def set_settings(self, request: MainPacket = None, response: MainPacket = None):
         if isinstance(request, MainPacket):
@@ -60,14 +63,32 @@ class Ft2SXR(Dev):
 
     def command_to_devs(self, command: Commands = None, response: MainPacket = None):
         for dev in self.state.devs:
-            self.request.address = dev
-            self.request.sender = self.address
-            self.request.command = command
+            self.request_to_dev.address = dev
+            self.request_to_dev.sender = self.address
+            self.request_to_dev.command = command
 
-            if self.request.IsInitialized():
-                self.channel0.emit(self.request.SerializeToString())
+            if self.request_to_dev.IsInitialized():
+                self.channel0.emit(self.request_to_dev.SerializeToString())
 
         self._response(response)
+
+    def command_to_dev_from_que(self, command: Commands = None, response: MainPacket = None):
+        # Command que have two "params" devs in que and command should be sent.
+        # If response from one device coincide with current command in que (in self.request_to_dev packet)
+        # next request (command to next device) will be sent
+
+        if command == self.request_to_dev.command:
+            if len(self.devs_que) > 0:
+                dev = self.devs_que.pop()
+                self.request_to_dev.address = dev
+
+                if self.request_to_dev.IsInitialized():
+                    self.channel0.emit(self.request_to_dev.SerializeToString())
+            else:
+                # "Clear command (INFO command require no acknowledgment)
+                self.request_to_dev.command = Commands.INFO
+                # return response so as full que is processed
+                self._response(self.response)
 
     def start(self, response: MainPacket = None):
         self.command_to_devs(Commands.START)
@@ -81,16 +102,20 @@ class Ft2SXR(Dev):
         filename = os.path.abspath(os.path.join(self.wdir, hf.filename))
         hf.close()
 
-        for dev in self.state.devs:
-            self.request.address = dev
-            self.request.sender = self.address
-            self.request.command = Commands.SNAPSHOT
-            self.request.data = f'/SXR@{filename}'.encode()
-            if self.request.IsInitialized():
-                self.channel0.emit(self.request.SerializeToString())
+        self.request_to_dev.command = Commands.SNAPSHOT
+        self.request_to_dev.data = f'/SXR@{filename}'.encode()
 
-        self._response(response, f'/SXR@{filename}'.encode())
+        self.devs_que.extend(self.state.devs)
+        self.command_to_dev_from_que(Commands.SNAPSHOT, response)
 
-        return f'/SXR@{filename}'
-
+    def channel0_slot(self, data: bytes):
+        # here processed commands
+        super().channel0_slot(data)
+        # check for responses (ACK)
+        if self.request.address == self.address:
+            if self.request.command ^ 0xFFFFFFFF in Commands.values():
+                self.command_to_dev_from_que(self.request.command ^ 0xFFFFFFFF, self.response)
+                # Command que have two "params" devs in que and command should be sent.
+                # If response from one device coincide with current command in que (in self.request_to_dev packet)
+                # next request (command to next device) will be sent
 

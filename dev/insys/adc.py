@@ -213,6 +213,12 @@ class ADC(Dev):
             self.request.command = Commands.SNAPSHOT
             if self.request.IsInitialized():
                 self.channel0.emit(self.request.SerializeToString())
+            self.request.address = SystemStatus.SXR
+            self.request.sender = self.address
+            self.request.command = Commands.STOP
+            if self.request.IsInitialized():
+                self.channel0.emit(self.request.SerializeToString())
+
 
     def channel2_slot(self, data: bytes):
         pkt = BRD_ctrl()
