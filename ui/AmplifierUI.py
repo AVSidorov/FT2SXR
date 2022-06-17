@@ -1,6 +1,6 @@
-import csv
 import sys
 import os
+import csv
 from PyQt5 import QtWidgets
 from ui.AmplifierUIDesign import Ui_AmplifierWidgetDesign
 from core.sxr_protocol_pb2 import MainPacket, AmpStatus, SystemStatus, Commands
@@ -22,15 +22,6 @@ class AmplifierWidget(QtWidgets.QWidget, Ui_AmplifierWidgetDesign):
         self.switch_state = 0
         self.status = AmpStatus()
         self.address = 14
-
-        last_file = {}
-        with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'amp_last.csv'), newline='') as file:
-            cal = csv.DictReader(file, delimiter=',')
-            for i in cal:
-                last_file = i
-        self.gainA = float(last_file['gainA'])
-        self.gainB = float(last_file['gainB'])
-        self.switch_state = int(last_file['switch_state'])
 
         # signals
         self.gainA_doubleSpinBox.valueChanged.connect(self.setgainA)
@@ -130,10 +121,14 @@ class AmplifierWidget(QtWidgets.QWidget, Ui_AmplifierWidgetDesign):
         self.ui2status()
 
     def status2ui(self):
-        self.gainA_doubleSpinBox.setValue(self.gainA)
-        self.gainB_doubleSpinBox.setValue(self.gainB)
+        self.gainA = self.status.gainA
+        self.gainB = self.status.gainB
+        self.switch_state = self.status.tail
 
-        state = self.switch_state
+        self.gainA_doubleSpinBox.setValue(self.status.gainA)
+        self.gainB_doubleSpinBox.setValue(self.status.gainB)
+
+        state = self.status.tail
         for i in range(4):
             if state & (1 << i):
                 if i == 0:
@@ -156,11 +151,6 @@ class AmplifierWidget(QtWidgets.QWidget, Ui_AmplifierWidgetDesign):
             request.data = self.status.SerializeToString()
         if request.IsInitialized():
             self.channel0.emit(request.SerializeToString())
-
-        with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'amp_last.csv'), 'w', newline='') as file:
-            writer = csv.writer(file)
-            writer.writerow(('gainA', 'gainB', 'switch_state'))
-            writer.writerow((self.gainA, self.gainB, self.switch_state))
 
     @QtCore.pyqtSlot(bytes)
     def channel0_slot(self, data: bytes):

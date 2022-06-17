@@ -1,5 +1,8 @@
 from core.core import Dev
 from core.sxr_protocol_pb2 import MainPacket, SystemStatus, Commands, AmpStatus
+from core.fileutils import work_dir
+import os
+import csv
 
 
 class Amplifier(Dev):
@@ -10,7 +13,15 @@ class Amplifier(Dev):
 
         self.state.gainA = 0.0
         self.state.gainB = 0.0
-        self.state.tail = 0b0110
+        self.state.tail = 0b0000
+        with open(os.path.join(work_dir(), 'amp_last.csv'), newline='') as file:
+            cal = csv.DictReader(file, delimiter=',')
+            last_file = {}
+            for i in cal:
+                last_file = i
+            self.state.gainA = float(last_file['gainA'])
+            self.state.gainB = float(last_file['gainB'])
+            self.state.tail = int(last_file['switch_state'])
 
     def snapshot(self, request: MainPacket = None, response: MainPacket = None):
         hf, amp = super().snapshot(request, response)
@@ -41,3 +52,8 @@ class Amplifier(Dev):
 
         if isinstance(request, AmpStatus):
             self.state = request
+
+        with open(os.path.join(work_dir(), 'amp_last.csv'), 'w', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerow(('gainA', 'gainB', 'switch_state'))
+            writer.writerow((self.state.gainA, self.state.gainB, self.state.tail))
