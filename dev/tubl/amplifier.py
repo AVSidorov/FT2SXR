@@ -33,15 +33,11 @@ class Amplifier(Dev):
         return filename
 
     def get_status(self, response: MainPacket = None):
-        self._response(response, self.state)
-        if response is None:
-            return self.state
+        self._response(response, self.state.SerializeToString())
 
     def set_settings(self, request: MainPacket = None, response: MainPacket = None):
         if isinstance(request, MainPacket):
-            data = request.data
-            request = AmpStatus()
-            request.ParseFromString(data)
+            self.state.ParseFromString(request.data)
 
         if isinstance(request, AmpStatus):
             self.state = request
