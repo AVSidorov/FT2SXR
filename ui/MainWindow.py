@@ -110,7 +110,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
         win.show()
 
-        request = packet_init(SystemStatus.ADC, amplifierSettings.address)
+        request = packet_init(SystemStatus.AMP, amplifierSettings.address)
         request.command = Commands.STATUS
         if request.IsInitialized():
             self.channel0.emit(request.SerializeToString())
