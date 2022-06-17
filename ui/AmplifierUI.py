@@ -19,7 +19,7 @@ class AmplifierWidget(QtWidgets.QWidget, Ui_AmplifierWidgetDesign):
         self.gainA = 0.0
         self.gainB = 0.0
         self.decay = 0.0
-        self.switch_state = 0b0000
+        self.switch_state = 0
         self.status = AmpStatus()
         self.address = 14
 
@@ -30,8 +30,7 @@ class AmplifierWidget(QtWidgets.QWidget, Ui_AmplifierWidgetDesign):
                 last_file = i
         self.gainA = float(last_file['gainA'])
         self.gainB = float(last_file['gainB'])
-        self.switch_state = bin(int(last_file['switch_state']))
-        print(self.switch_state)
+        self.switch_state = int(last_file['switch_state'])
 
         # signals
         self.gainA_doubleSpinBox.valueChanged.connect(self.setgainA)
@@ -48,10 +47,9 @@ class AmplifierWidget(QtWidgets.QWidget, Ui_AmplifierWidgetDesign):
                 cal_file.append(i)
         self.cal_textBrowser.setText(self.make_table(cal_file))
 
+        self.status2ui()
         self.setdecay()
 
-        self.status2ui()
-        self.ui2status()
 
     def make_table(self, cal_file):
         table = '<!DOCTYPE HTML>' \
@@ -135,8 +133,17 @@ class AmplifierWidget(QtWidgets.QWidget, Ui_AmplifierWidgetDesign):
         self.gainA_doubleSpinBox.setValue(self.gainA)
         self.gainB_doubleSpinBox.setValue(self.gainB)
 
-        state = bin(int(self.switch_state))
-        # if state
+        state = self.switch_state
+        for i in range(4):
+            if state & (1 << i):
+                if i == 0:
+                    self.time45_checkBox.setChecked(True)
+                elif i == 1:
+                    self.time9_checkBox.setChecked(True)
+                elif i == 2:
+                    self.time13_checkBox.setChecked(True)
+                elif i == 3:
+                    self.time17_checkBox.setChecked(True)
 
     def ui2status(self):
         self.status.gainA = self.gainA
