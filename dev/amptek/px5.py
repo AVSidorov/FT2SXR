@@ -80,14 +80,14 @@ class PX5(Dev):
             spectrum, status = self.protocol.responses['response_spectrum_status'](self.protocol.request)
 
             if 'status' not in px5_group:
-                group_status = px5_group.create_group('status')
+                group_status = px5_group.create_group('status', track_order=True)
             elif isinstance(px5_group['status'], h5py.Group):
                 group_status = px5_group['status']
 
             for key in ('DeviceID', 'SerialNum'):
                 px5_group.attrs[key] = status[key]
             for field in status:
-                group_status.create_dataset(field, data=status[field])
+                group_status.create_dataset(field, data=status[field], track_order=True)
                 group_status.attrs[field] = status[field]
 
             if 'spectrum' not in px5_group:
@@ -99,7 +99,7 @@ class PX5(Dev):
         ex = False
 
         count_tries = 0
-        group_cfg = px5_group.create_group('config_ascii')
+        group_cfg = px5_group.create_group('config_ascii', track_order=True)
         while all((not ex, count_tries < 4)):
             count_tries += 1
             ascii_cfg = self.send_to_px5(request_txt_cfg_readback(req))
