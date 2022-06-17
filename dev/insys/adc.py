@@ -12,7 +12,7 @@ from core.sxr_protocol import packet_init
 from threading import Thread
 from dev.insys.bardy.getCodesNames import *
 from insys.EXAM.exam_adc.exam_protocol_pb2 import BRD_ctrl
-from core.netmanager_simple import NetManagerSimple
+from core.netmanagers import NetManagerSimple
 from core.fileutils import work_dir, today_dir
 
 

@@ -9,12 +9,14 @@ class Logger(Core):
     def __init__(self, out=None, parent=None):
         super().__init__(parent)
         self.out = out
-        self.pck = MainPacket()
+        core = self.get_origin_core()
+        if core is not None:
+            core.channel0.connect(self.channel0_slot)
 
     @QtCore.pyqtSlot(bytes)
     def channel0_slot(self, data: bytes):
-        self.pck.ParseFromString(data)
-        pck = self.pck
+        self.request.ParseFromString(data)
+        pck = self.request
 
         head = f'[{datetime.datetime.now().strftime("%d.%m.%Y %H:%M:%S")}] '
         if pck.address in SystemStatus.EnumDev.values():

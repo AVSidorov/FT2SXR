@@ -11,8 +11,7 @@ import os
 
 class Ft2SXR(Dev):
     def __init__(self, parent=None, wdir=None):
-        self.address = SystemStatus.SXR
-        super().__init__(parent)
+        super().__init__(parent, SystemStatus.SXR)
         core = self.get_origin_core()
 
         if wdir is None:
@@ -72,7 +71,7 @@ class Ft2SXR(Dev):
 
         self._response(response)
 
-    def command_to_dev_from_que(self, command: Commands = None, response: MainPacket = None):
+    def command_to_dev_from_queue(self, command: Commands = None, response: MainPacket = None):
         # Command que have two "params" devs in que and command should be sent.
         # If response from one device coincide with current command in que (in self.request_to_dev packet)
         # next request (command to next device) will be sent
@@ -106,7 +105,7 @@ class Ft2SXR(Dev):
         self.request_to_dev.data = f'/SXR@{filename}'.encode()
 
         self.devs_que.extend(self.state.devs)
-        self.command_to_dev_from_que(Commands.SNAPSHOT, response)
+        self.command_to_dev_from_queue(Commands.SNAPSHOT, response)
 
     def channel0_slot(self, data: bytes):
         # here processed commands
@@ -114,7 +113,7 @@ class Ft2SXR(Dev):
         # check for responses (ACK)
         if self.request.address == self.address:
             if self.request.command ^ 0xFFFFFFFF in Commands.values():
-                self.command_to_dev_from_que(self.request.command ^ 0xFFFFFFFF, self.response)
+                self.command_to_dev_from_queue(self.request.command ^ 0xFFFFFFFF, self.response)
                 # Command que have two "params" devs in que and command should be sent.
                 # If response from one device coincide with current command in que (in self.request_to_dev packet)
                 # next request (command to next device) will be sent
