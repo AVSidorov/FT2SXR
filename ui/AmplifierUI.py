@@ -162,9 +162,10 @@ class AmplifierWidget(QtWidgets.QWidget, Ui_AmplifierWidgetDesign):
         if request.sender == SystemStatus.AMP:
             if request.command in (Commands.STATUS ^ 0xFFFFFFFF, Commands.SET ^ 0xFFFFFFFF):
                 self.blockSignals(True)
-                self.status = request.data
+                self.status.ParseFromString(request.data)
                 self.status2ui()
                 self.blockSignals(False)
+
 
 def main():
     app = QtWidgets.QApplication(sys.argv)
