@@ -17,8 +17,9 @@ class Core(QtCore.QObject):
         self.address = address
         self.request = MainPacket()
         self.response = MainPacket()
+        self.response.address = 0
         self.response.sender = self.address
-
+        self.response.command = Commands.INFO
 
     @QtCore.pyqtSlot(bytes)
     def channel0_slot(self, data: bytes):

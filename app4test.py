@@ -18,8 +18,7 @@ def main():
     core.channel0.connect(mw.channel0_slot)     # in Main Packets (commands)
     core.channel1.connect(mw.channel2)          # in BRD_ctrl packets (from exam_adc)
 
-    logger = Logger('log.txt', app)
-    core.channel0.connect(logger.channel0_slot)
+    logger = Logger('log.txt', core)
 
     mw.show()
     sys.exit(app.exec_())
