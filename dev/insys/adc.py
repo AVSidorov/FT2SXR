@@ -316,7 +316,7 @@ class ADC(Dev):
         else:
             return None
 
-    def set_settings(self, state: MainPacket = None, response: MainPacket = None):
+    def set_settings(self, state: MainPacket = None, response: bool = False):
         super().set_settings(state=state, response=response)
         status = self.state
 

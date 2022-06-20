@@ -52,22 +52,12 @@ class ADCUIWidget (QtWidgets.QWidget, Ui_ADCWidgetDesign):
         if request.sender == SystemStatus.ADC:  # 1 is reserved address for ADC
             if request.command in (Commands.STATUS ^ 0xFFFFFFFF, Commands.SET ^ 0xFFFFFFFF):
                 self.blockSignals(True)
-                self.status = request.data
+                self.status.ParseFromString(request.data)
                 self.status2ui()
                 self.blockSignals(False)
 
     def status2ui(self):
         status = self.status
-
-        if status is None:
-            return
-
-        if isinstance(status, bytes):
-            data = status
-            status = AdcStatus()
-            status.ParseFromString(data)
-
-        self.status = status
 
         last_ch = None
         n_ch = 0
@@ -77,7 +67,9 @@ class ADCUIWidget (QtWidgets.QWidget, Ui_ADCWidgetDesign):
                 last_ch = self.ch_comboBox.currentText()
             self.ch_comboBox.clear()
             for ch_n in range(len(status.board_status[0].channel_status)):
+                eval(f'self.ch{ch_n+1}_checkBox.blockSignals(True)')
                 eval(f'self.ch{ch_n+1}_checkBox.setChecked(status.board_status[0].channel_status[ch_n].enabled)')
+                eval(f'self.ch{ch_n+1}_checkBox.blockSignals(False)')
                 if status.board_status[0].channel_status[ch_n].enabled:
                     self.ch_comboBox.addItem(str(ch_n+1))
                     self.show_channel()
