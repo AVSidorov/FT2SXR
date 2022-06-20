@@ -20,11 +20,15 @@ class ADCUIWidget (QtWidgets.QWidget, Ui_ADCWidgetDesign):
         for _ in range(8):
             self.status.board_status[0].channel_status.add()
 
-        self.ch_names = ['', '', '', '', '', '', '', '']
+        self.ch_names = ['' for i in range(8)]
+        self.void_ch = 8
+        eval(f'self.ch{self.void_ch}_checkBox.setDisabled(True)')
+        eval(f'self.ch{self.void_ch}_name_lineEdit.setDisabled(True)')
+        eval(f'self.ch8_name_lineEdit.setText("void")')
 
         # signals
         for ch_n in range(1, 9):
-            eval(f'self.ch{ch_n}_checkBox.clicked.connect(self.ui2status)')
+            eval(f'self.ch{ch_n}_checkBox.stateChanged.connect(self.ui2status)')
             eval(f'self.ch{ch_n}_name_lineEdit.textChanged.connect(self.ui2status)')
         self.frec_spinBox.valueChanged.connect(self.ui2status)
         self.source_comboBox.currentIndexChanged.connect(self.ui2status)
@@ -135,6 +139,17 @@ class ADCUIWidget (QtWidgets.QWidget, Ui_ADCWidgetDesign):
                 self.status.board_status[0].channel_status.add()
             exec(f'self.status.board_status[0].channel_status[ch_n].enabled = self.ch{ch_n+1}_checkBox.isChecked()')
 
+        n_enabled = 0  # void channel
+        for ch_n in range(8):
+            if self.status.board_status[0].channel_status[ch_n].enabled and self.ch_names[ch_n] != 'void':
+                n_enabled += 1
+        if n_enabled % 2 != 0:
+            print('нечетный')
+            self.ch8_checkBox.setChecked(True)
+        else:
+            print('четный')
+            self.ch8_checkBox.setChecked(False)
+
         self.status.sampling_rate = self.frec_spinBox.value() * int(1e6)
 
         if self.source_comboBox.currentIndex() == 0:
@@ -147,10 +162,9 @@ class ADCUIWidget (QtWidgets.QWidget, Ui_ADCWidgetDesign):
         if self.ch_comboBox.count() > 0:
             self.status.board_status[0].channel_status[int(self.ch_comboBox.currentText())-1].bias = self.bias_doubleSpinBox.value()
 
-        for i in range(8):
+        for i in range(8):  # channel names
             eval(f'self.ch_names.pop({i})')
             eval(f'self.ch_names.insert({i}, self.ch{i+1}_name_lineEdit.text())')
-        print(self.ch_names)
 
         self.status2ui()
 
