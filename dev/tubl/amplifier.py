@@ -7,9 +7,7 @@ import csv
 
 class Amplifier(Dev):
     def __init__(self, parent=None):
-        super().__init__(parent, SystemStatus.AMP)
-
-        self.state = AmpStatus()
+        super().__init__(parent, SystemStatus.AMP, AmpStatus())
 
         self.state.gainA = 0.0
         self.state.gainB = 0.0
@@ -23,7 +21,7 @@ class Amplifier(Dev):
             self.state.gainB = float(last_file['gainB'])
             self.state.tail = int(last_file['switch_state'])
 
-    def snapshot(self, request: MainPacket = None, response: MainPacket = None):
+    def snapshot(self, request: MainPacket = None, response: bool = False):
         hf, amp = super().snapshot(request, response)
         amp.attrs['name'] = 'Shaping amplifier for Amptek FastSDD detector'
         for field in self.state.ListFields():
@@ -42,18 +40,6 @@ class Amplifier(Dev):
         self._response(response, filename.encode())
 
         return filename
-
-    def get_status(self, response: MainPacket = None):
-        self._response(response, self.state.SerializeToString())
-
-    def set_settings(self, request: MainPacket = None, response: MainPacket = None):
-        if isinstance(request, MainPacket):
-            self.state.ParseFromString(request.data)
-
-        if isinstance(request, AmpStatus):
-            self.state = request
-
-        self._response(response, self.state.SerializeToString())
 
     def __del__(self):
         with open(os.path.join(work_dir(), 'amp_last.csv'), 'w', newline='') as file:

@@ -50,16 +50,6 @@ class Ft2SXR(Dev):
         self.state.devs.append(SystemStatus.AMP)
         self.state.devs.append(SystemStatus.PX5)
 
-    def get_status(self, response: MainPacket = None):
-        self._response(response, self.state)
-
-    def set_settings(self, request: MainPacket = None, response: MainPacket = None):
-        if isinstance(request, MainPacket):
-            request = request.data
-
-        if isinstance(request, SystemStatus):
-            self.state = request
-
     def command_to_devs(self, command: Commands = None, response: MainPacket = None):
         for dev in self.state.devs:
             self.request_to_dev.address = dev

@@ -44,6 +44,10 @@ class Core(QtCore.QObject):
 
 
 class Dev(Core):
+    def __init__(self,parent=None, address=0, state=None):
+        super().__init__(parent=parent, address=address)
+        self.state = state
+
     @property
     def name(self):
         if self.address > 0:
@@ -52,37 +56,60 @@ class Dev(Core):
         else:
             return None
 
-    def _response(self, response: MainPacket = None, data: bytes = None):
-        if response is not None:
+    def _response(self, response: bool = False, data: bytes = None):
+        self.response.address = self.request.sender
+        self.response.command = self.request.command ^ 0xFFFFFFFF
+        if response:
             if data is not None:
-                response.data = data
-            if response.IsInitialized():
-                self.channel0.emit(response.SerializeToString())
+                self.response.data = data
+            if self.request.command in Commands.values():
+                if self.response.IsInitialized():
+                    self.channel0.emit(self.response.SerializeToString())
+            # reset request
+            # set command to INFO_ACK so response couldn't be emitted
+            self.request.command = Commands.INFO ^ 0xFFFFFFFF
         else:
             return data
 
-    def get_status(self, response: MainPacket = None):
+    def get_status(self, response: bool = False):
+        if self.state is not None:
+            if hasattr(self.state, 'SerializeToString'):
+                if callable(self.state.SerializeToString):
+                    self._response(response, self.state.SerializeToString())
+        else:
+            self._response(response)
+
+    def get_settings(self, response: bool = False):
         self._response(response)
 
-    def get_settings(self, response: MainPacket = None):
+    def set_settings(self, state: MainPacket = None, response: bool = False):
+        if response:
+            if state is None:
+                state = self.request
+
+        if state is None:
+            return
+
+        if isinstance(state, MainPacket):
+            self.state.ParseFromString(state.data)
+        elif isinstance(state, type(self.state)):
+            self.state = state
+
+        self._response(response, self.state.SerializeToString())
+
+    def start(self, response: bool = False):
         self._response(response)
 
-    def set_settings(self, response: MainPacket = None):
+    def stop(self, response: bool = False):
         self._response(response)
 
-    def start(self, response: MainPacket = None):
+    def reboot(self, response: bool = False):
         self._response(response)
 
-    def stop(self, response: MainPacket = None):
+    def connect(self, response: bool = False):
         self._response(response)
 
-    def reboot(self, response: MainPacket = None):
-        self._response(response)
-
-    def connect(self, response: MainPacket = None):
-        self._response(response)
-
-    def snapshot(self, request: MainPacket = None, response: MainPacket = None):
+    def snapshot(self, request: MainPacket = None, response: bool = False):
         file_origin = None
 
         timestamp = time.time()
@@ -137,21 +164,17 @@ class Dev(Core):
         self.request.ParseFromString(data)
         request = self.request
         if request.address == self.address:
-            if request.command in Commands.values():
-                self.response.address = request.sender
-                self.response.command = request.command ^ 0xFFFFFFFF
-
             if request.command == Commands.STATUS:
-                self.get_status(self.response)
+                self.get_status(response=True)
             elif request.command == Commands.SET:
-                self.set_settings(request, self.response)
+                self.set_settings(response=True)
             elif request.command == Commands.START:
-                self.start(self.response)
+                self.start(response=True)
             elif request.command == Commands.STOP:
-                self.stop(self.response)
+                self.stop(response=True)
             elif request.command == Commands.REBOOT:
-                self.reboot(self.response)
+                self.reboot(response=True)
             elif request.command == Commands.CONNECT:
-                self.make_connection(self.response)
+                self.make_connection(response=True)
             elif request.command == Commands.SNAPSHOT:
-                self.snapshot(request, self.response)
+                self.snapshot(request, response=True)

@@ -34,7 +34,7 @@ class PX5(Dev):
                       daemon=True)
         thrd.start()
 
-    def send_to_px5(self, data, response=None):
+    def send_to_px5(self, data, response: bool = False):
         # TODO check that data is amptek packet
         self.udp_socket.sendto(data, (self.px5_ip, self.px5_port))
         ex = False
@@ -49,29 +49,31 @@ class PX5(Dev):
                     if response is None:
                         res = 'Socket timeout'
                         ex = True
-                    else:
-                        response.command = Commands.INFO
 
         return self._response(response, res)
 
-    def start(self, response: MainPacket = None):
+    def start(self, response: bool = False):
         return self.send_to_px5(self.protocol('request_enable_mca'), response)
 
-    def stop(self, response: MainPacket = None):
+    def stop(self, response: bool = False):
         return self.send_to_px5(self.protocol('request_disable_mca'), response)
 
-    def get_status(self, response: MainPacket = None):
+    def get_status(self, response: bool = False):
         status = self.send_to_px5(self.protocol('request_status'), response)
         if isinstance(status, (bytes, bytearray)):
             return unpack_status(status)
         else:
             return status
 
-    def get_settings(self, response: MainPacket = None):
+    def get_settings(self, response: bool = False):
         #TODO split full request in two parts to avoid Serial Num reset and bad fields in response
-        return self.send_to_px5(request_txt_cfg_readback(self.cfg.full_req()))
+        req = self.cfg.full_req()
+        if response:
+            if len(self.request.data) > 0:
+                req = self.request.data
+        return self.send_to_px5(request_txt_cfg_readback(req))
 
-    def snapshot(self, request: MainPacket = None, response: MainPacket = None):
+    def snapshot(self, request: MainPacket = None, response: bool = False):
         hf, px5_group = super().snapshot(request, response)
 
         data = self.send_to_px5(self.protocol('request_spectrum_status'))
