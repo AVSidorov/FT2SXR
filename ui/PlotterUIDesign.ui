@@ -133,7 +133,7 @@
     <item row="4" column="0">
      <widget class="QLabel" name="samples_label">
       <property name="text">
-       <string>Samples:</string>
+       <string>Samples per ch.:</string>
       </property>
      </widget>
     </item>

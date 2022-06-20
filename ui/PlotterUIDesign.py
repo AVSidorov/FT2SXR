@@ -93,7 +93,7 @@ class Ui_Plotter(object):
         self.name_val_label.setText(_translate("Plotter", "000000_0"))
         self.rate_label.setText(_translate("Plotter", "Rate:"))
         self.rate_val_label.setText(_translate("Plotter", "00"))
-        self.samples_label.setText(_translate("Plotter", "Samples:"))
+        self.samples_label.setText(_translate("Plotter", "Samples per ch.:"))
         self.samples_val_label.setText(_translate("Plotter", "00"))
         self.channels_label.setText(_translate("Plotter", "Channels:"))
         self.channels_val_label.setText(_translate("Plotter", "0"))
