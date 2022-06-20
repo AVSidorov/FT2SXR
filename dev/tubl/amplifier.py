@@ -53,6 +53,8 @@ class Amplifier(Dev):
         if isinstance(request, AmpStatus):
             self.state = request
 
+        self._response(response, self.state.SerializeToString())
+
         with open(os.path.join(work_dir(), 'amp_last.csv'), 'w', newline='') as file:
             writer = csv.writer(file)
             writer.writerow(('gainA', 'gainB', 'switch_state'))
