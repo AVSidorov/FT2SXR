@@ -35,7 +35,8 @@ class Reader(Core):
                         str_mask = conf_dict['mask'][2:]
                         for i in range(1, len(str_mask)+1):
                             if str_mask[-i] == '1':
-                                meta.append('shotid')
+                                # meta.append('.\\' + data_file.split('\\')[-2] + '\\' + data_file.split('\\')[-1])
+                                meta.append(path.relpath(data_file, path.dirname(__file__)))
                                 meta.append(i)
                                 meta.append(conf_dict['samples'])
                                 meta.append(conf_dict['rate'])

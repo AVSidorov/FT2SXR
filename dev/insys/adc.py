@@ -93,6 +93,7 @@ class ADC(Dev):
                 if bias is not None:
                     self.boards[0].channels[ch_n].bias = float(bias)
 
+        self.status = AdcStatus()
         self.get_status()
 
         # make directory whit current date, to store adc memory dumps and  cfg.ini for sending
@@ -263,7 +264,7 @@ class ADC(Dev):
         stop = self.get_cfg_item('device0_fm814x250m0', 'StopSource')
         if stop is not None:
             if int(stop) == 0:
-                self.state.stop = AdcStatus.SOFTSTART
+                self.status.stop = AdcStatus.SOFTSTART
 
         stop = self.get_cfg_item('device0_fm814x250m0', 'StopSource')
         if stop is not None:
@@ -356,6 +357,9 @@ class ADC(Dev):
         elif status.start == status.IN0:
             self.config['device0_fm814x250m0']['StartSource'] = '0'
             self.config['device0_fm814x250m0']['StartBaseSource'] = '7'
+
+        if response is not None:
+            self.get_status(response)
 
     def generate_data(self):
         samples = self.get_cfg_item('Option', 'MemSamplesPerChan')
