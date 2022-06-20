@@ -20,9 +20,12 @@ class ADCUIWidget (QtWidgets.QWidget, Ui_ADCWidgetDesign):
         for _ in range(8):
             self.status.board_status[0].channel_status.add()
 
+        self.ch_names = ['', '', '', '', '', '', '', '']
+
         # signals
         for ch_n in range(1, 9):
             eval(f'self.ch{ch_n}_checkBox.clicked.connect(self.ui2status)')
+            eval(f'self.ch{ch_n}_name_lineEdit.textChanged.connect(self.ui2status)')
         self.frec_spinBox.valueChanged.connect(self.ui2status)
         self.source_comboBox.currentIndexChanged.connect(self.ui2status)
         self.delay_spinBox.valueChanged.connect(self.ui2status)
@@ -143,6 +146,11 @@ class ADCUIWidget (QtWidgets.QWidget, Ui_ADCWidgetDesign):
 
         if self.ch_comboBox.count() > 0:
             self.status.board_status[0].channel_status[int(self.ch_comboBox.currentText())-1].bias = self.bias_doubleSpinBox.value()
+
+        for i in range(8):
+            eval(f'self.ch_names.pop({i})')
+            eval(f'self.ch_names.insert({i}, self.ch{i+1}_name_lineEdit.text())')
+        print(self.ch_names)
 
         self.status2ui()
 
