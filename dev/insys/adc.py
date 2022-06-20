@@ -55,7 +55,7 @@ class Board:
 
 class ADC(Dev):
     def __init__(self, parent=None, nboards=1, connect=True, wdir=None):
-        super().__init__(parent, SystemStatus.ADC)
+        super().__init__(parent, SystemStatus.ADC, AdcStatus())
 
         self.boards = [Board() for _ in range(nboards)]
 
@@ -93,7 +93,6 @@ class ADC(Dev):
                 if bias is not None:
                     self.boards[0].channels[ch_n].bias = float(bias)
 
-        self.status = AdcStatus()
         self.get_status()
 
         # make directory whit current date, to store adc memory dumps and  cfg.ini for sending
@@ -155,13 +154,13 @@ class ADC(Dev):
         if self.connected:
             self.scp.put(os.path.join(self.wdir, 'cfg.ini'), '/home/embedded/examples/exam_adc.ini')
 
-    def start(self, response=None):
+    def start(self, response: bool = False):
         # separate function for ability start ADC(thread) "manually", not only by command in packet
         self.send_config()
         thrd = Thread(name='Thread-adc-start', target=self.run, args=(response,), daemon=True)
         thrd.start()
 
-    def run(self, response=None):
+    def run(self, response: bool = False):
             self.started = True
             self.isAcqComplete = False
             if os.path.exists(os.path.join(self.wdir, self.file_base+'.bin')):
@@ -220,8 +219,6 @@ class ADC(Dev):
             if self.request.IsInitialized():
                 self.channel0.emit(self.request.SerializeToString())
 
-
-
     def channel2_slot(self, data: bytes):
         pkt = BRD_ctrl()
         pkt.command = 0
@@ -238,82 +235,76 @@ class ADC(Dev):
                 elif cmd == 'BRDctrl_STREAM_CBUF_FREE':
                     self.started = False
 
-    def get_status(self, response: MainPacket = None):
+    def get_status(self, response: bool = False):
 
         name = self.get_cfg_item('Option', 'AdcServiceName')
         if name is not None:
-            self.status.name = name
+            self.state.name = name
 
-        self.status.connected = self.connected
+        self.state.connected = self.connected
 
         rate = self.get_cfg_item('device0_fm814x250m0', 'SamplingRate')
         if rate is not None:
-            self.status.sampling_rate = int(rate)
+            self.state.sampling_rate = int(rate)
 
         samples = self.get_cfg_item('Option', 'MemSamplesPerChan')
         if samples is not None:
-            self.status.samples = int(samples)
+            self.state.samples = int(samples)
 
         start = self.get_cfg_item('device0_fm814x250m0', 'StartSource')
         if start is not None:
             if int(start) == 0:
-                self.status.start = AdcStatus.IN0
+                self.state.start = AdcStatus.IN0
             elif int(start) == 2:
-                self.status.start = AdcStatus.EXTSTART
+                self.state.start = AdcStatus.EXTSTART
             elif int(start) == 3:
-                self.status.start = AdcStatus.SOFTSTART
+                self.state.start = AdcStatus.SOFTSTART
 
         stop = self.get_cfg_item('device0_fm814x250m0', 'StopSource')
         if stop is not None:
             if int(stop) == 0:
-                self.status.stop = AdcStatus.SOFTSTART
+                self.state.stop = AdcStatus.SOFTSTART
 
         stop = self.get_cfg_item('device0_fm814x250m0', 'StopSource')
         if stop is not None:
             if int(stop) == 0:
-                self.status.stop = AdcStatus.SOFTSTART
+                self.state.stop = AdcStatus.SOFTSTART
 
         clock = self.get_cfg_item('device0_fm814x250m0', 'ClockSource')
         if clock is not None:
             if int(clock, 16) == 0:
-                self.status.clock_source = AdcStatus.CLOCKOFF
+                self.state.clock_source = AdcStatus.CLOCKOFF
             elif int(clock, 16) == 1:
-                self.status.clock_source = AdcStatus.CLOCKINT
+                self.state.clock_source = AdcStatus.CLOCKINT
             elif int(clock, 16) == 2:
-                self.status.clock_source = AdcStatus.CLOCKEXT
+                self.state.clock_source = AdcStatus.CLOCKEXT
 
         memory = self.get_cfg_item('Option', 'DaqIntoMemory')
         if memory is not None:
             if int(memory) == 0:
-                self.status.memory_type = AdcStatus.MEMHOST
+                self.state.memory_type = AdcStatus.MEMHOST
             elif int(memory) == 1:
-                self.status.memory_type = AdcStatus.MEMINT
+                self.state.memory_type = AdcStatus.MEMINT
             elif int(memory) == 2:
-                self.status.memory_type = AdcStatus.MEMFIFO
+                self.state.memory_type = AdcStatus.MEMFIFO
 
         ch_mask = self.get_cfg_item('device0_fm814x250m0', 'ChannelMask')
         if ch_mask is not None:
-            if len(self.status.board_status) < 1:
-                self.status.board_status.add()
-            self.status.board_status[0].channel_mask = self.boards[0].channel_mask.to_bytes(1, 'big')
+            if len(self.state.board_status) < 1:
+                self.state.board_status.add()
+            self.state.board_status[0].channel_mask = self.boards[0].channel_mask.to_bytes(1, 'big')
 
         for ch_n in range(len(self.boards[0].channels)):
             bias = self.get_cfg_item('device0_fm814x250m0', f'Bias{ch_n}')
-            if len(self.status.board_status) < 1:
-                self.status.board_status.add()
+            if len(self.state.board_status) < 1:
+                self.state.board_status.add()
             if bias is not None:
-                if len(self.status.board_status[0].channel_status) < ch_n+1:
-                    self.status.board_status[0].channel_status.add()
-                self.status.board_status[0].channel_status[ch_n].enabled = self.boards[0].channels[ch_n].on
-                self.status.board_status[0].channel_status[ch_n].bias = float(bias)
+                if len(self.state.board_status[0].channel_status) < ch_n+1:
+                    self.state.board_status[0].channel_status.add()
+                self.state.board_status[0].channel_status[ch_n].enabled = self.boards[0].channels[ch_n].on
+                self.state.board_status[0].channel_status[ch_n].bias = float(bias)
 
-        if response is None:
-            return self.status.SerializeToString()
-        else:
-            response.data = self.status.SerializeToString()
-            if response.IsInitialized():
-                self.channel0.emit(response.SerializeToString())
-                self.channel0.emit(response.SerializeToString())
+        self._response(response, self.state.SerializeToString())
 
     def get_cfg_item(self, sec, key):
         if sec in self.config:
@@ -324,16 +315,9 @@ class ADC(Dev):
         else:
             return None
 
-    def set_settings(self, request: MainPacket = None, response: MainPacket = None):
-        if isinstance(request, MainPacket):
-            request = request.data
-
-        if isinstance(request, AdcStatus):
-            self.status = request
-        elif isinstance(request, (bytes, bytearray)):
-            self.status.ParseFromString(request)
-
-        status = self.status
+    def set_settings(self, state: MainPacket = None, response: MainPacket = None):
+        super().set_settings(state=state, response=response)
+        status = self.state
 
         self.config['Option']['DaqIntoMemory'] = str(status.memory_type)
         self.config['Option']['MemSamplesPerChan'] = str(status.samples)
@@ -373,9 +357,6 @@ class ADC(Dev):
             self.config['device0_fm814x250m0']['StartSource'] = '0'
             self.config['device0_fm814x250m0']['StartBaseSource'] = '7'
 
-        if response is not None:
-            self.get_status(response)
-
     def generate_data(self):
         samples = self.get_cfg_item('Option', 'MemSamplesPerChan')
         if samples is None:
@@ -396,13 +377,13 @@ class ADC(Dev):
             dump.tofile(f)
         return dump
 
-    def stop(self, response: MainPacket = None):
+    def stop(self, response: bool = False):
         if self.started:
             if self.connected:
                 self.ssh.send(b'\x1B')
         self.started = False
     
-    def reboot(self, response: MainPacket = None):
+    def reboot(self, response: bool = False):
         if self.connected and os.path.exists(os.path.join(work_dir(), 'root_key')):
             client = paramiko.SSHClient()
             client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
@@ -431,7 +412,7 @@ class ADC(Dev):
             self.channel0.emit(response.SerializeToString())
         self.make_connection()
 
-    def snapshot(self, request: MainPacket = None, response: MainPacket = None):
+    def snapshot(self, request: MainPacket = None, response: bool = False):
         hf, adc = super().snapshot(request, response)
 
         adc.attrs['name'] = 'InSys FM814X250M'
