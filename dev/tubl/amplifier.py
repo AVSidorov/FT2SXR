@@ -55,6 +55,7 @@ class Amplifier(Dev):
 
         self._response(response, self.state.SerializeToString())
 
+    def __del__(self):
         with open(os.path.join(work_dir(), 'amp_last.csv'), 'w', newline='') as file:
             writer = csv.writer(file)
             writer.writerow(('gainA', 'gainB', 'switch_state'))

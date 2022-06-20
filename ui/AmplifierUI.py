@@ -129,6 +129,12 @@ class AmplifierWidget(QtWidgets.QWidget, Ui_AmplifierWidgetDesign):
         self.gainB_doubleSpinBox.setValue(self.status.gainB)
 
         state = self.status.tail
+        for chb in (self.time45_checkBox,
+                    self.time9_checkBox,
+                    self.time13_checkBox,
+                    self.time17_checkBox):
+            chb.setChecked(False)
+
         for i in range(4):
             if state & (1 << i):
                 if i == 0:
