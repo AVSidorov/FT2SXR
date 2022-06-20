@@ -21,15 +21,14 @@ class ADCUIWidget (QtWidgets.QWidget, Ui_ADCWidgetDesign):
             self.status.board_status[0].channel_status.add()
 
         self.ch_names = ['' for i in range(8)]
-        self.void_ch = 8
-        eval(f'self.ch{self.void_ch}_checkBox.setDisabled(True)')
-        eval(f'self.ch{self.void_ch}_name_lineEdit.setDisabled(True)')
-        eval(f'self.ch8_name_lineEdit.setText("void")')
+        self.names_without_void = ['' for i in range(8)]
 
         # signals
         for ch_n in range(1, 9):
             eval(f'self.ch{ch_n}_checkBox.stateChanged.connect(self.ui2status)')
             eval(f'self.ch{ch_n}_name_lineEdit.textChanged.connect(self.ui2status)')
+            eval(f'self.ch{ch_n}_void_checkBox.stateChanged.connect(self.ui2status)')
+
         self.frec_spinBox.valueChanged.connect(self.ui2status)
         self.source_comboBox.currentIndexChanged.connect(self.ui2status)
         self.delay_spinBox.valueChanged.connect(self.ui2status)
@@ -139,16 +138,34 @@ class ADCUIWidget (QtWidgets.QWidget, Ui_ADCWidgetDesign):
                 self.status.board_status[0].channel_status.add()
             exec(f'self.status.board_status[0].channel_status[ch_n].enabled = self.ch{ch_n+1}_checkBox.isChecked()')
 
-        n_enabled = 0  # void channel
+        n_enabled = 0  # void channels
         for ch_n in range(8):
-            if self.status.board_status[0].channel_status[ch_n].enabled and self.ch_names[ch_n] != 'void':
+            if self.status.board_status[0].channel_status[ch_n].enabled:
                 n_enabled += 1
-        if n_enabled % 2 != 0:
-            print('нечетный')
-            self.ch8_checkBox.setChecked(True)
+
+        good_values = (0, 2, 4, 8)
+        if n_enabled not in good_values:
+            round_up = good_values[-1]
+            for i in range(len(good_values)):
+                if good_values[i] > n_enabled:
+                    round_up = good_values[i]
+                    break
+            self.void_label.setText(f'Требуется {round_up-n_enabled} дополнительных каналов')
         else:
-            print('четный')
-            self.ch8_checkBox.setChecked(False)
+            self.void_label.setText(f'Требуется 0 дополнительных каналов')
+
+        for ch in range(1, 9):
+            if eval(f'self.ch{ch}_void_checkBox.isChecked()'):
+                eval(f'self.ch{ch}_checkBox.setEnabled(False)')
+                eval(f'self.ch{ch}_name_lineEdit.setEnabled(False)')
+                eval(f'self.ch{ch}_checkBox.setChecked(True)')
+                eval(f'self.ch{ch}_name_lineEdit.setText("void")')
+            elif not eval(f'self.ch{ch}_void_checkBox.isChecked()') and eval(f'self.ch_names[{ch-1}]') == 'void' and eval(f'self.ch{ch}_checkBox.isChecked()'):
+                eval(f'self.ch{ch}_checkBox.setEnabled(True)')
+                eval(f'self.ch{ch}_name_lineEdit.setEnabled(True)')
+                eval(f'self.ch{ch}_checkBox.setChecked(False)')
+                eval(f'self.ch{ch}_name_lineEdit.setText(self.names_without_void[{ch-1}])')
+
 
         self.status.sampling_rate = self.frec_spinBox.value() * int(1e6)
 
@@ -165,15 +182,20 @@ class ADCUIWidget (QtWidgets.QWidget, Ui_ADCWidgetDesign):
         for i in range(8):  # channel names
             eval(f'self.ch_names.pop({i})')
             eval(f'self.ch_names.insert({i}, self.ch{i+1}_name_lineEdit.text())')
+            if eval(f'self.ch{i+1}_name_lineEdit.text()') != 'void':
+                eval(f'self.names_without_void.pop({i})')
+                eval(f'self.names_without_void.insert({i}, self.ch{i + 1}_name_lineEdit.text())')
+
 
         self.status2ui()
 
-        request = packet_init(SystemStatus.ADC, self.address)
-        request.command = Commands.SET
-        if self.status.IsInitialized():
-            request.data = self.status.SerializeToString()
-        if request.IsInitialized():
-            self.channel0.emit(request.SerializeToString())
+        if n_enabled in (0, 2, 4, 8):
+            request = packet_init(SystemStatus.ADC, self.address)
+            request.command = Commands.SET
+            if self.status.IsInitialized():
+                request.data = self.status.SerializeToString()
+            if request.IsInitialized():
+                self.channel0.emit(request.SerializeToString())
 
     def show_channel(self):
         if self.status is None:
