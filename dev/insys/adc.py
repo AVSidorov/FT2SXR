@@ -313,6 +313,7 @@ class ADC(Dev):
             response.data = self.status.SerializeToString()
             if response.IsInitialized():
                 self.channel0.emit(response.SerializeToString())
+                self.channel0.emit(response.SerializeToString())
 
     def get_cfg_item(self, sec, key):
         if sec in self.config:
