@@ -1,5 +1,6 @@
 import sys
 import os
+import gc
 from ui.MainWindowUIDesign import Ui_MainWindow
 from ui.CentralWidgetUI import MainWidget
 from ui.ADCUI import ADCUIWidget
@@ -69,6 +70,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         win.verticalLayout.addWidget(adcSettings)
 
         win.show()
+        gc.collect()
+
         request = packet_init(SystemStatus.ADC, adcSettings.address)
         request.command = Commands.STATUS
         if request.IsInitialized():
@@ -84,6 +87,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         win.verticalLayout.addWidget(px5Settings)
 
         win.show()
+        gc.collect()
 
     def action_gsa_set(self):
         win = QtWidgets.QDialog(self)
@@ -95,6 +99,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         win.verticalLayout.addWidget(gsaSettings)
 
         win.show()
+        gc.collect()
 
     def action_amplifier_set(self):
         win = QtWidgets.QDialog(self)
@@ -109,6 +114,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         win.verticalLayout.addWidget(amplifierSettings)
 
         win.show()
+        gc.collect()
 
         request = packet_init(SystemStatus.AMP, amplifierSettings.address)
         request.command = Commands.STATUS
@@ -158,8 +164,10 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.channel2.connect(adc_logger.channel2_slot)  # make downlink for BRD_ctrl messages
         adc_log.channel0.connect(self.channel0)  # make uplink for reboot
         win.show()
+        gc.collect()
 
     def open_sxr(self, data_file=None):
+        gc.collect(generation=2)
         win = QtWidgets.QMainWindow(self)
         # print(type(data_file))
 
@@ -180,6 +188,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             layout.addWidget(sxr_pltSettings)
 
             win.show()
+            gc.collect()
 
     @QtCore.pyqtSlot(bytes)
     def channel0_slot(self, data: bytes):
