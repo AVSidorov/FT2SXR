@@ -192,7 +192,9 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                 if isinstance(request.data.decode('utf-8'), str):
                     data_file = os.path.join(os.path.split(os.path.join(os.path.abspath('./'), request.data.decode('utf-8')))[0], 'data_0.bin')
                     self.open_sxr(data_file=data_file)
-
+        elif request.sender == 12:
+            if request.command == Commands.START:
+                self.action_amplifier_set()
 
 def main():
     app = QtWidgets.QApplication(sys.argv)

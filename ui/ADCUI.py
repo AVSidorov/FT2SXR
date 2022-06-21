@@ -135,7 +135,7 @@ class ADCUIWidget (QtWidgets.QWidget, Ui_ADCWidgetDesign):
             if self.status.board_status[0].channel_status[ch_n].enabled:
                 n_enabled += 1
 
-        good_values = (0, 2, 4, 8)
+        good_values = (0, 1, 2, 4, 8)
         if n_enabled not in good_values:
             round_up = good_values[-1]
             for i in range(len(good_values)):
@@ -158,7 +158,6 @@ class ADCUIWidget (QtWidgets.QWidget, Ui_ADCWidgetDesign):
                 eval(f'self.ch{ch}_checkBox.setChecked(False)')
                 eval(f'self.ch{ch}_name_lineEdit.setText(self.names_without_void[{ch-1}])')
 
-
         self.status.sampling_rate = self.frec_spinBox.value() * int(1e6)
 
         if self.source_comboBox.currentIndex() == 0:
@@ -178,10 +177,9 @@ class ADCUIWidget (QtWidgets.QWidget, Ui_ADCWidgetDesign):
                 eval(f'self.names_without_void.pop({i})')
                 eval(f'self.names_without_void.insert({i}, self.ch{i + 1}_name_lineEdit.text())')
 
-
         self.status2ui()
 
-        if n_enabled in (0, 2, 4, 8):
+        if n_enabled in (0, 1, 2, 4, 8):
             request = packet_init(SystemStatus.ADC, self.address)
             request.command = Commands.SET
             if self.status.IsInitialized():
