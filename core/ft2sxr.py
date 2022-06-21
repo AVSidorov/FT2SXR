@@ -102,6 +102,7 @@ class Ft2SXR(Dev):
     def snapshot(self, request: MainPacket = None,  response: bool = False):
         hf, sxr = super().snapshot(f'{self.wdir}/?', response)
         sxr.attrs['name'] = 'SXR diagnostics'
+        sxr.attrs['comments'] = ''
         filename = os.path.abspath(os.path.join(self.wdir, hf.filename))
         hf.close()
 
