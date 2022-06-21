@@ -386,6 +386,7 @@ class ADC(Dev):
             if self.connected:
                 self.ssh.send(b'\x1B')
         self.started = False
+        self._response(response)
     
     def reboot(self, response: bool = False):
         if self.connected and os.path.exists(os.path.join(work_dir(), 'root_key')):

@@ -16,6 +16,9 @@ class Core(QtCore.QObject):
         super().__init__(parent)
         self.address = address
         self.request = MainPacket()
+        self.request.address = self.address
+        self.request.sender = 0
+        self.request.command = Commands.INFO
         self.response = MainPacket()
         self.response.address = 0
         self.response.sender = self.address
@@ -57,19 +60,19 @@ class Dev(Core):
             return None
 
     def _response(self, response: bool = False, data: bytes = None):
-        self.response.address = self.request.sender
-        self.response.command = self.request.command ^ 0xFFFFFFFF
-        if response:
-            if data is not None:
+        if all((response, self.request.address == self.address, self.request.command in Commands.values(),
+                self.request.command != Commands.INFO)):
+            self.response.address = self.request.sender
+            self.response.command = self.request.command ^ 0xFFFFFFFF
+            if all((data is not None, isinstance(data, (bytes, bytearray)))):
                 self.response.data = data
-            if self.request.command in Commands.values():
-                if self.response.IsInitialized():
-                    self.channel0.emit(self.response.SerializeToString())
+            if self.response.IsInitialized():
+                self.channel0.emit(self.response.SerializeToString())
             # reset request
             # set command to INFO_ACK so response couldn't be emitted
             self.request.command = Commands.INFO ^ 0xFFFFFFFF
             self.response.data = b''
-        else:
+        elif not response:
             return data
 
     def get_status(self, response: bool = False):
@@ -162,20 +165,31 @@ class Dev(Core):
             return hf, None
 
     def channel0_slot(self, data: bytes):
+        # store request if not processed
+        if all((self.request.command != Commands.INFO,
+                self.request.command in Commands.values(),
+                self.request.IsInitialized())):
+            pkt_old = self.request.SerializeToString()
+        else:
+            pkt_old = None
+
         self.request.ParseFromString(data)
-        request = self.request
-        if request.address == self.address:
-            if request.command == Commands.STATUS:
+
+        if self.request.address == self.address:
+            if self.request.command == Commands.STATUS:
                 self.get_status(response=True)
-            elif request.command == Commands.SET:
+            elif self.request.command == Commands.SET:
                 self.set_settings(response=True)
-            elif request.command == Commands.START:
+            elif self.request.command == Commands.START:
                 self.start(response=True)
-            elif request.command == Commands.STOP:
+            elif self.request.command == Commands.STOP:
                 self.stop(response=True)
-            elif request.command == Commands.REBOOT:
+            elif self.request.command == Commands.REBOOT:
                 self.reboot(response=True)
-            elif request.command == Commands.CONNECT:
+            elif self.request.command == Commands.CONNECT:
                 self.make_connection(response=True)
-            elif request.command == Commands.SNAPSHOT:
-                self.snapshot(request, response=True)
+            elif self.request.command == Commands.SNAPSHOT:
+                self.snapshot(self.request, response=True)
+        # if request to other address restore request
+        elif pkt_old is not None:
+            self.request.ParseFromString(pkt_old)
