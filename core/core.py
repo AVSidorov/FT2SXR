@@ -68,6 +68,7 @@ class Dev(Core):
             # reset request
             # set command to INFO_ACK so response couldn't be emitted
             self.request.command = Commands.INFO ^ 0xFFFFFFFF
+            self.response.data = b''
         else:
             return data
 
