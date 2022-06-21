@@ -2,7 +2,6 @@ from core.core import Core
 from socket import socket, AF_INET, SOCK_DGRAM, SOL_SOCKET, SO_BROADCAST
 from threading import Thread, Lock
 
-
 class NetManagerBase(Core):
     def __init__(self, parent=None, ip="0.0.0.0", port=22222, name='NetManager'):
         super().__init__(parent, port)
@@ -50,10 +49,11 @@ class NetManagerSimple(NetManagerBase):
     def run(self):
         while self.actv:
             data, addr = self.sock.recvfrom(1024)
-            self.lock.acquire()
-            self.clients.add(addr)
-            self.lock.release()
-            self.channel0.emit(data)
+            if addr != (self.ip, self.port):
+                self.lock.acquire()
+                self.clients.add(addr)
+                self.lock.release()
+                self.channel0.emit(data)
 
 
 class Netmanager(NetManagerBase):
@@ -67,15 +67,18 @@ class Netmanager(NetManagerBase):
     def run(self):
         while self.actv:
             data, addr = self.sock.recvfrom(1024)
-            self.lock.acquire()
-            self.clients.add(addr)
-            self.lock.release()
-            self.request.ParseFromString(data)
-            self.channel0.emit(data)
+            if addr != (self.ip, self.port):
+                self.lock.acquire()
+                self.clients.add(addr)
+                self.lock.release()
+                self.request.ParseFromString(data)
+                self.channel0.emit(data)
 
     def channel0_slot(self, data: bytes):
         self.response.ParseFromString(data)
-        if self.request.sender != self.response.sender:
+        if all((self.request.sender != self.response.sender,
+                self.request.sender != self.address,
+                self.response.sender != self.address)):
             self.send_to_clients(data)
             self.response.sender = self.address
             self.request.sender = self.address
