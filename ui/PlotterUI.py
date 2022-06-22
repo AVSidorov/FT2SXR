@@ -1,5 +1,5 @@
 import sys
-from PyQt5 import QtWidgets
+from PyQt5 import QtWidgets, QtGui
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg, NavigationToolbar2QT
 from matplotlib.figure import Figure
 import numpy as np
@@ -13,6 +13,8 @@ class PlotterWidget(QtWidgets.QMainWindow, Ui_Plotter):
     def __init__(self, parent=None, data_file=None, x_unit='samples'):
         super().__init__(parent=parent)
         self.setupUi(self)
+
+        gc.collect(generation=2)
         self.dir = data_file
         self.x_unit = x_unit
         if self.x_unit not in ('samples', 'msec'):
@@ -96,6 +98,9 @@ class PlotterWidget(QtWidgets.QMainWindow, Ui_Plotter):
                 self.dir = data_file
                 self.make_plot(data_file=self.dir)
                 self.change_ax()
+
+    def closeEvent(self, a0: QtGui.QCloseEvent) -> None:
+        gc.collect(generation=2)
 
 
 def main():

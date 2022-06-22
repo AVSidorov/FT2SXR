@@ -27,9 +27,8 @@ class ADCUIWidget (QtWidgets.QWidget, Ui_ADCWidgetDesign):
         for ch_n in range(1, 9):
             eval(f'self.ch{ch_n}_checkBox.stateChanged.connect(self.ui2status)')
             eval(f'self.ch{ch_n}_name_lineEdit.textChanged.connect(self.ui2status)')
-            eval(f'self.ch{ch_n}_void_checkBox.stateChanged.connect(self.ui2status)')
 
-        self.frec_spinBox.valueChanged.connect(self.ui2status)
+        self.freq_spinBox.valueChanged.connect(self.ui2status)
         self.source_comboBox.currentIndexChanged.connect(self.ui2status)
         self.delay_spinBox.valueChanged.connect(self.ui2status)
         self.interval_spinBox.valueChanged.connect(self.ui2status)
@@ -75,9 +74,9 @@ class ADCUIWidget (QtWidgets.QWidget, Ui_ADCWidgetDesign):
                     self.show_channel()
                     n_ch += 1
 
-        self.frec_spinBox.blockSignals(True)
-        self.frec_spinBox.setValue(int(status.sampling_rate/1e6))
-        self.frec_spinBox.blockSignals(False)
+        self.freq_spinBox.blockSignals(True)
+        self.freq_spinBox.setValue(int(status.sampling_rate/1e6))
+        self.freq_spinBox.blockSignals(False)
 
         if n_ch > 0:
             max_time = trunc(536870912/(2*status.sampling_rate*n_ch)*1e3)
@@ -121,6 +120,15 @@ class ADCUIWidget (QtWidgets.QWidget, Ui_ADCWidgetDesign):
                 self.ch_comboBox.setCurrentIndex(0)
 
     def ui2status(self):
+        for ch in range(8, 0, -1):
+            if eval(f'self.ch{ch}_name_lineEdit.text() == "void"') and eval(f'self.ch{ch}_checkBox.isChecked()'):
+                # eval(f'self.ch{ch}_checkBox.blockSignals(True)')
+                eval(f'self.ch{ch}_checkBox.setChecked(False)')
+                # eval(f'self.ch{ch}_checkBox.blockSignals(False)')
+                # eval(f'self.ch{ch}_name_lineEdit.blockSignals(True))')
+                eval(f'self.ch{ch}_name_lineEdit.setText(self.names_without_void[{ch-1}])')
+                # eval(f'self.ch{ch}_name_lineEdit.blockSignals(False))')
+
         if len(self.status.board_status) < 1:
             self.status.board_status.add()
 
@@ -134,31 +142,31 @@ class ADCUIWidget (QtWidgets.QWidget, Ui_ADCWidgetDesign):
         for ch_n in range(8):
             if self.status.board_status[0].channel_status[ch_n].enabled:
                 n_enabled += 1
+        # print(n_enabled)
 
         good_values = (0, 1, 2, 4, 8)
+        n2add = 0
         if n_enabled not in good_values:
             round_up = good_values[-1]
             for i in range(len(good_values)):
                 if good_values[i] > n_enabled:
                     round_up = good_values[i]
                     break
-            self.void_label.setText(f'Требуется {round_up-n_enabled} дополнительных каналов')
-        else:
-            self.void_label.setText(f'Требуется 0 дополнительных каналов')
+            n2add = round_up-n_enabled
+            self.void_label.setText(f'Добавлено {n2add} дополнительных каналов')
 
-        for ch in range(1, 9):
-            if eval(f'self.ch{ch}_void_checkBox.isChecked()'):
-                eval(f'self.ch{ch}_checkBox.setEnabled(False)')
-                eval(f'self.ch{ch}_name_lineEdit.setEnabled(False)')
-                eval(f'self.ch{ch}_checkBox.setChecked(True)')
-                eval(f'self.ch{ch}_name_lineEdit.setText("void")')
-            elif not eval(f'self.ch{ch}_void_checkBox.isChecked()') and eval(f'self.ch_names[{ch-1}]') == 'void' and eval(f'self.ch{ch}_checkBox.isChecked()'):
-                eval(f'self.ch{ch}_checkBox.setEnabled(True)')
-                eval(f'self.ch{ch}_name_lineEdit.setEnabled(True)')
-                eval(f'self.ch{ch}_checkBox.setChecked(False)')
-                eval(f'self.ch{ch}_name_lineEdit.setText(self.names_without_void[{ch-1}])')
+        for i in range(n2add):
+            for ch in range(8, 0, -1):
+                if not eval(f'self.ch{ch}_checkBox.isChecked()'):
+                    eval(f'self.ch{ch}_checkBox.blockSignals(True)')
+                    eval(f'self.ch{ch}_checkBox.setChecked(True)')
+                    eval(f'self.ch{ch}_checkBox.blockSignals(False)')
+                    eval(f'self.ch{ch}_name_lineEdit.blockSignals(True)')
+                    eval(f'self.ch{ch}_name_lineEdit.setText("void")')
+                    eval(f'self.ch{ch}_name_lineEdit.blockSignals(False)')
+                    break
 
-        self.status.sampling_rate = self.frec_spinBox.value() * int(1e6)
+        self.status.sampling_rate = self.freq_spinBox.value() * int(1e6)
 
         if self.source_comboBox.currentIndex() == 0:
             self.status.start = self.status.SOFTSTART
@@ -177,9 +185,9 @@ class ADCUIWidget (QtWidgets.QWidget, Ui_ADCWidgetDesign):
                 eval(f'self.names_without_void.pop({i})')
                 eval(f'self.names_without_void.insert({i}, self.ch{i + 1}_name_lineEdit.text())')
 
-        self.status2ui()
+        # self.status2ui()
 
-        if n_enabled in (0, 1, 2, 4, 8):
+        if n_enabled in good_values:
             request = packet_init(SystemStatus.ADC, self.address)
             request.command = Commands.SET
             if self.status.IsInitialized():
