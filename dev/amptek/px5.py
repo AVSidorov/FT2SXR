@@ -45,10 +45,9 @@ class PX5(Dev):
                     res = Packet(self.protocol.request).data
                     ex = True
             except sockerr as err:
+                ex = True
                 if isinstance(err, socktimeout):
-                    if response is None:
-                        res = 'Socket timeout'
-                        ex = True
+                    res = 'Socket timeout'
 
         return self._response(response, res)
 
