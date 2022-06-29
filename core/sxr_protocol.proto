@@ -66,6 +66,18 @@ message AdcStatus{
 
   }
   repeated BoardStatus board_status = 10;
+  enum Connectors{
+    CON_START = 1;
+    CON_CH_1 = 2;
+    CON_CH_2 = 3;
+    CON_CH_3 = 4;
+    CON_CH_4 = 5;
+    CON_CH_5 = 6;
+    CON_CH_6 = 7;
+    CON_CH_7 = 8;
+    CON_CH_8 = 9;
+    CON_CLOCK = 10;
+  }
 
 }
 
@@ -73,6 +85,21 @@ message AmpStatus{
   required float gainA = 1 [default = 0.0];
   required float gainB= 2 [default = 0.0];
   required uint32 tail = 3 [default = 6];
+
+  enum Connectors{
+    CON_IN = 1;
+    CON_CH_A = 2;
+    CON_CH_B = 3;
+  }
+}
+
+message Connector{
+  required SystemStatus.EnumDev dev = 1;
+  required fixed32 connector = 2;
+}
+
+message Bind{
+  repeated Connector points = 1;
 }
 
 message SystemStatus{
@@ -95,9 +122,20 @@ message SystemStatus{
     XRAY = 6;
     SOURCE = 6;
     FE55 = 7;
-    TOKAMAK = 8;
+    SDD = 8;
+    TOKAMAK = 9;
   }
   repeated EnumDev devs = 2;
+
+  enum Connectors{
+    CON_IN = 1;
+    CON_OUT = 2;
+    CON_CON1 = 3;
+    CON_CON2 = 4;
+  }
+
+  repeated Bind binds = 3;
+
 }
 
 enum Commands{
