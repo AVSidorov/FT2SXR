@@ -1,12 +1,14 @@
-import time
+import h5py
+
 from core.core import Dev
 from core.sxr_protocol_pb2 import MainPacket, SystemStatus, Commands
-from core.sxr_protocol import packet_init
+from core.sxr_protocol_pb2 import AmpStatus, AdcStatus  # temporary for wiring
 from dev.insys.adc import ADC
 from dev.amptek.px5 import PX5
 from dev.tubl.amplifier import Amplifier
 from core.fileutils import today_dir
 import os
+import numpy as np
 
 
 class Ft2SXR(Dev):
@@ -51,6 +53,41 @@ class Ft2SXR(Dev):
         self.state.devs.append(SystemStatus.ADC)
         self.state.devs.append(SystemStatus.AMP)
         self.state.devs.append(SystemStatus.PX5)
+        
+        # devices wiring
+        self.state.binds.add()
+
+        self.state.binds[-1].points.add()
+        self.state.binds[-1].points[-1].dev = SystemStatus.SDD
+        self.state.binds[-1].points[-1].connector = SystemStatus.CON_OUT
+
+        self.state.binds[-1].points.add()
+        self.state.binds[-1].points[-1].dev = SystemStatus.AMP
+        self.state.binds[-1].points[-1].connector = AmpStatus.CON_IN
+
+        self.state.binds[-1].points.add()
+        self.state.binds[-1].points[-1].dev = SystemStatus.PX5
+        self.state.binds[-1].points[-1].connector = SystemStatus.CON_IN
+
+        self.state.binds.add()
+
+        self.state.binds[-1].points.add()
+        self.state.binds[-1].points[-1].dev = SystemStatus.AMP
+        self.state.binds[-1].points[-1].connector = AmpStatus.CON_CH_A
+
+        self.state.binds[-1].points.add()
+        self.state.binds[-1].points[-1].dev = SystemStatus.ADC
+        self.state.binds[-1].points[-1].connector = AdcStatus.CON_CH_1
+
+        self.state.binds.add()
+
+        self.state.binds[-1].points.add()
+        self.state.binds[-1].points[-1].dev = SystemStatus.AMP
+        self.state.binds[-1].points[-1].connector = AmpStatus.CON_CH_B
+
+        self.state.binds[-1].points.add()
+        self.state.binds[-1].points[-1].dev = SystemStatus.ADC
+        self.state.binds[-1].points[-1].connector = AdcStatus.CON_CH_2
 
     def command_to_devs(self, command: Commands = None, response: bool = False):
         # store initial request inside function
@@ -104,13 +141,23 @@ class Ft2SXR(Dev):
         sxr.attrs['name'] = 'SXR diagnostics'
         sxr.attrs['comments'] = ''
         filename = os.path.abspath(os.path.join(self.wdir, hf.filename))
+
+        # make wiring table
+        wiring = wiring_tab(self.state.binds)
+
+        # writing array
+        dt = h5py.string_dtype(encoding='utf-8')
+        dset = sxr.create_dataset('wiring', shape=wiring.shape, dtype=dt)
+        dset[:] = wiring
+
         hf.close()
 
-        self.request_to_dev.command = Commands.SNAPSHOT
-        self.request_to_dev.data = f'/SXR@{filename}'.encode()
+        if self.parent() is not None:
+            self.request_to_dev.command = Commands.SNAPSHOT
+            self.request_to_dev.data = f'/SXR@{filename}'.encode()
 
-        self.devs_queue.extend(self.state.devs)
-        self.command_to_dev_from_queue(Commands.SNAPSHOT, response)
+            self.devs_queue.extend(self.state.devs)
+            self.command_to_dev_from_queue(Commands.SNAPSHOT, response)
 
     def channel0_slot(self, data: bytes):
         # store initial request
@@ -132,3 +179,47 @@ class Ft2SXR(Dev):
                 # If response from one device coincide with current command in que (in self.request_to_dev packet)
                 # next request (command to next device) will be sent
 
+
+def connector2str(dev: SystemStatus.EnumDev, connector) -> str:
+    status_obj = SystemStatus
+    if dev == SystemStatus.ADC:
+        status_obj = AdcStatus
+    elif dev == SystemStatus.AMP:
+        status_obj = AmpStatus
+
+    return status_obj.Connectors.Name(connector).replace('CON_', '')
+
+
+def wiring_tab(binds) -> np.ndarray:
+    wiring = np.ndarray((1, 1), dtype='<U255')
+
+    wiring[0, 0] = 'To/From'
+
+    inputs = ['IN', 'CLOCK', 'START'] + [f'CH_{_}' for _ in range(1, 9)]
+    for bind in binds:
+        for pointA in bind.points:
+            conA = connector2str(pointA.dev, pointA.connector)
+            if conA in inputs:
+                for pointB in bind.points:
+                    conB = connector2str(pointB.dev, pointB.connector)
+                    if conB not in inputs:
+                        row_name = f'{SystemStatus.EnumDev.Name(pointA.dev)}_{conA}'
+                        col_name = f'{SystemStatus.EnumDev.Name(pointB.dev)}_{conB}'
+                        val = 'X'
+                        if pointA.dev == SystemStatus.ADC and conA in [f'CH_{_}' for _ in range(1, 9)]:
+                            row_name = f'{SystemStatus.EnumDev.Name(pointA.dev)}'
+                            val = conA.replace('CH_', '')
+
+                        row = np.squeeze(np.argwhere(wiring[:, 0] == row_name))
+                        if row.size == 0:
+                            wiring = np.vstack((wiring, np.ndarray((1, wiring.shape[1]), dtype='<U255')))
+                            row = wiring.shape[0] - 1
+                            wiring[row, 0] = row_name
+
+                        col = np.squeeze(np.argwhere(wiring[0, :] == col_name))
+                        if col.size == 0:
+                            wiring = np.hstack((wiring, np.ndarray((wiring.shape[0], 1), dtype='<U255')))
+                            col = wiring.shape[1] - 1
+                            wiring[0, col] = col_name
+                        wiring[row, col] = val
+    return wiring

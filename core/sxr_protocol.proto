@@ -67,16 +67,16 @@ message AdcStatus{
   }
   repeated BoardStatus board_status = 10;
   enum Connectors{
-    CON_START = 1;
-    CON_CH_1 = 2;
-    CON_CH_2 = 3;
-    CON_CH_3 = 4;
-    CON_CH_4 = 5;
-    CON_CH_5 = 6;
-    CON_CH_6 = 7;
-    CON_CH_7 = 8;
-    CON_CH_8 = 9;
-    CON_CLOCK = 10;
+    CON_START = 0;
+    CON_CH_1 = 1;
+    CON_CH_2 = 2;
+    CON_CH_3 = 3;
+    CON_CH_4 = 4;
+    CON_CH_5 = 5;
+    CON_CH_6 = 6;
+    CON_CH_7 = 7;
+    CON_CH_8 = 8;
+    CON_CLOCK = 9;
   }
 
 }
@@ -87,9 +87,9 @@ message AmpStatus{
   required uint32 tail = 3 [default = 6];
 
   enum Connectors{
-    CON_IN = 1;
-    CON_CH_A = 2;
-    CON_CH_B = 3;
+    CON_IN = 0;
+    CON_CH_A = 1;
+    CON_CH_B = 2;
   }
 }
 
@@ -128,10 +128,10 @@ message SystemStatus{
   repeated EnumDev devs = 2;
 
   enum Connectors{
-    CON_IN = 1;
-    CON_OUT = 2;
-    CON_CON1 = 3;
-    CON_CON2 = 4;
+    CON_IN = 0;
+    CON_OUT = 10;
+    CON_CON1 = 1;
+    CON_CON2 = 2;
   }
 
   repeated Bind binds = 3;
