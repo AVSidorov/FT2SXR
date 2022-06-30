@@ -205,20 +205,20 @@ def wiring_tab(binds) -> np.ndarray:
                     if conB not in inputs:
                         row_name = f'{SystemStatus.EnumDev.Name(pointA.dev)}_{conA}'
                         col_name = f'{SystemStatus.EnumDev.Name(pointB.dev)}_{conB}'
-                        val = 'X'
+                        val = '1'
                         if pointA.dev == SystemStatus.ADC and conA in [f'CH_{_}' for _ in range(1, 9)]:
                             row_name = f'{SystemStatus.EnumDev.Name(pointA.dev)}'
                             val = conA.replace('CH_', '')
 
                         row = np.squeeze(np.argwhere(wiring[:, 0] == row_name))
                         if row.size == 0:
-                            wiring = np.vstack((wiring, np.ndarray((1, wiring.shape[1]), dtype='<U255')))
+                            wiring = np.vstack((wiring, np.full((1, wiring.shape[1]), '0', dtype='<U255')))
                             row = wiring.shape[0] - 1
                             wiring[row, 0] = row_name
 
                         col = np.squeeze(np.argwhere(wiring[0, :] == col_name))
                         if col.size == 0:
-                            wiring = np.hstack((wiring, np.ndarray((wiring.shape[0], 1), dtype='<U255')))
+                            wiring = np.hstack((wiring, np.full((wiring.shape[0], 1), '0', dtype='<U255')))
                             col = wiring.shape[1] - 1
                             wiring[0, col] = col_name
                         wiring[row, col] = val
