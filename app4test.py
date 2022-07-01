@@ -20,15 +20,6 @@ def main():
 
     logger = Logger('log.txt', core)
 
-    class Destroyer(QtCore.QObject):
-        @QtCore.pyqtSlot(QtCore.QObject)
-        def send_shutdown(self, obj: QtCore.QObject):
-            system.shutdown()
-            print('app destroyed')
-
-    destroyer = Destroyer(core)
-    app.destroyed.connect(destroyer.send_shutdown)
-
     mw.show()
 
     sys.exit(app.exec_())

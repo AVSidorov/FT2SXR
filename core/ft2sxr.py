@@ -185,6 +185,13 @@ class Ft2SXR(Dev):
                 # If response from one device coincide with current command in que (in self.request_to_dev packet)
                 # next request (command to next device) will be sent
 
+    def shutdown(self, response: bool = False):
+        if self.parent() is not None:
+            self.request_to_dev.command = Commands.SHUTDOWN
+
+            self.devs_queue.extend(self.state.devs)
+            self.command_to_dev_from_queue(Commands.SHUTDOWN, response)
+
 
 def connector2str(dev: SystemStatus.EnumDev, connector, is_in: False) -> str:
     status_obj = SystemStatus
