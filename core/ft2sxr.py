@@ -147,6 +147,15 @@ class Ft2SXR(Dev):
         dset = sxr.create_dataset('wiring', shape=wiring.shape, dtype=dt)
         dset[:] = wiring
 
+        binds = sxr.require_group('BINDS')
+
+        for bind in self.state.binds:
+            bnd = binds.require_group(f'{SystemStatus.EnumDev.Name(bind.source.dev)}_'
+                                     f'{connector2str(bind.source.dev,bind.source.connector, is_in=False)}')
+            for recv in bind.receivers:
+                bnd.attrs[f'{SystemStatus.EnumDev.Name(recv.dev)}'] =\
+                          f'{connector2str(recv.dev,recv.connector, is_in=True)}'
+
         hf.close()
 
         if self.parent() is not None:
