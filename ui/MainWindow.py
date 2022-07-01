@@ -12,7 +12,7 @@ from ui.MeasurementSettingsUI import MeasurementSettingsWidget
 from ui.CalibrationSettingsUI import CalibrationSettingsWidget
 from ui.MiniX2UI import MiniX2Widget
 from ui.WarningUI import WarningWidget
-from PyQt5 import QtWidgets, QtCore
+from PyQt5 import QtWidgets, QtCore, QtGui
 from core.sxr_protocol import packet_init
 from core.sxr_protocol_pb2 import MainPacket, SystemStatus, Commands
 from core.logger import Logger
@@ -29,6 +29,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def __init__(self, parent=None):
         super().__init__(parent=parent)
         self.setupUi(self)
+        self.address = 16
         self.actionADC.triggered.connect(self.action_adc_set)
         self.actionPX_5.triggered.connect(self.action_px5_set)
         self.actionGSA.triggered.connect(self.action_gsa_set)
@@ -37,6 +38,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.actionMeasurement_settings.triggered.connect(self.action_measurement_set)
         self.actionMini_X2.triggered.connect(self.action_minix2_set)
         self.actionShow_log.triggered.connect(self.action_adclog)
+
+        self.setAttribute(QtCore.Qt.WA_DeleteOnClose, True)
 
         self.actionOpen_SXR_file.triggered.connect(self.open_sxr)
 
@@ -61,6 +64,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         win = QtWidgets.QDialog(self)
         win.setModal(True)
         win.setWindowTitle('ADC')
+        win.setAttribute(QtCore.Qt.WA_DeleteOnClose, True)
 
         adcSettings = ADCUIWidget(win)
         adcSettings.channel0.connect(self.channel0)  # make uplink for child widgets
@@ -81,6 +85,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         win = QtWidgets.QDialog(self)
         win.setModal(True)
         win.setWindowTitle('PX-5')
+        win.setAttribute(QtCore.Qt.WA_DeleteOnClose, True)
 
         px5Settings = PX5Widget(win)
         win.verticalLayout = QtWidgets.QVBoxLayout(win)
@@ -93,6 +98,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         win = QtWidgets.QDialog(self)
         win.setModal(True)
         win.setWindowTitle('GSA')
+        win.setAttribute(QtCore.Qt.WA_DeleteOnClose, True)
 
         gsaSettings = GSAWidget(win)
         win.verticalLayout = QtWidgets.QVBoxLayout(win)
@@ -105,6 +111,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         win = QtWidgets.QDialog(self)
         win.setModal(True)
         win.setWindowTitle('Amplifier')
+        win.setAttribute(QtCore.Qt.WA_DeleteOnClose, True)
 
         amplifierSettings = AmplifierWidget(win)
         amplifierSettings.channel0.connect(self.channel0)
@@ -125,6 +132,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         win = QtWidgets.QDialog(self)
         win.setModal(True)
         win.setWindowTitle('Calibration settings')
+        win.setAttribute(QtCore.Qt.WA_DeleteOnClose, True)
 
         calibrationSettings = CalibrationSettingsWidget(win)
         win.verticalLayout = QtWidgets.QVBoxLayout(win)
@@ -136,6 +144,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         win = QtWidgets.QDialog(self)
         win.setModal(True)
         win.setWindowTitle('Measurement settings')
+        win.setAttribute(QtCore.Qt.WA_DeleteOnClose, True)
 
         measurementSettings = MeasurementSettingsWidget(win)
         win.verticalLayout = QtWidgets.QVBoxLayout(win)
@@ -147,6 +156,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         win = QtWidgets.QDialog(self)
         win.setModal(True)
         win.setWindowTitle('Mini-X2')
+        win.setAttribute(QtCore.Qt.WA_DeleteOnClose, True)
 
         minix2Settings = MiniX2Widget(win)
         win.verticalLayout = QtWidgets.QVBoxLayout(win)
@@ -169,6 +179,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def open_sxr(self, data_file=None):
         gc.collect(generation=2)
         win = QtWidgets.QMainWindow(self)
+        win.setAttribute(QtCore.Qt.WA_DeleteOnClose, True)
         # print(type(data_file))
 
         # data_dir = QtWidgets.QFileDialog.getExistingDirectory(self, "Выбрать папку измерения", ".")
@@ -204,6 +215,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         elif request.sender == 12:
             if request.command == Commands.START:
                 self.action_amplifier_set()
+
 
 def main():
     app = QtWidgets.QApplication(sys.argv)

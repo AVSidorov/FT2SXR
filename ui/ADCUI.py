@@ -1,5 +1,5 @@
 import sys
-from PyQt5 import QtWidgets, QtCore
+from PyQt5 import QtWidgets, QtCore, QtGui
 from math import trunc
 from ui.ADCUIDesign import Ui_ADCWidgetDesign
 from core.sxr_protocol_pb2 import MainPacket, AdcStatus, SystemStatus, Commands
@@ -12,6 +12,7 @@ class ADCUIWidget (QtWidgets.QWidget, Ui_ADCWidgetDesign):
     def __init__(self, parent=None):
         super().__init__(parent=parent)
         self.setupUi(self)
+        self.setAttribute(QtCore.Qt.WA_DeleteOnClose, True)
 
         self.address = 11
 
@@ -213,6 +214,9 @@ class ADCUIWidget (QtWidgets.QWidget, Ui_ADCWidgetDesign):
             self.bias_doubleSpinBox.blockSignals(True)
             self.bias_doubleSpinBox.setValue(self.status.board_status[0].channel_status[int(self.ch_comboBox.currentText())-1].bias)
             self.bias_doubleSpinBox.blockSignals(False)
+
+    def hideEvent(self, a0: QtGui.QHideEvent) -> None:
+        self.close()
 
 
 def main():

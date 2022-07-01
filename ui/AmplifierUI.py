@@ -1,3 +1,4 @@
+import gc
 import sys
 import os
 import csv
@@ -5,7 +6,7 @@ from PyQt5 import QtWidgets
 from ui.AmplifierUIDesign import Ui_AmplifierWidgetDesign
 from core.sxr_protocol_pb2 import MainPacket, AmpStatus, SystemStatus, Commands
 from core.sxr_protocol import packet_init
-from PyQt5 import QtWidgets, QtCore
+from PyQt5 import QtWidgets, QtCore, QtGui
 
 
 class AmplifierWidget(QtWidgets.QWidget, Ui_AmplifierWidgetDesign):
@@ -14,6 +15,8 @@ class AmplifierWidget(QtWidgets.QWidget, Ui_AmplifierWidgetDesign):
     def __init__(self, parent=None):
         super().__init__(parent=parent)
         self.setupUi(self)
+        self.address = 18
+        self.setAttribute(QtCore.Qt.WA_DeleteOnClose, True)
 
         # Amplifier initial values
         self.gainA = 0.0
@@ -168,6 +171,9 @@ class AmplifierWidget(QtWidgets.QWidget, Ui_AmplifierWidgetDesign):
                 self.status.ParseFromString(request.data)
                 self.status2ui()
                 self.blockSignals(False)
+
+    def hideEvent(self, a0: QtGui.QHideEvent) -> None:
+        self.close()
 
 
 def main():

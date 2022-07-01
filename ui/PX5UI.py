@@ -1,5 +1,5 @@
 import sys
-from PyQt5 import QtWidgets, QtCore
+from PyQt5 import QtWidgets, QtCore, QtGui
 from ui.PX5UIDesign import Ui_PX5WidgetDesign
 from core.sxr_protocol_pb2 import MainPacket, AdcStatus
 from core.sxr_protocol import packet_init
@@ -11,6 +11,7 @@ class PX5Widget(QtWidgets.QWidget, Ui_PX5WidgetDesign):
     def __init__(self, parent=None):
         super().__init__(parent=parent)
         self.setupUi(self)
+        self.setAttribute(QtCore.Qt.WA_DeleteOnClose, True)
 
         # PX5 initial values
         # Режим запуска
@@ -35,6 +36,7 @@ class PX5Widget(QtWidgets.QWidget, Ui_PX5WidgetDesign):
 
         # signals
         self.enable_pushButton.clicked.connect(self.setenable)
+        # self.hideEvent.connect(self.closeEvent)
 
         statusbar = QtWidgets.QStatusBar(self)
         statusbar.setMaximumSize(16777215, 22)
@@ -58,6 +60,9 @@ class PX5Widget(QtWidgets.QWidget, Ui_PX5WidgetDesign):
             self.enable_pushButton.setStyleSheet('color: black')
             self.settings_toolBox.setItemEnabled(self.settings_toolBox.indexOf(self.mca_page), False)
             self.settings_toolBox.setItemEnabled(self.settings_toolBox.indexOf(self.start_page), False)
+
+    def hideEvent(self, a0: QtGui.QHideEvent) -> None:
+        self.close()
 
 
 def main():
