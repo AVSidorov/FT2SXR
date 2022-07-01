@@ -164,6 +164,9 @@ class Dev(Core):
         else:
             return hf, None
 
+    def shutdown(self, response: bool = False):
+        self._response(response)
+
     def channel0_slot(self, data: bytes):
         # store request if not processed
         if all((self.request.command != Commands.INFO,
@@ -190,6 +193,8 @@ class Dev(Core):
                 self.make_connection(response=True)
             elif self.request.command == Commands.SNAPSHOT:
                 self.snapshot(self.request, response=True)
+            elif self.request.command == Commands.SHUTDOWN:
+                self.shutdown(response=True)
         # if request to other address restore request
         elif pkt_old is not None:
             self.request.ParseFromString(pkt_old)

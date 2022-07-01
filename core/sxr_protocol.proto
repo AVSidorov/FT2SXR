@@ -158,6 +158,7 @@ enum Commands{
   REBOOT = 6;
   CONNECT = 7;
   SNAPSHOT = 8;
+  SHUTDOWN = 9;
 }
 
 message Source{
