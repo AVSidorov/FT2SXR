@@ -57,37 +57,34 @@ class Ft2SXR(Dev):
         # devices wiring
         self.state.binds.add()
 
-        self.state.binds[-1].points.add()
-        self.state.binds[-1].points[-1].dev = SystemStatus.SDD
-        self.state.binds[-1].points[-1].connector = SystemStatus.CON_OUT
+        self.state.binds[-1].source.dev = SystemStatus.SDD
+        self.state.binds[-1].source.connector = SystemStatus.CON_OUT
 
-        self.state.binds[-1].points.add()
-        self.state.binds[-1].points[-1].dev = SystemStatus.AMP
-        self.state.binds[-1].points[-1].connector = AmpStatus.CON_IN
+        self.state.binds[-1].receivers.add()
+        self.state.binds[-1].receivers[-1].dev = SystemStatus.AMP
+        self.state.binds[-1].receivers[-1].connector = AmpStatus.CON_IN
 
-        self.state.binds[-1].points.add()
-        self.state.binds[-1].points[-1].dev = SystemStatus.PX5
-        self.state.binds[-1].points[-1].connector = SystemStatus.CON_IN
-
-        self.state.binds.add()
-
-        self.state.binds[-1].points.add()
-        self.state.binds[-1].points[-1].dev = SystemStatus.AMP
-        self.state.binds[-1].points[-1].connector = AmpStatus.CON_CH_A
-
-        self.state.binds[-1].points.add()
-        self.state.binds[-1].points[-1].dev = SystemStatus.ADC
-        self.state.binds[-1].points[-1].connector = AdcStatus.CON_CH_1
+        self.state.binds[-1].receivers.add()
+        self.state.binds[-1].receivers[-1].dev = SystemStatus.PX5
+        self.state.binds[-1].receivers[-1].connector = SystemStatus.CON_IN
 
         self.state.binds.add()
 
-        self.state.binds[-1].points.add()
-        self.state.binds[-1].points[-1].dev = SystemStatus.AMP
-        self.state.binds[-1].points[-1].connector = AmpStatus.CON_CH_B
+        self.state.binds[-1].source.dev = SystemStatus.AMP
+        self.state.binds[-1].source.connector = AmpStatus.CON_CH_A
 
-        self.state.binds[-1].points.add()
-        self.state.binds[-1].points[-1].dev = SystemStatus.ADC
-        self.state.binds[-1].points[-1].connector = AdcStatus.CON_CH_2
+        self.state.binds[-1].receivers.add()
+        self.state.binds[-1].receivers[-1].dev = SystemStatus.ADC
+        self.state.binds[-1].receivers[-1].connector = AdcStatus.CON_CH_1
+
+        self.state.binds.add()
+
+        self.state.binds[-1].source.dev = SystemStatus.AMP
+        self.state.binds[-1].source.connector = AmpStatus.CON_CH_B
+
+        self.state.binds[-1].receivers.add()
+        self.state.binds[-1].receivers[-1].dev = SystemStatus.ADC
+        self.state.binds[-1].receivers[-1].connector = AdcStatus.CON_CH_2
 
     def command_to_devs(self, command: Commands = None, response: bool = False):
         # store initial request inside function
@@ -180,14 +177,16 @@ class Ft2SXR(Dev):
                 # next request (command to next device) will be sent
 
 
-def connector2str(dev: SystemStatus.EnumDev, connector) -> str:
+def connector2str(dev: SystemStatus.EnumDev, connector, is_in: False) -> str:
     status_obj = SystemStatus
     if dev == SystemStatus.ADC:
         status_obj = AdcStatus
     elif dev == SystemStatus.AMP:
         status_obj = AmpStatus
-
-    return status_obj.Connectors.Name(connector).replace('CON_', '')
+    if is_in:
+        return status_obj.ConnectorsIn.Name(connector).replace('CON_', '')
+    else:
+        return status_obj.ConnectorsOut.Name(connector).replace('CON_', '')
 
 
 def wiring_tab(binds) -> np.ndarray:
@@ -195,31 +194,27 @@ def wiring_tab(binds) -> np.ndarray:
 
     wiring[0, 0] = 'To/From'
 
-    inputs = ['IN', 'CLOCK', 'START'] + [f'CH_{_}' for _ in range(1, 9)]
     for bind in binds:
-        for pointA in bind.points:
-            conA = connector2str(pointA.dev, pointA.connector)
-            if conA in inputs:
-                for pointB in bind.points:
-                    conB = connector2str(pointB.dev, pointB.connector)
-                    if conB not in inputs:
-                        row_name = f'{SystemStatus.EnumDev.Name(pointA.dev)}_{conA}'
-                        col_name = f'{SystemStatus.EnumDev.Name(pointB.dev)}_{conB}'
-                        val = '1'
-                        if pointA.dev == SystemStatus.ADC and conA in [f'CH_{_}' for _ in range(1, 9)]:
-                            row_name = f'{SystemStatus.EnumDev.Name(pointA.dev)}'
-                            val = conA.replace('CH_', '')
+        con_out = connector2str(bind.source.dev, bind.source.connector, is_in=False)
+        for recv in bind.receivers:
+            con_in = connector2str(recv.dev, recv.connector, is_in=True)
+            col_name = f'{SystemStatus.EnumDev.Name(bind.source.dev)}_{con_out}'
+            row_name = f'{SystemStatus.EnumDev.Name(recv.dev)}_{con_in}'
+            val = '1'
+            if recv.dev == SystemStatus.ADC and con_in in [f'CH_{_}' for _ in range(1, 9)]:
+                row_name = f'{SystemStatus.EnumDev.Name(recv.dev)}'
+                val = con_in.replace('CH_', '')
 
-                        row = np.squeeze(np.argwhere(wiring[:, 0] == row_name))
-                        if row.size == 0:
-                            wiring = np.vstack((wiring, np.full((1, wiring.shape[1]), '0', dtype='<U255')))
-                            row = wiring.shape[0] - 1
-                            wiring[row, 0] = row_name
+            row = np.squeeze(np.argwhere(wiring[:, 0] == row_name))
+            if row.size == 0:
+                wiring = np.vstack((wiring, np.full((1, wiring.shape[1]), '0', dtype='<U255')))
+                row = wiring.shape[0] - 1
+                wiring[row, 0] = row_name
 
-                        col = np.squeeze(np.argwhere(wiring[0, :] == col_name))
-                        if col.size == 0:
-                            wiring = np.hstack((wiring, np.full((wiring.shape[0], 1), '0', dtype='<U255')))
-                            col = wiring.shape[1] - 1
-                            wiring[0, col] = col_name
-                        wiring[row, col] = val
+            col = np.squeeze(np.argwhere(wiring[0, :] == col_name))
+            if col.size == 0:
+                wiring = np.hstack((wiring, np.full((wiring.shape[0], 1), '0', dtype='<U255')))
+                col = wiring.shape[1] - 1
+                wiring[0, col] = col_name
+            wiring[row, col] = val
     return wiring

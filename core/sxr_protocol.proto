@@ -66,8 +66,7 @@ message AdcStatus{
 
   }
   repeated BoardStatus board_status = 10;
-  enum Connectors{
-    CON_START = 0;
+  enum ConnectorsIn{
     CON_CH_1 = 1;
     CON_CH_2 = 2;
     CON_CH_3 = 3;
@@ -76,7 +75,8 @@ message AdcStatus{
     CON_CH_6 = 6;
     CON_CH_7 = 7;
     CON_CH_8 = 8;
-    CON_CLOCK = 9;
+    CON_START = 9;
+    CON_CLOCK = 10;
   }
 
 }
@@ -86,20 +86,13 @@ message AmpStatus{
   required float gainB= 2 [default = 0.0];
   required uint32 tail = 3 [default = 6];
 
-  enum Connectors{
+  enum ConnectorsIn{
     CON_IN = 0;
+  }
+  enum ConnectorsOut{
     CON_CH_A = 1;
     CON_CH_B = 2;
   }
-}
-
-message Connector{
-  required SystemStatus.EnumDev dev = 1;
-  required fixed32 connector = 2;
-}
-
-message Bind{
-  repeated Connector points = 1;
 }
 
 message SystemStatus{
@@ -127,11 +120,23 @@ message SystemStatus{
   }
   repeated EnumDev devs = 2;
 
-  enum Connectors{
-    CON_IN = 0;
-    CON_OUT = 10;
+  enum ConnectorsOut{
+    CON_OUT = 0;
     CON_CON1 = 1;
     CON_CON2 = 2;
+  }
+  enum ConnectorsIn{
+    CON_IN = 0;
+    CON_CH_1 = 1;
+    CON_CH_2 = 2;
+    CON_CH_3 = 3;
+    CON_CH_4 = 4;
+    CON_CH_5 = 5;
+    CON_CH_6 = 6;
+    CON_CH_7 = 7;
+    CON_CH_8 = 8;
+    CON_START = 9;
+    CON_CLOCK = 10;
   }
 
   repeated Bind binds = 3;
@@ -153,4 +158,19 @@ enum Commands{
   REBOOT = 6;
   CONNECT = 7;
   SNAPSHOT = 8;
+}
+
+message Source{
+  required SystemStatus.EnumDev dev = 1;
+  required SystemStatus.ConnectorsOut connector = 2;
+}
+
+message Receiver{
+  required SystemStatus.EnumDev dev = 1;
+  required SystemStatus.ConnectorsOut connector = 2;
+}
+
+message Bind{
+  required Source source = 1;
+  repeated Receiver receivers = 2;
 }
