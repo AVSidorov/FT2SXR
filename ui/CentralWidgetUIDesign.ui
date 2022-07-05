@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1096</width>
-    <height>566</height>
+    <width>771</width>
+    <height>606</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -160,10 +160,16 @@ OFF</string>
       <enum>Qt::Vertical</enum>
      </property>
      <widget class="QGroupBox" name="groupBox">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
       <property name="minimumSize">
        <size>
         <width>400</width>
-        <height>270</height>
+        <height>230</height>
        </size>
       </property>
       <property name="maximumSize">
@@ -178,10 +184,16 @@ OFF</string>
       <layout class="QVBoxLayout" name="verticalLayout">
        <item>
         <widget class="QTableWidget" name="status_tableWidget">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <property name="maximumSize">
           <size>
            <width>16777215</width>
-           <height>16777215</height>
+           <height>290</height>
           </size>
          </property>
          <property name="focusPolicy">
@@ -292,6 +304,16 @@ OFF</string>
            <string>3</string>
           </property>
          </row>
+         <row>
+          <property name="text">
+           <string>4</string>
+          </property>
+         </row>
+         <row>
+          <property name="text">
+           <string>5</string>
+          </property>
+         </row>
          <column>
           <property name="text">
            <string>Snapshot</string>
@@ -323,9 +345,25 @@ OFF</string>
      </widget>
      <widget class="QGroupBox" name="groupBox_2">
       <property name="title">
-       <string>Процессы</string>
+       <string>Связи</string>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_2">
+       <item>
+        <widget class="QTableWidget" name="wiring_tableWidget"/>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QGroupBox" name="groupBox_4">
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>150</height>
+       </size>
+      </property>
+      <property name="title">
+       <string>Процессы</string>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout_2">
        <item>
         <widget class="QTextBrowser" name="log_textBrowser"/>
        </item>
