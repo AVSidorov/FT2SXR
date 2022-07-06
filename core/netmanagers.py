@@ -1,7 +1,7 @@
 from core.core import Core
 from socket import socket, AF_INET, SOCK_DGRAM, SOL_SOCKET, SO_BROADCAST
 from threading import Thread, Lock
-from google.protobuf.message import Error as ErrorProtobuf, DecodeError
+from socket import error as sock_error
 
 
 class NetManagerBase(Core):
@@ -51,12 +51,17 @@ class NetManagerSimple(NetManagerBase):
 
     def run(self):
         while self.actv:
-            data, addr = self.sock.recvfrom(1024)
-            if addr != (self.ip, self.port):
-                self.lock.acquire()
-                self.clients.add(addr)
-                self.lock.release()
-                self.channel0.emit(data)
+            try:
+                data, addr = self.sock.recvfrom(1024)
+
+                if addr != (self.ip, self.port):
+                    self.lock.acquire()
+                    self.clients.add(addr)
+                    self.lock.release()
+                    self.channel0.emit(data)
+
+            except sock_error:
+                pass
 
 
 class Netmanager(NetManagerBase):
@@ -64,28 +69,31 @@ class Netmanager(NetManagerBase):
     Class for send/receive channels data through socket
     """
 
-    def __init__(self, parent=None, ip="0.0.0.0", port=22222):
+    def __init__(self, parent=None, ip="0.0.0.0", port=22222, channel=0):
         super().__init__(parent, ip, port, 'NetManager-ch0')
         core = self.get_origin_core()
         if core is not None:
-            self.channel0.connect(core.channel0)
-            core.channel0.connect(self.channel0_slot)
+            exec(f'self.channel0.connect(core.channel{channel:1})')
+            exec(f'core.channel{channel:1}.connect(self.channel0_slot)')
         self.not_reflected = set()
 
     def run(self):
         while self.actv:
-            data, addr = self.sock.recvfrom(1024)
-            if addr != (self.ip, self.port):  # here we reject loopback
-                self.lock.acquire()
-                self.clients.add(addr)
-                self.lock.release()
-
-                if self.parent is not None:
-                    # we await reflection from core so store all data from socket in set before sending to channel
+            try:
+                data, addr = self.sock.recvfrom(1024)
+                if addr != (self.ip, self.port):  # here we reject loopback
                     self.lock.acquire()
-                    self.not_reflected.add(data)
+                    self.clients.add(addr)
                     self.lock.release()
-                    self.channel0.emit(data)
+
+                    if self.parent is not None:
+                        # we await reflection from core so store all data from socket in set before sending to channel
+                        self.lock.acquire()
+                        self.not_reflected.add(data)
+                        self.lock.release()
+                        self.channel0.emit(data)
+            except sock_error:
+                pass
 
     def channel0_slot(self, data: bytes):
         # catch reflection

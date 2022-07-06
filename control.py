@@ -1,8 +1,6 @@
 from ui.MainWindow import MainWindow
 from core.core import Core
-from core.logger import Logger
 from core.netmanagers import NetManagerSimple, Netmanager
-from core.ft2sxr import Ft2SXR
 from PyQt5 import QtWidgets
 import sys
 
