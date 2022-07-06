@@ -40,6 +40,10 @@ class NetManagerBase(Core):
             self.sock.sendto(data, addr)
         self.lock.release()
 
+    def timerEvent(self, a0: 'QTimerEvent') -> None:
+        self.send_to_clients(b'')
+        self.broadcast(b'')
+
 
 class NetManagerSimple(NetManagerBase):
     """
@@ -58,7 +62,8 @@ class NetManagerSimple(NetManagerBase):
                     self.lock.acquire()
                     self.clients.add(addr)
                     self.lock.release()
-                    self.channel0.emit(data)
+                    if self.parent is not None and len(data) > 0:
+                        self.channel0.emit(data)
 
             except sock_error:
                 pass
@@ -86,7 +91,7 @@ class Netmanager(NetManagerBase):
                     self.clients.add(addr)
                     self.lock.release()
 
-                    if self.parent is not None:
+                    if self.parent is not None and len(data) > 0:
                         # we await reflection from core so store all data from socket in set before sending to channel
                         self.lock.acquire()
                         self.not_reflected.add(data)
@@ -104,4 +109,3 @@ class Netmanager(NetManagerBase):
         # all other data resend to clients
         else:
             self.send_to_clients(data)
-

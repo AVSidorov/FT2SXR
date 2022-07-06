@@ -14,11 +14,15 @@ def main():
 
     # connecting to FT2_sxr (adding to clients)
     net_manager0.clients.add(("127.0.0.1", 5555))
+    net_manager0.startTimer(1000)
 
     net_manager_adc = NetManagerSimple(core, port=5558)
     # send packet to getting in clients at system side
-    net_manager_adc.sock.sendto(b'', ("127.0.0.1", 5557))
+    net_manager0.startTimer(30000)
+
+    net_manager0.clients.add(("127.0.0.1", 5557))
     net_manager_adc.channel0.connect(core.channel1)
+    net_manager_adc.startTimer(30000)
 
     mw = MainWindow()
     mw.channel0.connect(core.channel0)          # out Main Packets (commands)
