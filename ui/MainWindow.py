@@ -14,7 +14,7 @@ from ui.MiniX2UI import MiniX2Widget
 from ui.WarningUI import WarningWidget
 from PyQt5 import QtWidgets, QtCore, QtGui
 from core.sxr_protocol import packet_init
-from core.sxr_protocol_pb2 import MainPacket, SystemStatus, Commands
+from core.sxr_protocol_pb2 import MainPacket, SystemStatus, Commands, AmpStatus
 from core.logger import Logger
 from core.adc_logger import ADCLogger
 from ui.ADCLogUI import AdcLog
@@ -30,6 +30,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         super().__init__(parent=parent)
         self.setupUi(self)
         self.address = 16
+
         self.actionADC.triggered.connect(self.action_adc_set)
         self.actionPX_5.triggered.connect(self.action_px5_set)
         self.actionGSA.triggered.connect(self.action_gsa_set)

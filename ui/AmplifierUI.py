@@ -15,7 +15,6 @@ class AmplifierWidget(QtWidgets.QWidget, Ui_AmplifierWidgetDesign):
     def __init__(self, parent=None):
         super().__init__(parent=parent)
         self.setupUi(self)
-        self.address = 18
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose, True)
 
         # Amplifier initial values
