@@ -38,25 +38,41 @@ def ascii_req_full(cfg: np.ndarray) -> str:
     return ascii_rm_fields(req, 'RESC')
 
 
-def ascii_resp(req: str, cfg) -> str:
+def ascii_resp(req: str, cfg: np.ndarray) -> str:
     req = ascii_req_split(req)
     resp = np.array([(cmd, cfg[cmd == cfg[:, 0], 1][0]) for cmd in req[:, 0] if cmd in cfg[:, 0]])
     if 'RESC' in resp[:, 0]:
         resp[resp[:, 0] == 'RESC', 1] = '?'
-    return ';'.join(f'{cmd[0]} = {cmd[1]}' for cmd in resp)
+    return ';'.join(f'{cmd[0]}={cmd[1]}' for cmd in resp)
 
 
 def ascii_rm_fields(req: str, fields) -> str:
     return ';'.join([_ for _ in req.rstrip(';').split(';') if not _.split('=')[0] in fields]) + ';'
 
 
-def pack_txt_cfg(req, obj=None):
+def pack_txt_cfg(req: str, obj=None) -> str:
+    cfg = None
     if obj is None:
-        cfg = PX5Configuration()()
+        cfg = PX5Configuration()
+        cfg = cfg.cfg
+
+    if isinstance(obj, np.ndarray):
+        cfg = obj
+
     if hasattr(obj, 'ascii_cfg'):
-        cfg = obj.ascii_cfg
+        if isinstance(obj.ascii_cfg, PX5Configuration):
+            cfg = obj.ascii_cfg.cfg
+        elif isinstance(obj.ascii_cfg, np.ndarray):
+            cfg = obj.ascii_cfg
+
+    if hasattr(obj, 'cfg'):
+        if isinstance(obj.cfg, PX5Configuration):
+            cfg = obj.cfg.cfg
+        elif isinstance(obj.cfg, np.ndarray):
+            cfg = obj.cfg
+
     if cfg is None:
-        return None
+        return ''
 
     return ascii_resp(req, cfg)
 

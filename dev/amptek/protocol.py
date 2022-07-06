@@ -21,6 +21,7 @@ spec_len2pidI = lambda len_data: ((int(len_data // 3).bit_length() - 8) * 2 - 1)
 spec_len2pidB = lambda len_data: ((int(len_data // 3).bit_length() - 8) * 2 - 1).to_bytes(1, 'big')
 spec_pid2len = lambda pid2: 2 ** (8 + ((pid2 - 1) // 2))  # returns number of channels
 
+from dev.amptek.ascii import pack_txt_cfg
 
 def packet(pid1=b'\x00', pid2=b'\x00', data=b''):
     # make packet
@@ -175,8 +176,7 @@ def response_txt_cfg_readback(pkt, obj=None):
 
     if pkt.pid1 == b'\x20' and pkt.pid2 == b'\x03':
         req = pkt.data.decode()
-        # data = pack_txt_cfg(req, obj)
-        data = b''
+        data = pack_txt_cfg(req, obj)
         if isinstance(data, (tuple, list, np.ndarray)):
             return [packet(b'\x82', b'\x07', _) for _ in data]
         else:

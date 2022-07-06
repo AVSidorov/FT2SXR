@@ -148,11 +148,11 @@ class PX5Imitator:
         self.FPGAVer = str2ver("7.1") >> 4
         self.SerialNum = 1234
         self.HV = -1.0
-        self.DetectorTemp = 230
+        self.DetectorTemp = 252.8
         self.BoardTemp = 23
         self.PresetRealTimeReached = 0
-        self.FastThresholedLocked = 1
-        self.MCAEnabled = 1
+        self.FastThresholedLocked = 0
+        self.MCAEnabled = 0
         self.PresetCountReached = 0
         self.OscilloscopeReady = 0
         self.UnitIsConfigured = 0
@@ -166,10 +166,10 @@ class PX5Imitator:
         self.HVPolarity = -1
         self.PreAmpVoltage = 1  # 0 - 5V 1 - 8.5V
         self.DeviceID = 1
-        self.TECVoltage = 3.4765985497692813
+        self.TECVoltage = 3.4792353328938694
         self.HPGeHVPSinstalled = 0
 
-        self.ascii_cfg = ascii_cfg_load()
+        self.cfg = PX5Configuration()
 
         self.netfinder_thrd = Thread(name='Thread-NetFinder', target=self.netfinder_run, daemon=True)
         self.netfinder_actv = True
@@ -196,8 +196,8 @@ class PX5Imitator:
             req, addr = sock.recvfrom(self.mtu)
             resp = self.protocol(req, self)
             if resp is not None:
-                for i in range(len(resp) // self.mtu + 1):
-                    sock.sendto(resp[i * self.mtu:(i + 1) * self.mtu], addr)
+                if isinstance(resp, (bytes, bytearray)):
+                    sock.sendto(resp, addr)
 
     @property
     def FirmwareVerMajor(self):
