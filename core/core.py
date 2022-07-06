@@ -16,13 +16,18 @@ class Core(QtCore.QObject):
         super().__init__(parent)
         self.address = address
         self.request = MainPacket()
-        self.request.address = self.address
-        self.request.sender = 0
-        self.request.command = Commands.INFO
         self.response = MainPacket()
-        self.response.address = 0
+        self.reset_packets()
+
+    def reset_packets(self):
+        self.request.address = self.address
+        self.request.sender = self.address
+        self.request.command = Commands.INFO
+        self.request.data = b''
+        self.response.address = self.address
         self.response.sender = self.address
         self.response.command = Commands.INFO
+        self.response.data = b''
 
     @QtCore.pyqtSlot(bytes)
     def channel0_slot(self, data: bytes):
@@ -67,7 +72,8 @@ class Dev(Core):
             if all((data is not None, isinstance(data, (bytes, bytearray)))):
                 self.response.data = data
             if self.response.IsInitialized():
-                self.channel0.emit(self.response.SerializeToString())
+                if self.parent is not None:
+                    self.channel0.emit(self.response.SerializeToString())
             # reset request
             # set command to INFO_ACK so response couldn't be emitted
             self.request.command = Commands.INFO ^ 0xFFFFFFFF

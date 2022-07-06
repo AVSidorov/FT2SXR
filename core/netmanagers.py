@@ -1,6 +1,8 @@
 from core.core import Core
 from socket import socket, AF_INET, SOCK_DGRAM, SOL_SOCKET, SO_BROADCAST
 from threading import Thread, Lock
+from google.protobuf.message import Error as ErrorProtobuf, DecodeError
+
 
 class NetManagerBase(Core):
     def __init__(self, parent=None, ip="0.0.0.0", port=22222, name='NetManager'):
@@ -26,7 +28,7 @@ class NetManagerBase(Core):
 
     def broadcast(self, data):
         if self.ip != "0.0.0.0":
-            ip = self.ip[:self.ip.rfind('.')+1]+"255"
+            ip = self.ip[:self.ip.rfind('.') + 1] + "255"
             n = self.sock.sendto(data, (ip, self.port))
             return n
         else:
@@ -43,7 +45,8 @@ class NetManagerSimple(NetManagerBase):
     """
     Class only receive and send data from/to UDP socket and signal system
     """
-    def __init__(self,  parent=None, ip="0.0.0.0", port=9009):
+
+    def __init__(self, parent=None, ip="0.0.0.0", port=9009):
         super().__init__(parent, ip, port, 'NetManager-Simple')
 
     def run(self):
@@ -57,28 +60,40 @@ class NetManagerSimple(NetManagerBase):
 
 
 class Netmanager(NetManagerBase):
+    """
+    Class for send/receive channels data through socket
+    """
+
     def __init__(self, parent=None, ip="0.0.0.0", port=22222):
         super().__init__(parent, ip, port, 'NetManager-ch0')
         core = self.get_origin_core()
         if core is not None:
             self.channel0.connect(core.channel0)
             core.channel0.connect(self.channel0_slot)
+        self.not_reflected = set()
 
     def run(self):
         while self.actv:
             data, addr = self.sock.recvfrom(1024)
-            if addr != (self.ip, self.port):
+            if addr != (self.ip, self.port):  # here we reject loopback
                 self.lock.acquire()
                 self.clients.add(addr)
                 self.lock.release()
-                self.request.ParseFromString(data)
-                self.channel0.emit(data)
+
+                if self.parent is not None:
+                    # we await reflection from core so store all data from socket in set before sending to channel
+                    self.lock.acquire()
+                    self.not_reflected.add(data)
+                    self.lock.release()
+                    self.channel0.emit(data)
 
     def channel0_slot(self, data: bytes):
-        self.response.ParseFromString(data)
-        if all((self.request.sender != self.response.sender,
-                self.request.sender != self.address,
-                self.response.sender != self.address)):
+        # catch reflection
+        if data in self.not_reflected:
+            self.lock.acquire()
+            self.not_reflected.remove(data)
+            self.lock.release()
+        # all other data resend to clients
+        else:
             self.send_to_clients(data)
-            self.response.sender = self.address
-            self.request.sender = self.address
+
