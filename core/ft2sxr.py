@@ -13,7 +13,7 @@ import numpy as np
 
 class Ft2SXR(Dev):
     def __init__(self, parent=None, wdir=None):
-        super().__init__(parent, SystemStatus.SXR)
+        super().__init__(parent, SystemStatus.SXR, SystemStatus())
         core = self.get_origin_core()
 
         if wdir is None:
@@ -28,12 +28,11 @@ class Ft2SXR(Dev):
 
         self.devs_queue = list()
 
+        self.state.state = SystemStatus.IDLE
+
         self.adc = ADC(self)
         self.px5 = PX5(self)
         self.amp = Amplifier(self)
-
-        self.state = SystemStatus.IDLE
-        self.state = SystemStatus()
 
         # connect devs to message system
         if core is not None:
