@@ -1,6 +1,6 @@
 from PyQt5 import QtCore
 from core.sxr_protocol_pb2 import MainPacket, SystemStatus, Commands
-from core.sxr_protocol import packet_init
+from google.protobuf.message import DecodeError
 import time
 import datetime
 import os
@@ -182,7 +182,11 @@ class Dev(Core):
         else:
             pkt_old = None
 
-        self.request.ParseFromString(data)
+        try:
+            self.request.ParseFromString(data)
+        except DecodeError:
+            if pkt_old is not None:
+                self.request.ParseFromString(pkt_old)
 
         if self.request.address == self.address:
             if self.request.command == Commands.STATUS:
