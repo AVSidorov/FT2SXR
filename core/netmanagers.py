@@ -2,10 +2,12 @@ from core.core import Core
 from socket import socket, AF_INET, SOCK_DGRAM, SOL_SOCKET, SO_BROADCAST
 from threading import Thread, Lock
 from socket import error as sock_error
+from time import time
+from datetime import datetime
 
 
 class NetManagerBase(Core):
-    def __init__(self, parent=None, ip="0.0.0.0", port=22222, name='NetManager'):
+    def __init__(self, parent=None, ip="0.0.0.0", port=22222, name='NetManager', alive: float = None):
         super().__init__(parent, port)
 
         self.port = port
@@ -14,7 +16,8 @@ class NetManagerBase(Core):
         self.sock.setsockopt(SOL_SOCKET, SO_BROADCAST, 1)
         self.ip = self.sock.getsockname()[0]
         self.name = name
-        self.clients = set()
+        self.clients = dict()
+        self.alive = alive
         self.lock = Lock()
         self.actv = True
         self.thrd = Thread(name=f'Thread-{self.name}', target=self.run, daemon=True)
@@ -36,13 +39,25 @@ class NetManagerBase(Core):
 
     def send_to_clients(self, data: bytes):
         self.lock.acquire()
+
+        # remove old connections
+        if self.alive is not None:
+            clients = self.clients.copy()
+            for addr in self.clients:
+                if time()-self.clients[addr] > self.alive:
+                    clients.pop(addr)
+            self.clients = clients
+
         for addr in self.clients:
             self.sock.sendto(data, addr)
+
         self.lock.release()
 
     def timerEvent(self, a0: 'QTimerEvent') -> None:
-        self.send_to_clients(b'')
-        self.broadcast(b'')
+        self.response.data = f'{self.ip}:{self.port} {self.name} alive at {datetime.fromtimestamp(time())}'.encode()
+        if self.response.IsInitialized():
+            self.channel0.emit(self.response.SerializeToString())
+            self.broadcast(self.response.SerializeToString())
 
 
 class NetManagerSimple(NetManagerBase):
@@ -50,8 +65,8 @@ class NetManagerSimple(NetManagerBase):
     Class only receive and send data from/to UDP socket and signal system
     """
 
-    def __init__(self, parent=None, ip="0.0.0.0", port=9009):
-        super().__init__(parent, ip, port, 'NetManager-Simple')
+    def __init__(self, parent=None, ip="0.0.0.0", port=9009, alive: float = None):
+        super().__init__(parent, ip, port, 'NetManager-Simple', alive)
 
     def run(self):
         while self.actv:
@@ -60,7 +75,7 @@ class NetManagerSimple(NetManagerBase):
 
                 if addr != (self.ip, self.port):
                     self.lock.acquire()
-                    self.clients.add(addr)
+                    self.clients[addr] = time()
                     self.lock.release()
                     if self.parent is not None and len(data) > 0:
                         self.channel0.emit(data)
@@ -74,8 +89,8 @@ class Netmanager(NetManagerBase):
     Class for send/receive channels data through socket
     """
 
-    def __init__(self, parent=None, ip="0.0.0.0", port=22222, channel=0):
-        super().__init__(parent, ip, port, 'NetManager-ch0')
+    def __init__(self, parent=None, ip="0.0.0.0", port=22222, alive: float = None,  channel=0):
+        super().__init__(parent, ip, port, 'NetManager-ch0', alive)
         core = self.get_origin_core()
         if core is not None:
             exec(f'self.channel0.connect(core.channel{channel:1})')
@@ -88,7 +103,8 @@ class Netmanager(NetManagerBase):
                 data, addr = self.sock.recvfrom(1024)
                 if addr != (self.ip, self.port):  # here we reject loopback
                     self.lock.acquire()
-                    self.clients.add(addr)
+                    self.clients[addr] = time()
+
                     self.lock.release()
 
                     if self.parent is not None and len(data) > 0:

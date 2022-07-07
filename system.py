@@ -21,6 +21,7 @@ def main():
     std_out = Logger(sys.stdout, core)
 
     net_manager0 = Netmanager(core, port=5555)
+    net_manager0.startTimer(15000)
 
     # manager for ADC data
     net_manager_adc = NetManagerSimple(core, port=5557)

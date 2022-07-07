@@ -11,16 +11,12 @@ def main():
     core = Core(app)
 
     net_manager0 = Netmanager(core, port=5556)
-
-    # connecting to FT2_sxr (adding to clients)
-    net_manager0.clients.add(("127.0.0.1", 5555))
-    net_manager0.startTimer(1000)
-
-    net_manager_adc = NetManagerSimple(core, port=5558)
-    # send packet to getting in clients at system side
+    # connecting to FT2_sxr (adding to clients locally)
+    net_manager0.clients[("127.0.0.1", 5555)] = 0
+    # and starting send keep alive packets (to get in clients on system side)
     net_manager0.startTimer(30000)
 
-    net_manager0.clients.add(("127.0.0.1", 5557))
+    net_manager_adc = NetManagerSimple(core, port=5558)
     net_manager_adc.channel0.connect(core.channel1)
     net_manager_adc.startTimer(30000)
 
