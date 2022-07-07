@@ -1,6 +1,6 @@
 from ui.MainWindow import MainWindow
 from core.core import Core
-from core.netmanagers import NetManagerSimple, Netmanager
+from core.netmanagers import NetManagerSimple, NetManager
 from PyQt5 import QtWidgets
 import sys
 
@@ -10,14 +10,18 @@ def main():
 
     core = Core(app)
 
-    net_manager0 = Netmanager(core, port=5556)
+    # manager for  main data (channel 0)
+    net_manager0 = NetManager(core, port=5556)
     # connecting to FT2_sxr (adding to clients locally)
     net_manager0.clients[("127.0.0.1", 5555)] = 0
     # and starting send keep alive packets (to get in clients on system side)
     net_manager0.startTimer(30000)
 
-    net_manager_adc = NetManagerSimple(core, port=5558)
-    net_manager_adc.channel0.connect(core.channel1)
+    # manager for ADC data (channel 1)
+    net_manager_adc = NetManager(core, port=5558, channel=1)
+    # connecting to FT2_sxr (adding to clients locally)
+    net_manager_adc.clients[("127.0.0.1", 5557)] = 0
+    # and starting send keep alive packets (to get in clients on system side)
     net_manager_adc.startTimer(30000)
 
     mw = MainWindow()

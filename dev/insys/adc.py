@@ -104,7 +104,6 @@ class ADC(Dev):
             self.make_connection()
 
         adc_watcher = NetManagerSimple(self)
-        adc_watcher.channel0.connect(self.channel1)
         adc_watcher.channel0.connect(self.channel2_slot)
 
     def make_connection(self):

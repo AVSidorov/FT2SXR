@@ -1,7 +1,7 @@
 from core.core import Core
 from core.logger import Logger
 from core.ft2sxr import Ft2SXR
-from core.netmanagers import NetManagerSimple, Netmanager
+from core.netmanagers import NetManagerSimple, NetManager
 from PyQt5.QtCore import QCoreApplication
 import sys
 import signal
@@ -20,12 +20,14 @@ def main():
 
     std_out = Logger(sys.stdout, core)
 
-    net_manager0 = Netmanager(core, port=5555)
+    # manager for main data (channel 0)
+    net_manager0 = NetManager(core, port=5555)
     net_manager0.startTimer(15000)
 
-    # manager for ADC data
-    net_manager_adc = NetManagerSimple(core, port=5557)
-    core.channel1.connect(net_manager_adc.channel0_slot)
+    # manager for ADC data (channel 1)
+    net_manager_adc = NetManager(core, port=5557, channel=1)
+    net_manager_adc.startTimer(15000)
+
     sys.exit(app.exec_())
 
 

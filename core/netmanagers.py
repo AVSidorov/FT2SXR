@@ -38,20 +38,20 @@ class NetManagerBase(Core):
             return None
 
     def send_to_clients(self, data: bytes):
-        self.lock.acquire()
-
         # remove old connections
         if self.alive is not None:
+
             clients = self.clients.copy()
             for addr in self.clients:
                 if time()-self.clients[addr] > self.alive:
                     clients.pop(addr)
+
+            self.lock.acquire()
             self.clients = clients
+            self.lock.release()
 
         for addr in self.clients:
             self.sock.sendto(data, addr)
-
-        self.lock.release()
 
     def timerEvent(self, a0: 'QTimerEvent') -> None:
         self.response.data = f'{self.ip}:{self.port} {self.name} alive at {datetime.fromtimestamp(time())}'.encode()
@@ -62,11 +62,14 @@ class NetManagerBase(Core):
 
 class NetManagerSimple(NetManagerBase):
     """
-    Class only receive and send data from/to UDP socket and signal system
+    Class only receive from socket and send data to signal system
     """
 
-    def __init__(self, parent=None, ip="0.0.0.0", port=9009, alive: float = None):
+    def __init__(self, parent=None, ip="0.0.0.0", port=9009, alive: float = None, channel=1):
         super().__init__(parent, ip, port, 'NetManager-Simple', alive)
+        core = self.get_origin_core()
+        if core is not None:
+            exec(f'self.channel0.connect(core.channel{channel:1})')
 
     def run(self):
         while self.actv:
@@ -74,17 +77,17 @@ class NetManagerSimple(NetManagerBase):
                 data, addr = self.sock.recvfrom(1024)
 
                 if addr != (self.ip, self.port):
-                    self.lock.acquire()
-                    self.clients[addr] = time()
-                    self.lock.release()
                     if self.parent is not None and len(data) > 0:
                         self.channel0.emit(data)
 
             except sock_error:
                 pass
 
+    def channel0_slot(self, data: bytes):
+        pass
 
-class Netmanager(NetManagerBase):
+
+class NetManager(NetManagerBase):
     """
     Class for send/receive channels data through socket
     """
