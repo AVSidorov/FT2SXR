@@ -21,10 +21,10 @@ class Core(QtCore.QObject):
 
     def reset_packets(self):
         self.request.address = self.address
-        self.request.sender = self.address
+        self.request.sender = 0
         self.request.command = Commands.INFO
         self.request.data = b''
-        self.response.address = self.address
+        self.response.address = 0
         self.response.sender = self.address
         self.response.command = Commands.INFO
         self.response.data = b''

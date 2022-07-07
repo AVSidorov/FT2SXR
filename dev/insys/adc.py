@@ -101,7 +101,8 @@ class ADC(Dev):
             self.wdir = today_dir()
 
         if connect:
-            self.make_connection()
+            self.connection_watch = Thread(name='Thread-ADC_connection-watchdog', target=self.watchdog, daemon=True)
+            self.connection_watch.start()
 
         adc_watcher = NetManagerSimple(self)
         adc_watcher.channel0.connect(self.channel2_slot)
@@ -123,14 +124,10 @@ class ADC(Dev):
             self.scp = scp
             self.send_config()
 
-            connection_watch = Thread(name='Thread-connection-watchdog', target=self.watchdog, daemon=True)
-            connection_watch.start()
-
-            self.response.address = SystemStatus.SXR
-            self.response.command = Commands.INFO
             self.response.data = 'ADC connected'.encode()
-            if self.response.IsInitialized():
+            if self.response.IsInitialized() and self.parent is not None:
                 self.channel0.emit(self.response.SerializeToString())
+            self.reset_packets()
         except:
             self.connected = False
 
@@ -403,18 +400,20 @@ class ADC(Dev):
                 self.channel0.emit(response.SerializeToString())
 
     def watchdog(self, timeout=2):
-        transp = self.client.get_transport()
-        transp.set_keepalive(timeout*2)
-        while self.connected:
-            self.connected = transp.is_alive()
-            time.sleep(timeout)
+        while True:
+            if self.connected:
+                transp = self.client.get_transport()
+                transp.set_keepalive(timeout*2)
+                while self.connected:
+                    self.connected = transp.is_alive()
+                    time.sleep(timeout)
 
-        response = packet_init(0, self.address)
-        response.command = Commands.INFO
-        response.data = 'ADC disconnected'.encode()
-        if response.IsInitialized():
-            self.channel0.emit(response.SerializeToString())
-        self.make_connection()
+            self.response.data = 'ADC disconnected'.encode()
+            if self.response.IsInitialized() and self.parent is not None:
+                self.channel0.emit(self.response.SerializeToString())
+            self.reset_packets()
+            self.make_connection()
+            time.sleep(timeout)
 
     def snapshot(self, request: MainPacket = None, response: bool = False):
         hf, adc = super().snapshot(request, response)
