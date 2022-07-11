@@ -106,6 +106,8 @@ message SystemStatus{
 
   enum EnumDev{
     option allow_alias = true;
+    UNKNOWN = 0;
+    ANY = 0;
     SXR = 1;
     ADC = 2;
     PX5 = 3;
