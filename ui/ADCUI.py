@@ -54,8 +54,13 @@ class ADCUIWidget (QtWidgets.QWidget, Ui_ADCWidgetDesign):
         if request.sender == SystemStatus.ADC:  # 1 is reserved address for ADC
             if request.command in (Commands.STATUS ^ 0xFFFFFFFF, Commands.SET ^ 0xFFFFFFFF):
                 self.blockSignals(True)
-                self.status.ParseFromString(request.data)
-                self.status2ui()
+                try:
+                    str_data = request.data.decode()
+                    if str_data == 'ADC disconnected':
+                        pass
+                except UnicodeDecodeError:
+                    self.status.ParseFromString(request.data)
+                    self.status2ui()
                 self.blockSignals(False)
 
     def status2ui(self):

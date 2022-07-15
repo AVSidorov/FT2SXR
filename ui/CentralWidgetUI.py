@@ -28,11 +28,7 @@ class MainWidget(QtWidgets.QWidget, Ui_MainWidgetDesign):
         self.request = packet_init(SystemStatus.SXR, self.address)
 
     def start_adc(self):
-        # self.request.command = Commands.START
-        # if self.request.IsInitialized():
-        #     self.channel0.emit(self.request.SerializeToString())
         self.channelStart.emit()
-
 
     def stop_adc(self):
         self.request.command = Commands.STOP
@@ -47,15 +43,20 @@ class MainWidget(QtWidgets.QWidget, Ui_MainWidgetDesign):
         self.status_tableWidget.setItem(0, 2, QTableWidgetItem(setText))
         self.status_tableWidget.resizeColumnToContents(2)
 
-    def set_adc(self):
-        rate = self.ADCstatus.sampling_rate / 1e6
-        time = self.ADCstatus.samples / rate / 1000
-        ch_en = ''
-        for ch in self.ADCstatus.board_status[0].channel_status:
-            ch_en += str(int(ch.enabled))
-        setText = 'rate: {0:3.0f}MHz, time: {1:3.0f}ms, ch: {2}'.format(rate, time, ch_en)
-        self.status_tableWidget.setItem(0, 1, QTableWidgetItem(setText))
-        self.status_tableWidget.resizeColumnToContents(1)
+    def set_adc(self, connection=False):
+        if connection is True:
+            rate = self.ADCstatus.sampling_rate / 1e6
+            time = self.ADCstatus.samples / rate / 1000
+            ch_en = ''
+            for ch in self.ADCstatus.board_status[0].channel_status:
+                ch_en += str(int(ch.enabled))
+            setText = 'rate: {0:3.0f}MHz, time: {1:3.0f}ms, ch: {2}'.format(rate, time, ch_en)
+            self.status_tableWidget.setItem(0, 1, QTableWidgetItem(setText))
+            self.status_tableWidget.resizeColumnToContents(1)
+        elif connection is False:
+            setText = 'ADC disconnected'
+            self.status_tableWidget.setItem(0, 1, QTableWidgetItem(setText))
+            self.status_tableWidget.resizeColumnToContents(1)
 
     def get_settings(self):
         request = packet_init(SystemStatus.SXR, self.address)
@@ -76,8 +77,13 @@ class MainWidget(QtWidgets.QWidget, Ui_MainWidgetDesign):
 
         elif request.sender == SystemStatus.ADC:
             if request.command in (Commands.STATUS ^ 0xFFFFFFFF, Commands.SET ^ 0xFFFFFFFF):
-                self.ADCstatus.ParseFromString(request.data)
-                self.set_adc()
+                try:
+                    str_data = request.data.decode()
+                    if str_data == 'ADC disconnected':
+                        self.set_adc(connection=False)
+                except UnicodeDecodeError:
+                    self.ADCstatus.ParseFromString(request.data)
+                    self.set_adc(connection=True)
 
         elif request.sender == SystemStatus.SXR:
             if request.command in (Commands.STATUS ^ 0xFFFFFFFF, Commands.SET ^ 0xFFFFFFFF):
