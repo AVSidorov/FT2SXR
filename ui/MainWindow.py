@@ -228,9 +228,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                 if isinstance(request.data.decode('utf-8'), str):
                     data_file = os.path.join(os.path.split(os.path.join(os.path.abspath('./'), request.data.decode('utf-8')))[0], 'data_0.bin')
                     self.open_sxr(data_file=data_file)
-        # elif request.sender == 12:
-        #     if request.command == Commands.START:
-        #         self.action_amplifier_set()
 
     @QtCore.pyqtSlot()
     def channelStart_slot(self):
@@ -238,22 +235,11 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             self.show_index = 0
             self.nextSlot()
 
-        # self.action_amplifier_set()
-        #
-        # self.action_adc_set()
-        #
-        # request = packet_init(SystemStatus.SXR, self.address)
-        # request.command = Commands.START
-        # if request.IsInitialized():
-        #     self.channel0.emit(request.SerializeToString())
-
     @QtCore.pyqtSlot()
     def nextSlot(self):
-        print(self.show_index, ' ', len(self.show_then_start))
         if 0 <= self.show_index < len(self.show_then_start):
             eval(f'self.action_{self.show_then_start[self.show_index]}_set()')
         elif self.show_index == len(self.show_then_start):
-            print('started')
             request = packet_init(SystemStatus.SXR, self.address)
             request.command = Commands.START
             if request.IsInitialized():
@@ -262,7 +248,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
         if self.show_index != -1:
             self.show_index += 1
-            print('add')
 
 
 def main():
