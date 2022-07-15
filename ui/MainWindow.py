@@ -50,15 +50,26 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.h = int(self.size().height() * height / 768)
         self.resize(self.w, self.h)
 
+        request = packet_init(SystemStatus.ADC, self.address)
+        request.command = Commands.STATUS
+        if request.IsInitialized():
+            self.channel0.emit(request.SerializeToString())
+
         win_main = MainWidget(self.centralwidget)
         win_main.channel0.connect(self.channel0)
         self.channel1.connect(win_main.channel0_slot)
         self.verticalLayout = QtWidgets.QVBoxLayout(self.centralwidget)
         self.verticalLayout.setObjectName("verticalLayout")
         self.verticalLayout.addWidget(win_main)
+        win_main.channelStart.connect(self.channelStart_slot)
 
         logger = Logger(win_main.log_textBrowser, self)
         self.channel1.connect(logger.channel0_slot)
+
+        self.next_win_show = False
+        self.show_then_start = ('adc', 'amplifier')
+        self.show_index = -1  # -1 - not show ; 0,1,2... - element to show
+
         win_main.show()
 
     def action_adc_set(self):
@@ -76,6 +87,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
         win.show()
         gc.collect()
+
+        adcSettings.channelNext.connect(self.nextSlot)
 
         request = packet_init(SystemStatus.ADC, adcSettings.address)
         request.command = Commands.STATUS
@@ -123,6 +136,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
         win.show()
         gc.collect()
+
+        amplifierSettings.channelNext.connect(self.nextSlot)
 
         request = packet_init(SystemStatus.AMP, amplifierSettings.address)
         request.command = Commands.STATUS
@@ -213,9 +228,41 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                 if isinstance(request.data.decode('utf-8'), str):
                     data_file = os.path.join(os.path.split(os.path.join(os.path.abspath('./'), request.data.decode('utf-8')))[0], 'data_0.bin')
                     self.open_sxr(data_file=data_file)
-        elif request.sender == 12:
-            if request.command == Commands.START:
-                self.action_amplifier_set()
+        # elif request.sender == 12:
+        #     if request.command == Commands.START:
+        #         self.action_amplifier_set()
+
+    @QtCore.pyqtSlot()
+    def channelStart_slot(self):
+        if self.show_index == -1:
+            self.show_index = 0
+            self.nextSlot()
+
+        # self.action_amplifier_set()
+        #
+        # self.action_adc_set()
+        #
+        # request = packet_init(SystemStatus.SXR, self.address)
+        # request.command = Commands.START
+        # if request.IsInitialized():
+        #     self.channel0.emit(request.SerializeToString())
+
+    @QtCore.pyqtSlot()
+    def nextSlot(self):
+        print(self.show_index, ' ', len(self.show_then_start))
+        if 0 <= self.show_index < len(self.show_then_start):
+            eval(f'self.action_{self.show_then_start[self.show_index]}_set()')
+        elif self.show_index == len(self.show_then_start):
+            print('started')
+            request = packet_init(SystemStatus.SXR, self.address)
+            request.command = Commands.START
+            if request.IsInitialized():
+                self.channel0.emit(request.SerializeToString())
+            self.show_index = -1
+
+        if self.show_index != -1:
+            self.show_index += 1
+            print('add')
 
 
 def main():

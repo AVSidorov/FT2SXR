@@ -1,4 +1,4 @@
-from PyQt5 import QtWidgets, QtCore
+from PyQt5 import QtWidgets, QtCore, QtGui
 from PyQt5.QtWidgets import QTableWidgetItem
 from ui.CentralWidgetUIDesign import Ui_MainWidgetDesign
 from core.sxr_protocol import packet_init
@@ -9,25 +9,30 @@ class MainWidget(QtWidgets.QWidget, Ui_MainWidgetDesign):
 
     channel0 = QtCore.pyqtSignal(bytes)  # For uplink
     channel1 = QtCore.pyqtSignal(bytes)  # For downlink
+    channelStart = QtCore.pyqtSignal()  # To start system
 
     def __init__(self, parent=None):
         super().__init__(parent=parent)
         self.setupUi(self)
         self.AMPstatus = AmpStatus()
         self.ADCstatus = AdcStatus()
+        self.SXRstatus = SystemStatus()
+        self.timer = QtCore.QTimer(self)
+        self.timer.timeout.connect(self.get_settings)
+        self.timer.start(60000)
 
         self.address = 12
 
         self.manual_pushButton.clicked.connect(self.start_adc)
         self.stop_pushButton.clicked.connect(self.stop_adc)
-        self.request = packet_init(SystemStatus.SXR, 12)
-
-        self.get_status()
+        self.request = packet_init(SystemStatus.SXR, self.address)
 
     def start_adc(self):
-        self.request.command = Commands.START
-        if self.request.IsInitialized():
-            self.channel0.emit(self.request.SerializeToString())
+        # self.request.command = Commands.START
+        # if self.request.IsInitialized():
+        #     self.channel0.emit(self.request.SerializeToString())
+        self.channelStart.emit()
+
 
     def stop_adc(self):
         self.request.command = Commands.STOP
@@ -42,15 +47,6 @@ class MainWidget(QtWidgets.QWidget, Ui_MainWidgetDesign):
         self.status_tableWidget.setItem(0, 2, QTableWidgetItem(setText))
         self.status_tableWidget.resizeColumnToContents(2)
 
-    def get_status(self):
-        request = packet_init(SystemStatus.AMP, self.address)
-        request.command = Commands.STATUS
-        self.channel0.emit(request.SerializeToString())
-
-        request = packet_init(SystemStatus.ADC, self.address)
-        request.command = Commands.STATUS
-        self.channel0.emit(request.SerializeToString())
-
     def set_adc(self):
         rate = self.ADCstatus.sampling_rate / 1e6
         time = self.ADCstatus.samples / rate / 1000
@@ -60,6 +56,12 @@ class MainWidget(QtWidgets.QWidget, Ui_MainWidgetDesign):
         setText = 'rate: {0:3.0f}MHz, time: {1:3.0f}ms, ch: {2}'.format(rate, time, ch_en)
         self.status_tableWidget.setItem(0, 1, QTableWidgetItem(setText))
         self.status_tableWidget.resizeColumnToContents(1)
+
+    def get_settings(self):
+        request = packet_init(SystemStatus.SXR, self.address)
+        request.command = Commands.STATUS
+        if request.IsInitialized():
+            self.channel0.emit(request.SerializeToString())
 
     @QtCore.pyqtSlot(bytes)
     def channel0_slot(self, data: bytes):
@@ -76,3 +78,11 @@ class MainWidget(QtWidgets.QWidget, Ui_MainWidgetDesign):
             if request.command in (Commands.STATUS ^ 0xFFFFFFFF, Commands.SET ^ 0xFFFFFFFF):
                 self.ADCstatus.ParseFromString(request.data)
                 self.set_adc()
+
+        elif request.sender == SystemStatus.SXR:
+            if request.command in (Commands.STATUS ^ 0xFFFFFFFF, Commands.SET ^ 0xFFFFFFFF):
+                self.SXRstatus.ParseFromString(request.data)
+
+    def showEvent(self, a0: QtGui.QShowEvent) -> None:
+        self.get_settings()
+        self.show()

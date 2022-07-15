@@ -1,4 +1,5 @@
 import sys
+import gc
 from PyQt5 import QtWidgets, QtCore, QtGui
 from math import trunc
 from ui.ADCUIDesign import Ui_ADCWidgetDesign
@@ -8,6 +9,7 @@ from core.sxr_protocol import packet_init
 
 class ADCUIWidget (QtWidgets.QWidget, Ui_ADCWidgetDesign):
     channel0 = QtCore.pyqtSignal(bytes)
+    channelNext = QtCore.pyqtSignal()
 
     def __init__(self, parent=None):
         super().__init__(parent=parent)
@@ -216,7 +218,11 @@ class ADCUIWidget (QtWidgets.QWidget, Ui_ADCWidgetDesign):
             self.bias_doubleSpinBox.blockSignals(False)
 
     def hideEvent(self, a0: QtGui.QHideEvent) -> None:
+        gc.collect()
         self.close()
+
+    def closeEvent(self, a0: QtGui.QCloseEvent) -> None:
+        self.channelNext.emit()
 
 
 def main():
