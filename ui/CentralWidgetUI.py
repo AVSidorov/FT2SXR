@@ -19,7 +19,7 @@ class MainWidget(QtWidgets.QWidget, Ui_MainWidgetDesign):
         self.SXRstatus = SystemStatus()
         self.timer = QtCore.QTimer(self)
         self.timer.timeout.connect(self.get_settings)
-        self.timer.start(60000)
+        self.timer.start(30000)
 
         self.address = 12
 
@@ -54,12 +54,23 @@ class MainWidget(QtWidgets.QWidget, Ui_MainWidgetDesign):
             self.status_tableWidget.setItem(0, 1, QTableWidgetItem(setText))
             self.status_tableWidget.resizeColumnToContents(1)
         elif connection is False:
-            setText = 'ADC disconnected'
-            self.status_tableWidget.setItem(0, 1, QTableWidgetItem(setText))
-            self.status_tableWidget.resizeColumnToContents(1)
+            # setText = self.status_tableWidget.item(0, 1).text() + ' (DISCON)'
+            # self.status_tableWidget.setItem(0, 1, QTableWidgetItem(setText))
+            # self.status_tableWidget.resizeColumnToContents(1)
+            pass
 
     def get_settings(self):
         request = packet_init(SystemStatus.SXR, self.address)
+        request.command = Commands.STATUS
+        if request.IsInitialized():
+            self.channel0.emit(request.SerializeToString())
+
+        request = packet_init(SystemStatus.AMP, self.address)
+        request.command = Commands.STATUS
+        if request.IsInitialized():
+            self.channel0.emit(request.SerializeToString())
+
+        request = packet_init(SystemStatus.ADC, self.address)
         request.command = Commands.STATUS
         if request.IsInitialized():
             self.channel0.emit(request.SerializeToString())
