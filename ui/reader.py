@@ -57,7 +57,7 @@ class Reader(Core):
                     str_mask = conf_dict['mask'][2:]
                     for i in range(1, len(str_mask) + 1):
                         if str_mask[-i] == '1':
-                            meta.append('shotid')
+                            meta.append(path.split(data_file)[1])
                             meta.append(i)
                             meta.append(conf_dict['samples'])
                             meta.append(conf_dict['rate'])
@@ -94,7 +94,7 @@ class Reader(Core):
     def parse_h5(self, h5_path):
         if path.isabs(h5_path):
             with h5.File(h5_path, 'r') as file:
-                config = file['ADC']['config']
+                config = file['SXR']['ADC']['config']
                 samples = eval(config['Option']['MemSamplesPerChan'][()])
                 device_section = list(config.keys())
                 device_section.remove('Option')
@@ -104,11 +104,11 @@ class Reader(Core):
                 rate = eval(config[device_section]['SamplingRate'][()])
                 mask = bin(eval(config[device_section]['ChannelMask'][()]))
 
-                channels = list(file['ADC'].keys())
+                channels = list(file['SXR']['ADC'].keys())
                 channels.remove('config')
 
                 for i in channels:
-                    globals()[i] = file['ADC'][i][()]
+                    globals()[i] = file['SXR']['ADC'][i][()]
                 measurements = np.vstack([eval(i) for i in channels])
 
                 return {'samples': samples,

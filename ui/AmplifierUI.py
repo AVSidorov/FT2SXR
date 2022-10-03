@@ -11,6 +11,7 @@ from PyQt5 import QtWidgets, QtCore, QtGui
 
 class AmplifierWidget(QtWidgets.QWidget, Ui_AmplifierWidgetDesign):
     channel0 = QtCore.pyqtSignal(bytes)
+    channelNext = QtCore.pyqtSignal()
 
     def __init__(self, parent=None):
         super().__init__(parent=parent)
@@ -172,7 +173,11 @@ class AmplifierWidget(QtWidgets.QWidget, Ui_AmplifierWidgetDesign):
                 self.blockSignals(False)
 
     def hideEvent(self, a0: QtGui.QHideEvent) -> None:
+        gc.collect()
         self.close()
+
+    def closeEvent(self, a0: QtGui.QCloseEvent) -> None:
+        self.channelNext.emit()
 
 
 def main():
