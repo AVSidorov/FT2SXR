@@ -13,14 +13,14 @@ def main():
     # manager for  main data (channel 0)
     net_manager0 = NetManager(core, port=5556)
     # connecting to FT2_sxr (adding to clients locally)
-    net_manager0.clients[("127.0.0.1", 5555)] = 0
+    net_manager0.clients[("192.0.0.1", 5555)] = 0
     # and starting send keep alive packets (to get in clients on system side)
     net_manager0.startTimer(30000)
 
     # manager for ADC data (channel 1)
     net_manager_adc = NetManager(core, port=5558, channel=1)
     # connecting to FT2_sxr (adding to clients locally)
-    net_manager_adc.clients[("127.0.0.1", 5557)] = 0
+    net_manager_adc.clients[("192.0.0.1", 5557)] = 0
     # and starting send keep alive packets (to get in clients on system side)
     net_manager_adc.startTimer(30000)
 
