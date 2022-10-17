@@ -24,8 +24,12 @@ class MainWidget(QtWidgets.QWidget, Ui_MainWidgetDesign):
         self.address = 12
 
         self.manual_pushButton.clicked.connect(self.start_adc)
+        self.external_pushButton.clicked.connect(self.start_adc)
+        self.periodic_pushButton.clicked.connect(self.start_adc)
         self.stop_pushButton.clicked.connect(self.stop_adc)
         self.request = packet_init(SystemStatus.SXR, self.address)
+
+        self.periodic_pushButton.setDisabled(True)
 
     def start_adc(self):
         self.channelStart.emit()
@@ -51,6 +55,8 @@ class MainWidget(QtWidgets.QWidget, Ui_MainWidgetDesign):
             for ch in self.ADCstatus.board_status[0].channel_status:
                 ch_en += str(int(ch.enabled))
             setText = 'rate: {0:3.0f}MHz, time: {1:3.0f}ms, ch: {2}'.format(rate, time, ch_en)
+            if not self.ADCstatus.enabled:
+                setText = '*DISCON* ' + setText
             self.status_tableWidget.setItem(0, 1, QTableWidgetItem(setText))
             self.status_tableWidget.resizeColumnToContents(1)
         elif connection is False:
@@ -58,6 +64,41 @@ class MainWidget(QtWidgets.QWidget, Ui_MainWidgetDesign):
             # self.status_tableWidget.setItem(0, 1, QTableWidgetItem(setText))
             # self.status_tableWidget.resizeColumnToContents(1)
             pass
+
+    def radio_buttons(self, command = None, ADCstatus_start = None):
+        # if ADCstatus_start is not None:
+        #     if ADCstatus_start == AdcStatus.INTSTART:
+        #         self.external_pushButton.setDisabled(True)
+        #         self.stop_pushButton.setDisabled(True)
+        #         self.manual_pushButton.setEnabled(True)
+        #     elif ADCstatus_start == AdcStatus.EXTSTART:
+        #         self.external_pushButton.setEnabled(True)
+        #         self.stop_pushButton.setEnabled(True)
+        #         self.manual_pushButton.setDisabled(True)
+        # elif command is not None:
+        #     if command == Commands.START:
+        #         self.manual_pushButton.setDisabled()
+        if ADCstatus_start is not None and command is not None:
+            if ADCstatus_start == AdcStatus.INTSTART:
+                self.external_pushButton.setDisabled(True)
+                self.stop_pushButton.setDisabled(True)
+                if command == Commands.START:
+                    self.manual_pushButton.setDisabled(True)
+                elif command == Commands.STOP:
+                    self.manual_pushButton.setEnabled(True)
+                else:
+                    self.manual_pushButton.setEnabled(True)
+            elif ADCstatus_start == AdcStatus.EXTSTART:
+                self.manual_pushButton.setDisabled(True)
+                if command == Commands.START:
+                    self.external_pushButton.setDisabled(True)
+                    self.stop_pushButton.setEnabled(True)
+                elif command == Commands.STOP:
+                    self.external_pushButton.setEnabled(True)
+                    self.stop_pushButton.setDisabled(True)
+                else:
+                    self.external_pushButton.setEnabled(True)
+                    self.stop_pushButton.setDisabled(True)
 
     def get_settings(self):
         request = packet_init(SystemStatus.SXR, self.address)
@@ -81,6 +122,7 @@ class MainWidget(QtWidgets.QWidget, Ui_MainWidgetDesign):
 
         request = MainPacket()
         request.ParseFromString(data)
+
         if request.sender == SystemStatus.AMP:
             if request.command in (Commands.STATUS ^ 0xFFFFFFFF, Commands.SET ^ 0xFFFFFFFF):
                 self.AMPstatus.ParseFromString(request.data)
@@ -95,6 +137,7 @@ class MainWidget(QtWidgets.QWidget, Ui_MainWidgetDesign):
                 except UnicodeDecodeError:
                     self.ADCstatus.ParseFromString(request.data)
                     self.set_adc(connection=True)
+                    self.radio_buttons(ADCstatus_start=self.ADCstatus.start, command=(request.command^ 0xFFFFFFFF))
 
         elif request.sender == SystemStatus.SXR:
             if request.command in (Commands.STATUS ^ 0xFFFFFFFF, Commands.SET ^ 0xFFFFFFFF):

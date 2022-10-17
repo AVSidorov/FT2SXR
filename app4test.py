@@ -21,7 +21,6 @@ def main():
     logger = Logger('log.txt', core)
 
     mw.show()
-
     sys.exit(app.exec_())
 
 

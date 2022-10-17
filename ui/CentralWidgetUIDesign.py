@@ -247,16 +247,13 @@ class Ui_MainWidgetDesign(object):
         MainWidgetDesign.setWindowTitle(_translate("MainWidgetDesign", "MainWidget"))
         self.groupBox_3.setTitle(_translate("MainWidgetDesign", "Действия"))
         self.Init_pushButton.setText(_translate("MainWidgetDesign", "Init"))
-        self.manual_pushButton.setText(_translate("MainWidgetDesign", "Manual start:\n"
-"Calibration"))
+        self.manual_pushButton.setText(_translate("MainWidgetDesign", "Manual start"))
         self.save_pushButton.setText(_translate("MainWidgetDesign", "Save data"))
-        self.periodic_pushButton.setText(_translate("MainWidgetDesign", "Periodic start:\n"
-"Calibration"))
+        self.periodic_pushButton.setText(_translate("MainWidgetDesign", "Periodic start"))
         self.stop_pushButton.setText(_translate("MainWidgetDesign", "Stop waiting"))
         self.enableMiniX2_pushButton.setText(_translate("MainWidgetDesign", "Mini-X2:\n"
 "OFF"))
-        self.external_pushButton.setText(_translate("MainWidgetDesign", "External trigger:\n"
-"Calibration"))
+        self.external_pushButton.setText(_translate("MainWidgetDesign", "External trigger"))
         self.groupBox.setTitle(_translate("MainWidgetDesign", "Статус"))
         self.status_tableWidget.setSortingEnabled(False)
         item = self.status_tableWidget.verticalHeaderItem(0)

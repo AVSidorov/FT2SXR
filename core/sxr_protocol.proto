@@ -55,6 +55,7 @@ message AdcStatus{
     optional string name = 1;
     optional bool enabled = 2;
     optional bytes channel_mask = 3;
+    optional bytes hidden_channel_mask = 5;
 
     message ChannelStatus{
       optional string name = 1;
@@ -119,6 +120,7 @@ message SystemStatus{
     FE55 = 7;
     SDD = 8;
     TOKAMAK = 9;
+    JOURNAL = 10;
   }
   repeated EnumDev devs = 2;
 

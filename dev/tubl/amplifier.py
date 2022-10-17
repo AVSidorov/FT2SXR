@@ -12,7 +12,7 @@ class Amplifier(Dev):
         self.state.gainA = 0.0
         self.state.gainB = 0.0
         self.state.tail = 0b0000
-        with open(os.path.join(work_dir(), 'amp_last.csv'), newline='') as file:
+        with open(os.path.join(work_dir(), os.path.normpath('dev/tubl/amp_last.csv')), newline='') as file:
             cal = csv.DictReader(file, delimiter=',')
             last_file = {}
             for i in cal:
