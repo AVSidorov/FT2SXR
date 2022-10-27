@@ -30,7 +30,9 @@ message AdcStatus{
   optional EnumStartSource start = 6 [default = SOFTSTART];
   optional float start_threshold = 61;
   optional bool start_inversion = 62;
-  optional bytes start_mode= 63;
+  optional bytes start_mode = 63;
+
+  optional bool is_in_periodic = 11;
 
   optional EnumStartSource stop = 7 [default = SOFTSTART];
   optional float stop_threshold = 71;

@@ -22,10 +22,13 @@ class MainWidget(QtWidgets.QWidget, Ui_MainWidgetDesign):
         self.timer.start(30000)
 
         self.address = 12
+        self.isInPeriodic = False
 
-        self.manual_pushButton.clicked.connect(self.start_adc)
-        self.external_pushButton.clicked.connect(self.start_adc)
-        self.periodic_pushButton.clicked.connect(self.start_adc)
+        # self.manual_pushButton.clicked.connect(self.start_btn)
+        self.external_pushButton.clicked.connect(self.start_btn)
+        # self.periodic_pushButton.clicked.connect(self.start_adc)
+        self.manual_pushButton.hide()
+        self.periodic_pushButton.hide()
         self.stop_pushButton.clicked.connect(self.stop_adc)
         self.request = packet_init(SystemStatus.SXR, self.address)
 
@@ -56,7 +59,8 @@ class MainWidget(QtWidgets.QWidget, Ui_MainWidgetDesign):
                 ch_en += str(int(ch.enabled))
             setText = 'rate: {0:3.0f}MHz, time: {1:3.0f}ms, ch: {2}'.format(rate, time, ch_en)
             if not self.ADCstatus.enabled:
-                setText = '*DISCON* ' + setText
+                # setText = '*DISCON* ' + setText
+                pass
             self.status_tableWidget.setItem(0, 1, QTableWidgetItem(setText))
             self.status_tableWidget.resizeColumnToContents(1)
         elif connection is False:
@@ -64,6 +68,14 @@ class MainWidget(QtWidgets.QWidget, Ui_MainWidgetDesign):
             # self.status_tableWidget.setItem(0, 1, QTableWidgetItem(setText))
             # self.status_tableWidget.resizeColumnToContents(1)
             pass
+
+    def start_btn(self):
+        text = self.external_pushButton.text()
+        if text == 'Manual start':
+            self.start_adc()
+        elif text == 'External start':
+            self.start_adc()
+        # self.external_pushButton.setDisabled(True)
 
     def radio_buttons(self, command = None, ADCstatus_start = None):
         # if ADCstatus_start is not None:
@@ -78,27 +90,39 @@ class MainWidget(QtWidgets.QWidget, Ui_MainWidgetDesign):
         # elif command is not None:
         #     if command == Commands.START:
         #         self.manual_pushButton.setDisabled()
-        if ADCstatus_start is not None and command is not None:
+        if ADCstatus_start is not None:
             if ADCstatus_start == AdcStatus.INTSTART:
-                self.external_pushButton.setDisabled(True)
-                self.stop_pushButton.setDisabled(True)
-                if command == Commands.START:
-                    self.manual_pushButton.setDisabled(True)
-                elif command == Commands.STOP:
-                    self.manual_pushButton.setEnabled(True)
-                else:
-                    self.manual_pushButton.setEnabled(True)
+                self.external_pushButton.setText('Manual start')
+                # self.external_pushButton.setDisabled(True)
+                # self.stop_pushButton.setDisabled(True)
+                # if command == Commands.START:
+                #     self.manual_pushButton.setDisabled(True)
+                # elif command == Commands.STOP:
+                #     self.manual_pushButton.setEnabled(True)
+                # else:
+                #     self.manual_pushButton.setEnabled(True)
             elif ADCstatus_start == AdcStatus.EXTSTART:
-                self.manual_pushButton.setDisabled(True)
-                if command == Commands.START:
-                    self.external_pushButton.setDisabled(True)
-                    self.stop_pushButton.setEnabled(True)
-                elif command == Commands.STOP:
-                    self.external_pushButton.setEnabled(True)
-                    self.stop_pushButton.setDisabled(True)
-                else:
-                    self.external_pushButton.setEnabled(True)
-                    self.stop_pushButton.setDisabled(True)
+                # self.manual_pushButton.setDisabled(True)
+                self.external_pushButton.setText('External start')
+                # if command == Commands.START:
+                #     self.external_pushButton.setDisabled(True)
+                #     self.stop_pushButton.setEnabled(True)
+                # elif command == Commands.STOP:
+                #     self.external_pushButton.setEnabled(True)
+                #     self.stop_pushButton.setDisabled(True)
+                # else:
+                #     self.external_pushButton.setEnabled(True)
+                #     self.stop_pushButton.setDisabled(True)
+
+        if command is not None:
+            if command == Commands.START:
+                self.external_pushButton.setDisabled(True)
+            elif command == Commands.START ^ 0xFFFFFFFF:
+                self.external_pushButton.setDisabled(True)
+            elif command == Commands.STOP:
+                self.external_pushButton.setEnabled(True)
+            elif command == Commands.STOP ^ 0xFFFFFFFF:
+                self.external_pushButton.setEnabled(True)
 
     def get_settings(self):
         request = packet_init(SystemStatus.SXR, self.address)
@@ -137,11 +161,12 @@ class MainWidget(QtWidgets.QWidget, Ui_MainWidgetDesign):
                 except UnicodeDecodeError:
                     self.ADCstatus.ParseFromString(request.data)
                     self.set_adc(connection=True)
-                    self.radio_buttons(ADCstatus_start=self.ADCstatus.start, command=(request.command^ 0xFFFFFFFF))
+                    self.radio_buttons(ADCstatus_start=self.ADCstatus.start, command=None)
 
         elif request.sender == SystemStatus.SXR:
             if request.command in (Commands.STATUS ^ 0xFFFFFFFF, Commands.SET ^ 0xFFFFFFFF):
                 self.SXRstatus.ParseFromString(request.data)
+            self.radio_buttons(ADCstatus_start=None, command=(request.command ^ 0xFFFFFFFF))
 
     def showEvent(self, a0: QtGui.QShowEvent) -> None:
         self.get_settings()

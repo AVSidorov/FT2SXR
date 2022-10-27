@@ -17,6 +17,7 @@ class ADCUIWidget (QtWidgets.QWidget, Ui_ADCWidgetDesign):
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose, True)
 
         self.address = 11
+        self.isInPeriodic = False
 
         self.status = AdcStatus()  # Object - message for storage ADC state
         self.status.board_status.add()
@@ -108,9 +109,10 @@ class ADCUIWidget (QtWidgets.QWidget, Ui_ADCWidgetDesign):
         self.ch_comboBox.blockSignals(True)
         if status.start == status.SOFTSTART:
             self.source_comboBox.setCurrentIndex(0)
-        elif status.start == status.EXTSTART:
+        elif status.start == status.EXTSTART and not self.isInPeriodic:
             self.source_comboBox.setCurrentIndex(1)
-        self.ch_comboBox.blockSignals(False)
+        elif status.start == status.EXTSTART and self.isInPeriodic:
+            self.source_comboBox.setCurrentIndex(2)
         self.ch_comboBox.blockSignals(False)
 
         self.interval_spinBox.blockSignals(True)
@@ -178,8 +180,13 @@ class ADCUIWidget (QtWidgets.QWidget, Ui_ADCWidgetDesign):
 
         if self.source_comboBox.currentIndex() == 0:
             self.status.start = self.status.SOFTSTART
+            self.isInPeriodic = False
         elif self.source_comboBox.currentIndex() == 1:
             self.status.start = self.status.EXTSTART
+            self.isInPeriodic = False
+        elif self.source_comboBox.currentIndex() == 2:
+            self.status.start = self.status.EXTSTART
+            self.isInPeriodic = True
 
         self.status.samples = int(self.interval_spinBox.value()/1e3 * self.status.sampling_rate)
 
