@@ -70,6 +70,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.show_then_start = ('adc', 'amplifier')
         self.show_index = -1  # -1 - not show ; 0,1,2... - element to show
 
+        self.current_plotter_win = None
+
         win_main.show()
 
     def action_adc_set(self):
@@ -205,11 +207,19 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                                                               "Select one or more files to open",
                                                               ".",
                                                               "SXR Files (*.h5 *.bin)")[0]
+
         if data_file != '':
+            try:
+                if self.current_plotter_win is not None:
+                    self.current_plotter_win.close()
+            except:
+                pass
+
             win.setWindowTitle('SXR Plotter')
             win._main = QtWidgets.QWidget()
             win.setCentralWidget(win._main)
             layout = QtWidgets.QVBoxLayout(win._main)
+            self.current_plotter_win = win
 
             sxr_pltSettings = PlotterWidget(data_file=data_file)
             layout.addWidget(sxr_pltSettings)
