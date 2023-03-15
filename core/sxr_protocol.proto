@@ -62,6 +62,7 @@ message AdcStatus{
     message ChannelStatus{
       optional string name = 1;
       optional bool enabled = 2 [default = false];
+      optional bool void = 5 [default = false];
       optional float gain = 3 [default = 1.0];
       optional float bias = 4 [default = 0.0];
     }
@@ -98,6 +99,14 @@ message AmpStatus{
   }
 }
 
+message HardwareStatus{
+  required float angle = 1 [default = 0.0];
+  required float vknife = 2 [default = 0.0];
+  required float hknife = 3 [default = 0.0];
+  required string foil = 4 [default = '?'];
+  required string diaphragm = 5 [default = '?'];
+}
+
 message SystemStatus{
   enum EnumState{
     IDLE = 0;
@@ -123,6 +132,7 @@ message SystemStatus{
     SDD = 8;
     TOKAMAK = 9;
     JOURNAL = 10;
+    HARDWARE = 11;
   }
   repeated EnumDev devs = 2;
 

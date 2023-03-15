@@ -46,27 +46,41 @@ class MainWidget(QtWidgets.QWidget, Ui_MainWidgetDesign):
         tail = ''
         for i in range(4):
             tail = ('1' if self.AMPstatus.tail & (1 << i) else '0') + tail
-        setText = 'gA: {0:4.2f}, gB: {1:4.2f}, tail: {2:s}'.format(self.AMPstatus.gainA, self.AMPstatus.gainB, tail)
-        self.status_tableWidget.setItem(0, 2, QTableWidgetItem(setText))
-        self.status_tableWidget.resizeColumnToContents(2)
+        # setText = 'gA: {0:4.2f}, gB: {1:4.2f}, tail: {2:s}'.format(self.AMPstatus.gainA, self.AMPstatus.gainB, tail) #del
+        # self.status_tableWidget.setItem(0, 2, QTableWidgetItem(setText))
+        # self.status_tableWidget.resizeColumnToContents(2)
+        self.amp_mask_label.setText(tail)
+        self.amp_gainA_label.setText(f'{self.AMPstatus.gainA:4.2f}')
+        self.amp_gainB_label.setText(f'{self.AMPstatus.gainB:4.2f}')
 
     def set_adc(self, connection=False):
-        if connection is True:
-            rate = self.ADCstatus.sampling_rate / 1e6
-            time = self.ADCstatus.samples / rate / 1000
-            ch_en = ''
-            for ch in self.ADCstatus.board_status[0].channel_status:
-                ch_en += str(int(ch.enabled))
-            setText = 'rate: {0:3.0f}MHz, time: {1:3.0f}ms, ch: {2}'.format(rate, time, ch_en)
+        # if connection is True:
+        rate = self.ADCstatus.sampling_rate / 1e6
+        time = self.ADCstatus.samples / rate / 1000
+        self.adc_freq_label.setText(f'{rate:3.0f}')
+        self.adc_duration_label.setText(f'{time:4.0f}')
+        if self.ADCstatus.connected:
+            self.adc_status_label.setText('Connected')
+        else:
+            self.adc_status_label.setText('Disconnected')
+
+        for n, ch in enumerate(self.ADCstatus.board_status[0].channel_status):
+            if ch.enabled and not ch.void:
+                eval(f'self.ch{n+1}_groupBox.show()')
+                eval(f'self.ch{n+1}_name_label.setText(ch.name)')
+                eval(f'self.ch{n+1}_bias_label.setText(f"{ch.bias:3.0f}")')
+            else:
+                eval(f'self.ch{n+1}_groupBox.hide()')
+        # setText = 'rate: {0:3.0f}MHz, time: {1:3.0f}ms, ch: {2}'.format(rate, time, ch_en)
             # if not self.ADCstatus.enabled:
             #     setText = '*DISCON* ' + setText
                 # pass
-            self.status_tableWidget.setItem(0, 1, QTableWidgetItem(setText))
-            self.status_tableWidget.resizeColumnToContents(1)
-        elif connection is False:
-            setText = '(DISCON) ' + self.status_tableWidget.item(0, 1).text()
-            self.status_tableWidget.setItem(0, 1, QTableWidgetItem(setText))
-            self.status_tableWidget.resizeColumnToContents(1)
+            # self.status_tableWidget.setItem(0, 1, QTableWidgetItem(setText))
+            # self.status_tableWidget.resizeColumnToContents(1)
+        # elif connection is False:
+            # setText = '(DISCON) ' + self.status_tableWidget.item(0, 1).text()
+            # self.status_tableWidget.setItem(0, 1, QTableWidgetItem(setText))
+            # self.status_tableWidget.resizeColumnToContents(1)
             # pass
 
     def start_btn(self):

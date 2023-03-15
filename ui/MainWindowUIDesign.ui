@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>577</width>
-    <height>502</height>
+    <width>750</width>
+    <height>550</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -29,66 +29,28 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>577</width>
-     <height>21</height>
+     <width>750</width>
+     <height>26</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menuExit">
-    <property name="title">
-     <string>Save files</string>
-    </property>
-    <addaction name="actionSave_SXR_file"/>
-    <addaction name="actionSave_CLB_file"/>
-    <addaction name="actionSave_BKG_file"/>
-    <addaction name="actionSave_GSA_file"/>
-    <addaction name="actionSave_MCA_file"/>
-   </widget>
    <widget class="QMenu" name="menuOpen_files">
     <property name="title">
-     <string>Open files</string>
+     <string>Open file</string>
     </property>
     <addaction name="actionOpen_SXR_file"/>
     <addaction name="actionOpen_CLB_file"/>
-    <addaction name="actionOpen_BKG_file"/>
-    <addaction name="actionOpen_GSA_file"/>
     <addaction name="actionOpen_MCA_file"/>
    </widget>
    <widget class="QMenu" name="menuInstall">
     <property name="title">
      <string>Install</string>
     </property>
-    <addaction name="actionPX_5"/>
+    <addaction name="actionHardware"/>
     <addaction name="actionADC"/>
-    <addaction name="actionMini_X2"/>
     <addaction name="actionAmplifier"/>
     <addaction name="actionGSA"/>
-   </widget>
-   <widget class="QMenu" name="menuCalibrations">
-    <property name="title">
-     <string>Calibrations</string>
-    </property>
-    <addaction name="actionCalibration_Status"/>
-    <addaction name="separator"/>
-    <addaction name="actionCalibration_settings"/>
-    <addaction name="actionThreshold_PX_5"/>
-   </widget>
-   <widget class="QMenu" name="menuMeasurements">
-    <property name="title">
-     <string>Measurements</string>
-    </property>
-    <addaction name="actionMeasurements_Status"/>
-    <addaction name="separator"/>
-    <addaction name="actionMeasurement_settings"/>
-   </widget>
-   <widget class="QMenu" name="menuSignals">
-    <property name="title">
-     <string>Signals</string>
-    </property>
-   </widget>
-   <widget class="QMenu" name="menuExit_2">
-    <property name="title">
-     <string>Exit</string>
-    </property>
+    <addaction name="actionPX_5"/>
+    <addaction name="actionMini_X2"/>
    </widget>
    <widget class="QMenu" name="menuADC_Log">
     <property name="title">
@@ -96,13 +58,8 @@
     </property>
     <addaction name="actionShow_log"/>
    </widget>
-   <addaction name="menuExit"/>
    <addaction name="menuOpen_files"/>
    <addaction name="menuInstall"/>
-   <addaction name="menuCalibrations"/>
-   <addaction name="menuMeasurements"/>
-   <addaction name="menuSignals"/>
-   <addaction name="menuExit_2"/>
    <addaction name="menuADC_Log"/>
   </widget>
   <action name="actionSave_SXR_file">
@@ -223,6 +180,11 @@
   <action name="actionShow_log">
    <property name="text">
     <string>Show log</string>
+   </property>
+  </action>
+  <action name="actionHardware">
+   <property name="text">
+    <string>Hardware</string>
    </property>
   </action>
  </widget>

@@ -66,10 +66,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         logger = Logger(win_main.log_textBrowser, self)
         self.channel1.connect(logger.channel0_slot)
 
-        self.next_win_show = False
-        self.show_then_start = ('adc', 'amplifier')
-        self.show_index = -1  # -1 - not show ; 0,1,2... - element to show
-
         self.current_plotter_win = None
 
         win_main.show()
@@ -89,8 +85,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
         win.show()
         gc.collect()
-
-        adcSettings.channelNext.connect(self.nextSlot)
 
         request = packet_init(SystemStatus.ADC, adcSettings.address)
         request.command = Commands.STATUS
@@ -138,8 +132,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
         win.show()
         gc.collect()
-
-        amplifierSettings.channelNext.connect(self.nextSlot)
 
         request = packet_init(SystemStatus.AMP, amplifierSettings.address)
         request.command = Commands.STATUS
@@ -236,28 +228,18 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         if request.sender == SystemStatus.ADC:
             if request.command == Commands.SNAPSHOT ^ 0xFFFFFFFF:
                 if isinstance(request.data.decode('utf-8'), str):
-                    data_file = os.path.join(os.path.split(os.path.join(os.path.abspath('./'), request.data.decode('utf-8')))[0], 'data_0.bin')
+                    data_file = os.path.join(
+                        os.path.split(os.path.join(os.path.abspath('./'), request.data.decode('utf-8')))[0],
+                        'data_0.bin')
+                    print(request.data.decode('utf-8'))
                     self.open_sxr(data_file=data_file)
 
     @QtCore.pyqtSlot()
     def channelStart_slot(self):
-        if self.show_index == -1:
-            self.show_index = 0
-            self.nextSlot()
-
-    @QtCore.pyqtSlot()
-    def nextSlot(self):
-        if 0 <= self.show_index < len(self.show_then_start):
-            eval(f'self.action_{self.show_then_start[self.show_index]}_set()')
-        elif self.show_index == len(self.show_then_start):
-            request = packet_init(SystemStatus.SXR, self.address)
-            request.command = Commands.START
-            if request.IsInitialized():
-                self.channel0.emit(request.SerializeToString())
-            self.show_index = -1
-
-        if self.show_index != -1:
-            self.show_index += 1
+        request = packet_init(SystemStatus.SXR, self.address)
+        request.command = Commands.START
+        if request.IsInitialized():
+            self.channel0.emit(request.SerializeToString())
 
 
 def main():

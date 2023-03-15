@@ -33,6 +33,8 @@ class AmplifierWidget(QtWidgets.QWidget, Ui_AmplifierWidgetDesign):
         self.time9_checkBox.stateChanged.connect(self.setdecay)
         self.time13_checkBox.stateChanged.connect(self.setdecay)
         self.time17_checkBox.stateChanged.connect(self.setdecay)
+        self.install_pushButton.clicked.connect(self.install_settings)
+        self.return_pushButton.clicked.connect(self.return_settings)
 
         cal_file = []
         with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'amp_cal.csv'), newline='') as file:
@@ -154,6 +156,7 @@ class AmplifierWidget(QtWidgets.QWidget, Ui_AmplifierWidgetDesign):
         self.status.gainB = self.gainB
         self.status.tail = self.switch_state
 
+    def install_settings(self):
         request = packet_init(SystemStatus.AMP, self.address)
         request.command = Commands.SET
         if self.status.IsInitialized():
@@ -161,11 +164,17 @@ class AmplifierWidget(QtWidgets.QWidget, Ui_AmplifierWidgetDesign):
         if request.IsInitialized():
             self.channel0.emit(request.SerializeToString())
 
+    def return_settings(self):
+        request = packet_init(SystemStatus.AMP, self.address)
+        request.command = Commands.STATUS
+        self.channel0.emit(request.SerializeToString())
+
+
     @QtCore.pyqtSlot(bytes)
     def channel0_slot(self, data: bytes):
         request = MainPacket()
         request.ParseFromString(data)
-        if request.sender == SystemStatus.AMP:
+        if request.sender == SystemStatus.AMP and request.address == self.address:
             if request.command in (Commands.STATUS ^ 0xFFFFFFFF, Commands.SET ^ 0xFFFFFFFF):
                 self.blockSignals(True)
                 self.status.ParseFromString(request.data)

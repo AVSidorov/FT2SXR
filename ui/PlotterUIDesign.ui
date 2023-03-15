@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>304</width>
-    <height>408</height>
+    <width>755</width>
+    <height>750</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -28,10 +28,10 @@
   <widget class="QGroupBox" name="shot_groupBox">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>40</y>
+     <x>514</x>
+     <y>11</y>
      <width>230</width>
-     <height>311</height>
+     <height>335</height>
     </rect>
    </property>
    <property name="minimumSize">
@@ -69,6 +69,25 @@
       </property>
      </widget>
     </item>
+    <item row="1" column="0" colspan="2">
+     <widget class="Line" name="line">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>0</height>
+       </size>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+     </widget>
+    </item>
     <item row="2" column="0">
      <widget class="QLabel" name="x_ax_label">
       <property name="maximumSize">
@@ -102,10 +121,43 @@
       </item>
      </widget>
     </item>
+    <item row="3" column="0" colspan="2">
+     <widget class="Line" name="line_2">
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>0</height>
+       </size>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+     </widget>
+    </item>
     <item row="4" column="0">
      <widget class="QLabel" name="name_label">
       <property name="text">
        <string>Name:</string>
+      </property>
+     </widget>
+    </item>
+    <item row="5" column="0" colspan="2">
+     <widget class="QLabel" name="name_val_label">
+      <property name="text">
+       <string>000000_0</string>
+      </property>
+     </widget>
+    </item>
+    <item row="6" column="0" colspan="2">
+     <widget class="Line" name="line_3">
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>0</height>
+       </size>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
       </property>
      </widget>
     </item>
@@ -123,6 +175,19 @@
       </property>
      </widget>
     </item>
+    <item row="8" column="0" colspan="2">
+     <widget class="Line" name="line_4">
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>0</height>
+       </size>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+     </widget>
+    </item>
     <item row="9" column="0">
      <widget class="QLabel" name="samples_label">
       <property name="text">
@@ -134,6 +199,19 @@
      <widget class="QLabel" name="samples_val_label">
       <property name="text">
        <string>00</string>
+      </property>
+     </widget>
+    </item>
+    <item row="10" column="0" colspan="2">
+     <widget class="Line" name="line_5">
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>0</height>
+       </size>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
       </property>
      </widget>
     </item>
@@ -151,6 +229,19 @@
       </property>
      </widget>
     </item>
+    <item row="12" column="0" colspan="2">
+     <widget class="Line" name="line_6">
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>0</height>
+       </size>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+     </widget>
+    </item>
     <item row="13" column="0">
      <widget class="QLabel" name="time_label">
       <property name="text">
@@ -165,86 +256,17 @@
       </property>
      </widget>
     </item>
-    <item row="5" column="0" colspan="2">
-     <widget class="QLabel" name="name_val_label">
-      <property name="text">
-       <string>000000_0</string>
+    <item row="15" column="0" colspan="2">
+     <widget class="Line" name="line_7">
+      <property name="enabled">
+       <bool>true</bool>
       </property>
-     </widget>
-    </item>
-    <item row="1" column="0" colspan="2">
-     <widget class="Line" name="line">
       <property name="sizePolicy">
-       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+       <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
         <horstretch>0</horstretch>
         <verstretch>0</verstretch>
        </sizepolicy>
       </property>
-      <property name="minimumSize">
-       <size>
-        <width>0</width>
-        <height>0</height>
-       </size>
-      </property>
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
-      </property>
-     </widget>
-    </item>
-    <item row="3" column="0" colspan="2">
-     <widget class="Line" name="line_2">
-      <property name="minimumSize">
-       <size>
-        <width>0</width>
-        <height>0</height>
-       </size>
-      </property>
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
-      </property>
-     </widget>
-    </item>
-    <item row="6" column="0" colspan="2">
-     <widget class="Line" name="line_3">
-      <property name="minimumSize">
-       <size>
-        <width>0</width>
-        <height>0</height>
-       </size>
-      </property>
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
-      </property>
-     </widget>
-    </item>
-    <item row="8" column="0" colspan="2">
-     <widget class="Line" name="line_4">
-      <property name="minimumSize">
-       <size>
-        <width>0</width>
-        <height>0</height>
-       </size>
-      </property>
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
-      </property>
-     </widget>
-    </item>
-    <item row="10" column="0" colspan="2">
-     <widget class="Line" name="line_5">
-      <property name="minimumSize">
-       <size>
-        <width>0</width>
-        <height>0</height>
-       </size>
-      </property>
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
-      </property>
-     </widget>
-    </item>
-    <item row="12" column="0" colspan="2">
-     <widget class="Line" name="line_6">
       <property name="minimumSize">
        <size>
         <width>0</width>

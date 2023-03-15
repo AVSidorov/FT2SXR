@@ -17,11 +17,13 @@ from core.fileutils import work_dir, today_dir
 
 
 class Channel:
-    def __init__(self, gain=1., bias=0., on=False):
+    def __init__(self, gain=1., bias=0., on=False, void=False, name='No name'):
         self.gain = gain
         self.bias = bias
         self.on = on
         self.data = np.ndarray((0,))
+        self.void = void
+        self.name = name
 
 
 class Board:
@@ -343,6 +345,8 @@ class ADC(Dev):
                 n_ch += 1
                 self.config['device0_fm814x250m0'][f'Bias{n_ch}'] = f'{ch_status.bias:4.2f}'
                 self.boards[0].channels[n_ch].bias = ch_status.bias
+                self.boards[0].channels[n_ch].name = ch_status.name
+                self.boards[0].channels[n_ch].void = ch_status.void
 
         if status.start == status.SOFTSTART:
             self.config['device0_fm814x250m0']['StartSource'] = '3'
@@ -437,9 +441,10 @@ class ADC(Dev):
 
         adc.attrs['num_active_ch'] = self.boards[0].n_active_ch
         for ch in self.boards[0].channels:
-            if ch.on:
+            if ch.on and not ch.void:
                 dset = adc.create_dataset(f'channel{self.boards[0].channels.index(ch):02d}', shape=ch.data.shape,  compression="gzip", compression_opts=1, data=ch.data)
                 dset.attrs['units'] = 'adc counts'
+                dset.attrs['name'] = ch.name
 
         filename = hf.filename
         hf.close()

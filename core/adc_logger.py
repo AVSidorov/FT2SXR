@@ -22,7 +22,7 @@ class ADCLogger(Core):
         pkt = BRD_ctrl()
         pkt.command = 0
         pkt.out = 0
-        pkt.status =0
+        pkt.status = 0
         pktSize = pkt.ByteSize()
 
         if len(data) == pktSize:
