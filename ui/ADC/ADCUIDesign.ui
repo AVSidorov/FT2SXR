@@ -418,6 +418,9 @@
      <property name="text">
       <string>Установить настройки</string>
      </property>
+     <property name="default">
+      <bool>true</bool>
+     </property>
     </widget>
    </item>
   </layout>

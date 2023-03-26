@@ -6,6 +6,7 @@ from core.sxr_protocol_pb2 import AmpStatus, AdcStatus  # temporary for wiring
 from dev.insys.adc import ADC
 from dev.amptek.px5 import PX5
 from dev.tubl.amplifier import Amplifier
+from dev.hardware.table import Hardware
 from core.fileutils import today_dir
 import os
 import numpy as np
@@ -33,6 +34,7 @@ class Ft2SXR(Dev):
         self.adc = ADC(self)
         self.px5 = PX5(self)
         self.amp = Amplifier(self)
+        self.hardware = Hardware(self)
 
         # connect devs to message system
         if core is not None:
@@ -49,9 +51,13 @@ class Ft2SXR(Dev):
             self.amp.channel0.connect(core.channel0)       # out Main Packets (commands)
             core.channel0.connect(self.amp.channel0_slot)  # in Main Packets (commands)
 
+            self.hardware.channel0.connect(core.channel0)  # out Main Packets (commands)
+            core.channel0.connect(self.hardware.channel0_slot)  # in Main Packets (commands)
+
         self.state.devs.append(SystemStatus.ADC)
         self.state.devs.append(SystemStatus.AMP)
         self.state.devs.append(SystemStatus.PX5)
+        self.state.devs.append(SystemStatus.HARDWARE)
         
         # devices wiring
         self.state.binds.add()

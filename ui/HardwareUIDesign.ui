@@ -7,230 +7,227 @@
     <x>0</x>
     <y>0</y>
     <width>670</width>
-    <height>513</height>
+    <height>570</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Hardware</string>
   </property>
-  <widget class="QGroupBox" name="groupBox">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>40</y>
-     <width>651</width>
-     <height>179</height>
-    </rect>
-   </property>
-   <property name="title">
-    <string>Настройки</string>
-   </property>
-   <layout class="QGridLayout" name="gridLayout">
-    <item row="0" column="0">
-     <widget class="QLabel" name="label">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="text">
-       <string>Фольга:</string>
-      </property>
-     </widget>
-    </item>
-    <item row="0" column="1">
-     <widget class="QComboBox" name="foil_comboBox">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <item>
-       <property name="text">
-        <string>No</string>
-       </property>
+  <layout class="QGridLayout" name="gridLayout_2">
+   <item row="0" column="0" colspan="2">
+    <widget class="QGroupBox" name="settings_groupBox">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="title">
+      <string>Настройки</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout">
+      <item row="3" column="1">
+       <widget class="QDoubleSpinBox" name="vknife_doubleSpinBox">
+        <property name="wrapping">
+         <bool>false</bool>
+        </property>
+        <property name="accelerated">
+         <bool>true</bool>
+        </property>
+        <property name="decimals">
+         <number>2</number>
+        </property>
+        <property name="singleStep">
+         <double>0.010000000000000</double>
+        </property>
+       </widget>
       </item>
-      <item>
-       <property name="text">
-        <string>Be 50um</string>
-       </property>
+      <item row="0" column="0">
+       <widget class="QLabel" name="label">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>Фольга:</string>
+        </property>
+       </widget>
       </item>
-      <item>
-       <property name="text">
-        <string>Be 100um</string>
-       </property>
+      <item row="0" column="1">
+       <widget class="QComboBox" name="foil_comboBox">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
       </item>
-      <item>
-       <property name="text">
-        <string>Be 150um</string>
-       </property>
+      <item row="0" column="2">
+       <widget class="QLabel" name="foil_comment_label">
+        <property name="text">
+         <string>, длина винта: мм</string>
+        </property>
+       </widget>
       </item>
-      <item>
-       <property name="text">
-        <string>Be 200um</string>
-       </property>
+      <item row="2" column="0">
+       <widget class="QLabel" name="label_3">
+        <property name="text">
+         <string>H-нож (=): </string>
+        </property>
+       </widget>
       </item>
-      <item>
-       <property name="text">
-        <string>Be 250um</string>
-       </property>
+      <item row="1" column="2">
+       <widget class="QLabel" name="diaph_comment_label">
+        <property name="text">
+         <string>, длина винта: мм</string>
+        </property>
+       </widget>
       </item>
-      <item>
-       <property name="text">
-        <string>Pb</string>
-       </property>
+      <item row="1" column="1">
+       <widget class="QComboBox" name="diaph_comboBox"/>
       </item>
-     </widget>
-    </item>
-    <item row="0" column="2">
-     <widget class="QLabel" name="foil_comment_label">
-      <property name="text">
-       <string>, длина винта: мм</string>
-      </property>
-     </widget>
-    </item>
-    <item row="1" column="0">
-     <widget class="QLabel" name="label_2">
-      <property name="text">
-       <string>Диафрагма:</string>
-      </property>
-     </widget>
-    </item>
-    <item row="1" column="1">
-     <widget class="QComboBox" name="diaph_comboBox">
-      <item>
-       <property name="text">
-        <string>0.7 mm</string>
-       </property>
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_2">
+        <property name="text">
+         <string>Диафрагма:</string>
+        </property>
+       </widget>
       </item>
-      <item>
-       <property name="text">
-        <string>1 mm</string>
-       </property>
+      <item row="2" column="1">
+       <widget class="QDoubleSpinBox" name="hknife_doubleSpinBox">
+        <property name="wrapping">
+         <bool>false</bool>
+        </property>
+        <property name="accelerated">
+         <bool>true</bool>
+        </property>
+        <property name="decimals">
+         <number>2</number>
+        </property>
+        <property name="singleStep">
+         <double>0.010000000000000</double>
+        </property>
+       </widget>
       </item>
-      <item>
-       <property name="text">
-        <string>2 mm</string>
-       </property>
+      <item row="4" column="2">
+       <widget class="QLabel" name="label_6">
+        <property name="text">
+         <string>градусов (&quot;+&quot; - луч зрения вверх, &quot;-&quot; - вниз)</string>
+        </property>
+       </widget>
       </item>
-      <item>
-       <property name="text">
-        <string>3 mm</string>
-       </property>
+      <item row="2" column="2">
+       <widget class="QLabel" name="label_8">
+        <property name="text">
+         <string>мм (1 оборот = 1 мм, ноль = 10+0.03 дел.)</string>
+        </property>
+       </widget>
       </item>
-      <item>
-       <property name="text">
-        <string>6 mm</string>
-       </property>
+      <item row="3" column="0">
+       <widget class="QLabel" name="label_4">
+        <property name="text">
+         <string>V-нож (||):</string>
+        </property>
+       </widget>
       </item>
-      <item>
-       <property name="text">
-        <string>Al 8mm</string>
-       </property>
+      <item row="3" column="2">
+       <widget class="QLabel" name="label_7">
+        <property name="text">
+         <string>мм (1 оборот = 1 мм, ноль = 10+0.12 дел.)</string>
+        </property>
+       </widget>
       </item>
-     </widget>
-    </item>
-    <item row="1" column="2">
-     <widget class="QLabel" name="diaph_comment_label">
-      <property name="text">
-       <string>, длина винта: мм</string>
-      </property>
-     </widget>
-    </item>
-    <item row="2" column="0">
-     <widget class="QLabel" name="label_3">
-      <property name="text">
-       <string>H-нож (=): </string>
-      </property>
-     </widget>
-    </item>
-    <item row="2" column="1">
-     <widget class="QDoubleSpinBox" name="hknife_doubleSpinBox">
-      <property name="wrapping">
-       <bool>false</bool>
-      </property>
-      <property name="accelerated">
-       <bool>true</bool>
-      </property>
-      <property name="decimals">
-       <number>2</number>
-      </property>
-      <property name="singleStep">
-       <double>0.010000000000000</double>
-      </property>
-     </widget>
-    </item>
-    <item row="2" column="2">
-     <widget class="QLabel" name="label_8">
-      <property name="text">
-       <string>мм (1 оборот = 1 мм, ноль = 10+0.03 дел.)</string>
-      </property>
-     </widget>
-    </item>
-    <item row="3" column="0">
-     <widget class="QLabel" name="label_4">
-      <property name="text">
-       <string>V-нож (||):</string>
-      </property>
-     </widget>
-    </item>
-    <item row="3" column="1" rowspan="2">
-     <widget class="QDoubleSpinBox" name="vknife_doubleSpinBox">
-      <property name="wrapping">
-       <bool>false</bool>
-      </property>
-      <property name="accelerated">
-       <bool>true</bool>
-      </property>
-      <property name="decimals">
-       <number>2</number>
-      </property>
-      <property name="singleStep">
-       <double>0.010000000000000</double>
-      </property>
-     </widget>
-    </item>
-    <item row="3" column="2">
-     <widget class="QLabel" name="label_7">
-      <property name="text">
-       <string>мм (1 оборот = 1 мм, ноль = 10+0.12 дел.)</string>
-      </property>
-     </widget>
-    </item>
-    <item row="4" column="2" rowspan="2">
-     <widget class="QLabel" name="label_6">
-      <property name="text">
-       <string>градусов (&quot;+&quot; - вверх, &quot;-&quot; - вниз)</string>
-      </property>
-     </widget>
-    </item>
-    <item row="5" column="0">
-     <widget class="QLabel" name="label_5">
-      <property name="text">
-       <string>Наклон стола:</string>
-      </property>
-     </widget>
-    </item>
-    <item row="5" column="1">
-     <widget class="QDoubleSpinBox" name="angle_doubleSpinBox">
-      <property name="decimals">
-       <number>1</number>
-      </property>
-      <property name="minimum">
-       <double>-10.000000000000000</double>
-      </property>
-      <property name="maximum">
-       <double>10.000000000000000</double>
-      </property>
-      <property name="singleStep">
-       <double>0.100000000000000</double>
-      </property>
-     </widget>
-    </item>
-   </layout>
-  </widget>
+      <item row="4" column="1">
+       <widget class="QDoubleSpinBox" name="angle_doubleSpinBox">
+        <property name="decimals">
+         <number>1</number>
+        </property>
+        <property name="minimum">
+         <double>-10.000000000000000</double>
+        </property>
+        <property name="maximum">
+         <double>10.000000000000000</double>
+        </property>
+        <property name="singleStep">
+         <double>0.100000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0">
+       <widget class="QLabel" name="label_5">
+        <property name="text">
+         <string>Наклон стола:</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="1" column="0" colspan="2">
+    <widget class="QGroupBox" name="groupBox">
+     <property name="title">
+      <string>Поле зрения</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0">
+    <widget class="QPushButton" name="return_pushButton">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>44</height>
+      </size>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>9</pointsize>
+      </font>
+     </property>
+     <property name="cursor">
+      <cursorShape>PointingHandCursor</cursorShape>
+     </property>
+     <property name="text">
+      <string>Вернуть настройки</string>
+     </property>
+     <property name="autoDefault">
+      <bool>false</bool>
+     </property>
+     <property name="default">
+      <bool>false</bool>
+     </property>
+     <property name="flat">
+      <bool>false</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="1">
+    <widget class="QPushButton" name="install_pushButton">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>44</height>
+      </size>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>9</pointsize>
+      </font>
+     </property>
+     <property name="cursor">
+      <cursorShape>PointingHandCursor</cursorShape>
+     </property>
+     <property name="text">
+      <string>Установить настройки</string>
+     </property>
+     <property name="default">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+  </layout>
  </widget>
  <resources/>
  <connections/>

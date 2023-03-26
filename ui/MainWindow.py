@@ -3,18 +3,18 @@ import os
 import gc
 from ui.MainWindowUIDesign import Ui_MainWindow
 from ui.CentralWidgetUI import MainWidget
-from ui.ADCUI import ADCUIWidget
+from ui.ADC.ADCUI import ADCUIWidget
 from ui.GSAUI import GSAWidget
 # from ui.PX5UI import PX5Widget
 from ui.PX5_bigUI import PX5Widget
 from ui.AmplifierUI import AmplifierWidget
 from ui.MeasurementSettingsUI import MeasurementSettingsWidget
+from ui.HardwareUI import HardwareWidget
 from ui.CalibrationSettingsUI import CalibrationSettingsWidget
 from ui.MiniX2UI import MiniX2Widget
-from ui.WarningUI import WarningWidget
-from PyQt5 import QtWidgets, QtCore, QtGui
+from PyQt5 import QtWidgets, QtCore
 from core.sxr_protocol import packet_init
-from core.sxr_protocol_pb2 import MainPacket, SystemStatus, Commands, AmpStatus
+from core.sxr_protocol_pb2 import MainPacket, SystemStatus, Commands
 from core.logger import Logger
 from core.adc_logger import ADCLogger
 from ui.ADCLogUI import AdcLog
@@ -39,6 +39,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.actionMeasurement_settings.triggered.connect(self.action_measurement_set)
         self.actionMini_X2.triggered.connect(self.action_minix2_set)
         self.actionShow_log.triggered.connect(self.action_adclog)
+        self.actionHardware.triggered.connect(self.action_hardware_set)
 
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose, True)
 
@@ -137,6 +138,28 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         request.command = Commands.STATUS
         if request.IsInitialized():
             self.channel0.emit(request.SerializeToString())
+
+    def action_hardware_set(self):
+        win = QtWidgets.QDialog(self)
+        win.setModal(True)
+        win.setWindowTitle('Стол')
+        win.setAttribute(QtCore.Qt.WA_DeleteOnClose, True)
+
+        hardwareSettings = HardwareWidget(win)
+        hardwareSettings.channel0.connect(self.channel0)
+        self.channel1.connect(hardwareSettings.channel0_slot)
+
+        win.verticalLayout = QtWidgets.QVBoxLayout(win)
+        win.verticalLayout.addWidget(hardwareSettings)
+
+        win.show()
+        gc.collect()
+
+        request = packet_init(SystemStatus.AMP, hardwareSettings.address)
+        request.command = Commands.STATUS
+        if request.IsInitialized():
+            self.channel0.emit(request.SerializeToString())
+
 
     def action_calibration_set(self):
         win = QtWidgets.QDialog(self)

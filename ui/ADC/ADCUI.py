@@ -1,9 +1,8 @@
 import sys
 import gc
-import os
 from PyQt5 import QtWidgets, QtCore, QtGui
 from math import trunc
-from ui.ADCUIDesign import Ui_ADCWidgetDesign
+from ui.ADC.ADCUIDesign import Ui_ADCWidgetDesign
 from core.sxr_protocol_pb2 import MainPacket, AdcStatus, SystemStatus, Commands
 from core.sxr_protocol import packet_init
 
@@ -53,7 +52,7 @@ class ADCUIWidget (QtWidgets.QWidget, Ui_ADCWidgetDesign):
         self.status2ui()
 
     def install_ch_comboBox(self):
-        with open('ui/ADC_channel_names.txt') as f:
+        with open('ui/ADC/ADC_channel_names.txt') as f:
             names = [name[:-1] for name in f]
             self.ch_names = names
             for i in range(1, 9):

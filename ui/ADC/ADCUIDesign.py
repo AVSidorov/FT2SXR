@@ -203,6 +203,7 @@ class Ui_ADCWidgetDesign(object):
         font.setPointSize(9)
         self.install_pushButton.setFont(font)
         self.install_pushButton.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.install_pushButton.setDefault(True)
         self.install_pushButton.setObjectName("install_pushButton")
         self.gridLayout_3.addWidget(self.install_pushButton, 1, 1, 1, 1)
 
