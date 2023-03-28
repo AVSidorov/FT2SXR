@@ -1,5 +1,4 @@
 import h5py
-
 from core.core import Dev
 from core.sxr_protocol_pb2 import MainPacket, SystemStatus, Commands
 from core.sxr_protocol_pb2 import AmpStatus, AdcStatus  # temporary for wiring
@@ -7,6 +6,8 @@ from dev.insys.adc import ADC
 from dev.amptek.px5 import PX5
 from dev.tubl.amplifier import Amplifier
 from dev.hardware.table import Hardware
+from dev.journal.journal import Journal
+from dev.tokamak.tokamak import Tokamak
 from core.fileutils import today_dir
 import os
 import numpy as np
@@ -16,6 +17,7 @@ class Ft2SXR(Dev):
     def __init__(self, parent=None, wdir=None):
         super().__init__(parent, SystemStatus.SXR, SystemStatus())
         core = self.get_origin_core()
+        self.status = SystemStatus()
 
         if wdir is None:
             self.wdir = today_dir()
@@ -35,6 +37,8 @@ class Ft2SXR(Dev):
         self.px5 = PX5(self)
         self.amp = Amplifier(self)
         self.hardware = Hardware(self)
+        self.journal = Journal(self)
+        # self.tokamak = Tokamak(self)
 
         # connect devs to message system
         if core is not None:
@@ -54,10 +58,18 @@ class Ft2SXR(Dev):
             self.hardware.channel0.connect(core.channel0)  # out Main Packets (commands)
             core.channel0.connect(self.hardware.channel0_slot)  # in Main Packets (commands)
 
+            self.journal.channel0.connect(core.channel0)  # out Main Packets (commands)
+            core.channel0.connect(self.journal.channel0_slot)  # in Main Packets (commands)
+
+            # self.tokamak.channel0.connect(core.channel0)  # out Main Packets (commands)
+            # core.channel0.connect(self.tokamak.channel0_slot)  # in Main Packets (commands)
+
         self.state.devs.append(SystemStatus.ADC)
         self.state.devs.append(SystemStatus.AMP)
         self.state.devs.append(SystemStatus.PX5)
         self.state.devs.append(SystemStatus.HARDWARE)
+        self.state.devs.append(SystemStatus.JOURNAL)
+        # self.state.devs.append(SystemStatus.TOKAMAK)
         
         # devices wiring
         self.state.binds.add()

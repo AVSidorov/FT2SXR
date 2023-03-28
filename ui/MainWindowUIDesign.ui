@@ -46,6 +46,7 @@
      <string>Install</string>
     </property>
     <addaction name="actionHardware"/>
+    <addaction name="actionShot"/>
     <addaction name="actionADC"/>
     <addaction name="actionAmplifier"/>
     <addaction name="actionGSA"/>
@@ -185,6 +186,11 @@
   <action name="actionHardware">
    <property name="text">
     <string>Hardware</string>
+   </property>
+  </action>
+  <action name="actionShot">
+   <property name="text">
+    <string>Shot</string>
    </property>
   </action>
  </widget>

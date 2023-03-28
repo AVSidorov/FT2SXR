@@ -107,7 +107,25 @@ message HardwareStatus{
   required string diaphragm = 5 [default = '?'];
 }
 
+message JournalStatus{
+  required uint32 SXRshot = 1 [default = 0];
+  optional uint32 TOKAMAKshot = 2 [default = 0];
+  required string filename = 3 [default = 'SXRspectrum'];
+  optional string comment = 4 [default = ''];
+}
+
+message TokamakStatus{
+  optional uint32 density = 1 [default = 0];
+  optional uint32 current = 2 [default = 0];
+  enum EnumShot{
+    OH = 0;
+    RF = 1;
+  }
+  optional EnumShot shotType = 3 [default = OH];
+}
+
 message SystemStatus{
+
   enum EnumState{
     IDLE = 0;
     MEASUREMENT = 1;

@@ -19,6 +19,7 @@ from core.logger import Logger
 from core.adc_logger import ADCLogger
 from ui.ADCLogUI import AdcLog
 from ui.PlotterUI import PlotterWidget
+from ui.ShotSettingsUI import ShotSettings
 
 
 class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
@@ -40,6 +41,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.actionMini_X2.triggered.connect(self.action_minix2_set)
         self.actionShow_log.triggered.connect(self.action_adclog)
         self.actionHardware.triggered.connect(self.action_hardware_set)
+        self.actionShot.triggered.connect(self.action_shot_set)
 
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose, True)
 
@@ -160,6 +162,26 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         if request.IsInitialized():
             self.channel0.emit(request.SerializeToString())
 
+    def action_shot_set(self):
+        win = QtWidgets.QDialog(self)
+        win.setModal(True)
+        win.setWindowTitle('Нумерация')
+        win.setAttribute(QtCore.Qt.WA_DeleteOnClose, True)
+
+        shotSettings = ShotSettings(win)
+        shotSettings.channel0.connect(self.channel0)
+        self.channel1.connect(shotSettings.channel0_slot)
+
+        win.verticalLayout = QtWidgets.QVBoxLayout(win)
+        win.verticalLayout.addWidget(shotSettings)
+
+        win.show()
+        gc.collect()
+
+        request = packet_init(SystemStatus.JOURNAL, shotSettings.address)
+        request.command = Commands.STATUS
+        if request.IsInitialized():
+            self.channel0.emit(request.SerializeToString())
 
     def action_calibration_set(self):
         win = QtWidgets.QDialog(self)

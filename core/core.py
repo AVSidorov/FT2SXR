@@ -130,6 +130,8 @@ class Dev(Core):
                  f'{curtime.hour:02d}{curtime.minute:02d}{curtime.second:02d}.h5'
         group = f'/{self.name}'
 
+        print(request)
+        print('******')
         if isinstance(request, MainPacket):
             file_origin = request.data.decode()
 
