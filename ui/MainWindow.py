@@ -258,7 +258,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             layout = QtWidgets.QVBoxLayout(win._main)
             self.current_plotter_win = win
 
-            sxr_pltSettings = PlotterWidget(data_file=data_file)
+            sxr_pltSettings = PlotterWidget(data_file=data_file, x_unit='msec')
             layout.addWidget(sxr_pltSettings)
 
             win.show()
@@ -273,10 +273,10 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         if request.sender == SystemStatus.ADC:
             if request.command == Commands.SNAPSHOT ^ 0xFFFFFFFF:
                 if isinstance(request.data.decode('utf-8'), str):
-                    data_file = os.path.join(
-                        os.path.split(os.path.join(os.path.abspath('./'), request.data.decode('utf-8')))[0],
-                        'data_0.bin')
-                    print(request.data.decode('utf-8'))
+                    # data_file = os.path.join(
+                    #     os.path.split(os.path.join(os.path.abspath('./'), request.data.decode('utf-8')))[0],
+                    #     'data_0.bin')
+                    data_file = request.data.decode('utf-8')
                     self.open_sxr(data_file=data_file)
 
     @QtCore.pyqtSlot()

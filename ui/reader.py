@@ -40,6 +40,7 @@ class Reader(Core):
                                 meta.append(i)
                                 meta.append(conf_dict['samples'])
                                 meta.append(conf_dict['rate'])
+                                meta.append(i)
                         meta = np.array(meta)
                         meta = meta.reshape((n_ch, -1))
                         self.meta = meta
@@ -61,6 +62,7 @@ class Reader(Core):
                             meta.append(i)
                             meta.append(conf_dict['samples'])
                             meta.append(conf_dict['rate'])
+                            meta.append(conf_dict['names'][i-1])
                     meta = np.array(meta)
                     meta = meta.reshape((n_ch, -1))
                     self.meta = meta
@@ -83,11 +85,10 @@ class Reader(Core):
             rate = int(config[device_section]['SamplingRate'])
             mask = bin(eval(config[device_section]['ChannelMask']))
 
-
-
             return {'samples': samples,
                     'rate': rate,
-                    'mask': mask}
+                    'mask': mask,
+                    'names': None}
         else:
             return None
 
@@ -107,12 +108,15 @@ class Reader(Core):
                 channels = list(file['SXR']['ADC'].keys())
                 channels.remove('config')
 
+                names = []
                 for i in channels:
                     globals()[i] = file['SXR']['ADC'][i][()]
+                    names.append(file['SXR']['ADC'][i].attrs.get('name'))
                 measurements = np.vstack([eval(i) for i in channels])
 
                 return {'samples': samples,
                         'rate': rate,
-                        'mask': mask}, measurements
+                        'mask': mask,
+                        'names': names}, measurements
         else:
             return None

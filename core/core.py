@@ -130,25 +130,22 @@ class Dev(Core):
                  f'{curtime.hour:02d}{curtime.minute:02d}{curtime.second:02d}.h5'
         group = f'/{self.name}'
 
-        print(request)
-        print('******')
         if isinstance(request, MainPacket):
             file_origin = request.data.decode()
 
         if isinstance(request, str):
-            file_origin = request
-            cur_dir = file_origin.split('/')[0]
-            # print(cur_dir)
-            cur_num = 0
-            list_dir = os.listdir(cur_dir)
-            while True:
-                file = f'{self.name}{curtime.year-2000:02d}{curtime.month:02d}{curtime.day:02d}_{str(cur_num).zfill(3)}.h5'
-                if file in list_dir:
-                    cur_num += 1
-                    continue
-                else:
-                    break
-            # print(file)
+            # file_origin = request
+            # cur_dir = file_origin.split('/')[0]
+            # cur_num = 0
+            # list_dir = os.listdir(cur_dir)
+            # while True:
+            #     file = f'{self.name}{curtime.year-2000:02d}{curtime.month:02d}{curtime.day:02d}_{str(cur_num).zfill(3)}.h5'
+            #     if file in list_dir:
+            #         cur_num += 1
+            #         continue
+            #     else:
+            #         break
+            file = request
 
         if file_origin is not None:
             if len(file_origin) > 0:

@@ -151,10 +151,12 @@ class Ft2SXR(Dev):
         self.command_to_devs(Commands.STOP, response)
 
     def snapshot(self, request: MainPacket = None,  response: bool = False):
-        hf, sxr = super().snapshot(f'{self.wdir}/?', response)
+        # hf, sxr = super().snapshot(f'{self.wdir}/?', response)
+        filename = os.path.abspath(os.path.join(self.wdir, f'{self.journal.state.filename}.h5'))
+        hf, sxr = super().snapshot(f'{self.wdir}/{f"{self.journal.state.filename}.h5"}', response)
         sxr.attrs['name'] = 'SXR diagnostics'
         sxr.attrs['comments'] = ''
-        filename = os.path.abspath(os.path.join(self.wdir, hf.filename))
+        # filename = os.path.abspath(os.path.join(self.wdir, hf.filename))  # old
 
         # make wiring table
         wiring = wiring_tab(self.state.binds)
