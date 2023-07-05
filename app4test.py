@@ -7,6 +7,8 @@ import sys
 
 
 def main():
+    sys.stdout = open('errors.txt', 'w')
+
     app = QtWidgets.QApplication(sys.argv)
 
     core = Core(app)

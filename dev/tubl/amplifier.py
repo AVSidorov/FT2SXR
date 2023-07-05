@@ -1,25 +1,37 @@
 from core.core import Dev
 from core.sxr_protocol_pb2 import MainPacket, SystemStatus, Commands, AmpStatus
-from core.fileutils import work_dir
+import configparser
 import os
-import csv
+import gc
+from core.fileutils import work_dir
 
 
 class Amplifier(Dev):
     def __init__(self, parent=None):
         super().__init__(parent, SystemStatus.AMP, AmpStatus())
 
-        self.state.gainA = 0.0
-        self.state.gainB = 0.0
-        self.state.tail = 0b0000
-        with open(os.path.join(work_dir(), os.path.normpath('dev/tubl/amp_last.csv')), newline='') as file:
-            cal = csv.DictReader(file, delimiter=',')
-            last_file = {}
-            for i in cal:
-                last_file = i
-            self.state.gainA = float(last_file['gainA'])
-            self.state.gainB = float(last_file['gainB'])
-            self.state.tail = int(last_file['switch_state'])
+        config = configparser.ConfigParser()
+        config.read(os.path.join(work_dir(), os.path.normpath('dev/tubl/amp_settings.ini')))
+
+        self.state.gainA = float(config['amp']['gaina'])
+        self.state.gainB = float(config['amp']['gainb'])
+        self.state.tail = eval(config['amp']['switchstate'])
+
+        gc.collect(2)
+
+    def set_settings(self, state: MainPacket = None, response: bool = False):
+        super().set_settings(state, response)
+        config = configparser.ConfigParser()
+        config.read(os.path.join(work_dir(), os.path.normpath('dev/tubl/amp_settings.ini')))
+
+        config['amp']['gaina'] = str(self.state.gainA)
+        config['amp']['gainb'] = str(self.state.gainB)
+        config['amp']['switchstate'] = bin(self.state.tail)
+
+        with open(os.path.join(work_dir(), os.path.normpath('dev/tubl/amp_settings.ini')), 'w') as configfile:
+            config.write(configfile)
+
+        gc.collect(2)
 
     def snapshot(self, request: MainPacket = None, response: bool = False):
         hf, amp = super().snapshot(request, response)

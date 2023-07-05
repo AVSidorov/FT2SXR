@@ -31,7 +31,6 @@ class ShotSettings(QtWidgets.QWidget, Ui_shotSettings):
 
         self.sxr_number_spinBox.setValue(0)
         self.ui2status()
-        self.install_settings()
 
     def set_number(self):
         self.status.SXRshot = self.sxr_number_spinBox.value()
