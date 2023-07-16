@@ -12,3 +12,6 @@
 /core/log.txt
 /*/cfg.ini
 /*/*.bin
+/*/*.h5
+/ErrorsLog.txt
+/test.py
