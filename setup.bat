@@ -8,3 +8,5 @@ pip install paramiko
 pip install protobuf
 pip install scp
 pip install configparser
+pip install scipy
+git remote add origin 'https://github.com/AVSidorov/FT2SXR.git'
