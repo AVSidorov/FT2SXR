@@ -1,6 +1,6 @@
 @echo off
 git pull origin work
-echo ------------------------------------------- >> ErrorsLog.txt
-echo %date% >> ErrorsLog.txt
-echo %time% >> ErrorsLog.txt
-python app4test.py >> ErrorsLog.txt
+echo -------------------------------------------------------------------------------- >> errors.log
+echo %date% >> errors.log
+echo %time% >> errors.log
+python app4test.py >> errors.log 2>&1

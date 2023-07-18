@@ -13,5 +13,5 @@
 /*/cfg.ini
 /*/*.bin
 /*/*.h5
-/ErrorsLog.txt
+/errors.log
 /test.py

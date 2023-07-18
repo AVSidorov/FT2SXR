@@ -1,0 +1,54 @@
+------------------------------------------- 
+18.07.2023 
+18:30:37,36 
+------------------------------------------- 
+18.07.2023 
+18:31:08,47 
+------------------------------------------- 
+18.07.2023 
+18:31:16,71 
+------------------------------------------- 
+18.07.2023 
+18:49:18,07 
+------------------------------------------- 
+18.07.2023 
+18:49:27,54 
+------------------------------------------- 
+18.07.2023 
+18:49:43,05 
+------------------------------------------- 
+18.07.2023 
+18:50:07,53 
+Traceback (most recent call last):
+  File "D:\home\projects\SXR\FT2SXR\core\ft2sxr.py", line 197, in channel0_slot
+    super().channel0_slot(data)
+  File "D:\home\projects\SXR\FT2SXR\core\core.py", line 216, in channel0_slot
+    self.snapshot(self.request, response=True)
+  File "D:\home\projects\SXR\FT2SXR\core\ft2sxr.py", line 166, in snapshot
+    dset = sxr.create_dataset('wiring', shape=wiring.shape, dtype=dt)
+  File "C:\Users\misha\AppData\Local\Programs\Python\Python39\lib\site-packages\h5py\_hl\group.py", line 183, in create_dataset
+    dsid = dataset.make_new_dset(group, shape, dtype, data, name, **kwds)
+  File "C:\Users\misha\AppData\Local\Programs\Python\Python39\lib\site-packages\h5py\_hl\dataset.py", line 165, in make_new_dset
+    dset_id = h5d.create(parent.id, name, tid, sid, dcpl=dcpl, dapl=dapl)
+  File "h5py\_objects.pyx", line 54, in h5py._objects.with_phil.wrapper
+  File "h5py\_objects.pyx", line 55, in h5py._objects.with_phil.wrapper
+  File "h5py\h5d.pyx", line 135, in h5py.h5d.create
+ValueError: Unable to create dataset (name already exists)
+------------------------------------------- 
+18.07.2023 
+18:57:02,15 
+Traceback (most recent call last):
+  File "D:\home\projects\SXR\FT2SXR\core\ft2sxr.py", line 197, in channel0_slot
+    super().channel0_slot(data)
+  File "D:\home\projects\SXR\FT2SXR\core\core.py", line 216, in channel0_slot
+    self.snapshot(self.request, response=True)
+  File "D:\home\projects\SXR\FT2SXR\core\ft2sxr.py", line 166, in snapshot
+    dset = sxr.create_dataset('wiring', shape=wiring.shape, dtype=dt)
+  File "C:\Users\misha\AppData\Local\Programs\Python\Python39\lib\site-packages\h5py\_hl\group.py", line 183, in create_dataset
+    dsid = dataset.make_new_dset(group, shape, dtype, data, name, **kwds)
+  File "C:\Users\misha\AppData\Local\Programs\Python\Python39\lib\site-packages\h5py\_hl\dataset.py", line 165, in make_new_dset
+    dset_id = h5d.create(parent.id, name, tid, sid, dcpl=dcpl, dapl=dapl)
+  File "h5py\_objects.pyx", line 54, in h5py._objects.with_phil.wrapper
+  File "h5py\_objects.pyx", line 55, in h5py._objects.with_phil.wrapper
+  File "h5py\h5d.pyx", line 135, in h5py.h5d.create
+ValueError: Unable to create dataset (name already exists)
