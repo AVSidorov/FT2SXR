@@ -1,4 +1,6 @@
 import sys
+import time
+
 from PyQt5 import QtWidgets, QtGui, QtCore
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg, NavigationToolbar2QT
 from matplotlib.figure import Figure
@@ -11,6 +13,7 @@ import gc
 from silx.math import medfilt1d
 from silx.math.fit import savitsky_golay
 import scipy.signal as signal
+from numba import njit
 
 
 class PlotterWidget(QtWidgets.QMainWindow, Ui_Plotter):
@@ -72,13 +75,14 @@ class PlotterWidget(QtWidgets.QMainWindow, Ui_Plotter):
                     self.time_val_label.setText(time_ms)
                     self.count_rate_comboBox.clear()
                     self.rms_comboBox.clear()
-                    for i in range(n_plots-1, -1, -1):
-                        self.count_rate_comboBox.addItem(f'Graph №{self.reader.meta[i - 1][1]} ({self.reader.meta[i-1][4]})')
-                        self.rms_comboBox.addItem(f'Graph №{self.reader.meta[i - 1][1]} ({self.reader.meta[i-1][4]})')
+                    for i in range(n_plots - 1, -1, -1):
+                        self.count_rate_comboBox.addItem(
+                            f'Graph №{self.reader.meta[i - 1][1]} ({self.reader.meta[i - 1][4]})')
+                        self.rms_comboBox.addItem(f'Graph №{self.reader.meta[i - 1][1]} ({self.reader.meta[i - 1][4]})')
 
                 for i in range(1, n_plots + 1):
                     globals()[f"ax{i}"] = self.static_canvas.figure.add_subplot(n_plots, 1, i)
-                    eval(f'ax{i}').set_title(f'Graph №{self.reader.meta[i - 1][1]} ({self.reader.meta[i-1][4]})')
+                    eval(f'ax{i}').set_title(f'Graph №{self.reader.meta[i - 1][1]} ({self.reader.meta[i - 1][4]})')
                     if x_unit == 'samples':
                         eval(f'ax{i}').plot(self.reader.data[i - 1])
                     elif x_unit == 'ms':
@@ -151,28 +155,41 @@ class PlotterWidget(QtWidgets.QMainWindow, Ui_Plotter):
 
                 count_time_ms = self.count_rate_window_doubleSpinBox.value()
                 count_time_smpls = int(count_time_ms * rate / 1e3)
-                counts = []
-                times = []
 
-                sig = medfilt1d(self.reader.data[signal_index], kernel_size=7)
-                sig = savitsky_golay(sig, npoints=70)
+                sig = medfilt1d(self.reader.data[signal_index], kernel_size=5)
+                sig = savitsky_golay(sig, npoints=40)
                 maxs = signal.find_peaks(sig, distance=10)[0]
                 prominences, mins, _ = signal.peak_prominences(sig, maxs)
-                real_maxs = []
-                real_mins = []
+
                 threshold = self.threshold_spinBox.value()
-                for i in range(len(maxs)):
-                    if prominences[i] > threshold:
-                        real_maxs.append(maxs[i])
-                        real_mins.append(mins[i])
-                real_maxs = np.array(real_maxs)
-                # real_mins = np.array(real_mins)
 
-                for i in range(int(time_ms / count_time_ms)):
-                    counts.append(np.sum(np.in1d(list(range(i * count_time_smpls, (i + 1) * count_time_smpls)), real_maxs)))
-                    times.append((i + 0.5) * count_time_smpls * ms_per_smpl)
+                @njit
+                def _check_and_count():
+                    real_maxs = []
+                    # real_mins = []
+                    for i in range(len(maxs)):
+                        if prominences[i] > threshold:
+                            real_maxs.append(maxs[i])
+                            # real_mins.append(mins[i])
+                    real_maxs = np.array(real_maxs)
+                    # real_mins = np.array(real_mins)
 
-                counts = np.array(counts) / count_time_ms / 1e3
+                    counts = [0.0 for i in range(int(time_ms / count_time_ms))]
+                    times = [(i + 0.5) * count_time_smpls * ms_per_smpl for i in range(int(time_ms / count_time_ms))]
+
+                    for i in real_maxs:
+                        counts[int(i*ms_per_smpl/count_time_ms)] += 1.0
+                    for i in range(len(counts)):
+                        counts[i] = counts[i] / (count_time_ms * 1000.0)
+                    # for i in range(int(time_ms / count_time_ms)):
+                        # counts.append(np.sum(
+                        #     np.in1d(list(range(i * count_time_smpls, (i + 1) * count_time_smpls)), real_maxs)) / (
+                        #                           count_time_ms * 1e3))
+                        # times.append((i + 0.5) * count_time_smpls * ms_per_smpl)
+                    return counts, times
+
+                counts, times = _check_and_count()
+
                 plt.close()
                 plt.title(f'Count rate in {self.reader.meta[signal_index][4]} (file {lable})')
                 plt.ylabel('Millions per second')

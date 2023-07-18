@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>750</width>
-    <height>550</height>
+    <width>798</width>
+    <height>627</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -29,7 +29,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>750</width>
+     <width>798</width>
      <height>26</height>
     </rect>
    </property>
@@ -38,20 +38,17 @@
      <string>Open file</string>
     </property>
     <addaction name="actionOpen_SXR_file"/>
-    <addaction name="actionOpen_CLB_file"/>
-    <addaction name="actionOpen_MCA_file"/>
    </widget>
    <widget class="QMenu" name="menuInstall">
     <property name="title">
      <string>Install</string>
     </property>
-    <addaction name="actionHardware"/>
     <addaction name="actionShot"/>
+    <addaction name="actionHardware"/>
+    <addaction name="actionTokamak"/>
     <addaction name="actionADC"/>
     <addaction name="actionAmplifier"/>
     <addaction name="actionGSA"/>
-    <addaction name="actionPX_5"/>
-    <addaction name="actionMini_X2"/>
    </widget>
    <widget class="QMenu" name="menuADC_Log">
     <property name="title">
@@ -191,6 +188,11 @@
   <action name="actionShot">
    <property name="text">
     <string>Shot</string>
+   </property>
+  </action>
+  <action name="actionTokamak">
+   <property name="text">
+    <string>Tokamak</string>
    </property>
   </action>
  </widget>

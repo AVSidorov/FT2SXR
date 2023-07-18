@@ -166,7 +166,7 @@ class Ui_Plotter(object):
         self.count_rate_window_doubleSpinBox = QtWidgets.QDoubleSpinBox(self.shot_groupBox)
         self.count_rate_window_doubleSpinBox.setMinimum(0.01)
         self.count_rate_window_doubleSpinBox.setSingleStep(0.1)
-        self.count_rate_window_doubleSpinBox.setProperty("value", 0.5)
+        self.count_rate_window_doubleSpinBox.setProperty("value", 1.0)
         self.count_rate_window_doubleSpinBox.setObjectName("count_rate_window_doubleSpinBox")
         self.formLayout.setWidget(16, QtWidgets.QFormLayout.FieldRole, self.count_rate_window_doubleSpinBox)
         self.rms_window_label = QtWidgets.QLabel(self.shot_groupBox)

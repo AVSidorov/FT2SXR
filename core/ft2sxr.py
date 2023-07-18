@@ -38,7 +38,7 @@ class Ft2SXR(Dev):
         self.amp = Amplifier(self)
         self.hardware = Hardware(self)
         self.journal = Journal(self)
-        # self.tokamak = Tokamak(self)
+        self.tokamak = Tokamak(self)
 
         # connect devs to message system
         if core is not None:
@@ -61,15 +61,15 @@ class Ft2SXR(Dev):
             self.journal.channel0.connect(core.channel0)  # out Main Packets (commands)
             core.channel0.connect(self.journal.channel0_slot)  # in Main Packets (commands)
 
-            # self.tokamak.channel0.connect(core.channel0)  # out Main Packets (commands)
-            # core.channel0.connect(self.tokamak.channel0_slot)  # in Main Packets (commands)
+            self.tokamak.channel0.connect(core.channel0)  # out Main Packets (commands)
+            core.channel0.connect(self.tokamak.channel0_slot)  # in Main Packets (commands)
 
         self.state.devs.append(SystemStatus.ADC)
         self.state.devs.append(SystemStatus.AMP)
         self.state.devs.append(SystemStatus.PX5)
         self.state.devs.append(SystemStatus.HARDWARE)
         self.state.devs.append(SystemStatus.JOURNAL)
-        # self.state.devs.append(SystemStatus.TOKAMAK)
+        self.state.devs.append(SystemStatus.TOKAMAK)
         
         # devices wiring
         self.state.binds.add()

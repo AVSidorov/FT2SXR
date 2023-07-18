@@ -115,13 +115,15 @@ message JournalStatus{
 }
 
 message TokamakStatus{
-  optional uint32 density = 1 [default = 0];
+  optional float density = 1 [default = 0];
   optional uint32 current = 2 [default = 0];
   enum EnumShot{
     OH = 0;
     RF = 1;
+    GLOW = 2;
   }
   optional EnumShot shotType = 3 [default = OH];
+  optional uint32 power = 4 [default = 0];
 }
 
 message SystemStatus{

@@ -1,17 +1,14 @@
 from core.core import Dev
 from core.sxr_protocol_pb2 import MainPacket, SystemStatus, Commands, TokamakStatus
-from core.fileutils import work_dir
-import os
 
 
 class Tokamak(Dev):
     def __init__(self, parent=None):
-        super().__init__(parent, SystemStatus.JOURNAL, TokamakStatus())
+        super().__init__(parent, SystemStatus.TOKAMAK, TokamakStatus())
 
         self.state.density = 0
         self.state.current = 0
         self.state.shotType = TokamakStatus.OH
-        print(self.state.shotType)
 
     def snapshot(self, request: MainPacket = None, response: bool = False):
         hf, jour = super().snapshot(request, response)

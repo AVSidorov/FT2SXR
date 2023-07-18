@@ -1,14 +1,14 @@
 from PyQt5 import QtWidgets, QtCore, QtGui
-from PyQt5.QtWidgets import QTableWidgetItem
 from ui.CentralWidgetUIDesign import Ui_MainWidgetDesign
 from core.sxr_protocol import packet_init
-from core.sxr_protocol_pb2 import MainPacket, SystemStatus, Commands, AmpStatus, AdcStatus
+from core.sxr_protocol_pb2 import MainPacket, SystemStatus, Commands, AmpStatus, AdcStatus, HardwareStatus, TokamakStatus, JournalStatus
 
 
 class MainWidget(QtWidgets.QWidget, Ui_MainWidgetDesign):
 
     channel0 = QtCore.pyqtSignal(bytes)  # For uplink
     channel1 = QtCore.pyqtSignal(bytes)  # For downlink
+    channelSettings = QtCore.pyqtSignal(int)  # To open settings windows
     channelStart = QtCore.pyqtSignal()  # To start system
 
     def __init__(self, parent=None):
@@ -17,6 +17,9 @@ class MainWidget(QtWidgets.QWidget, Ui_MainWidgetDesign):
         self.AMPstatus = AmpStatus()
         self.ADCstatus = AdcStatus()
         self.SXRstatus = SystemStatus()
+        self.HARDWAREstatus = HardwareStatus()
+        self.TOKAMAKstatus = TokamakStatus()
+        self.JOURNALstatus = JournalStatus()
         self.timer = QtCore.QTimer(self)
         self.timer.timeout.connect(self.get_settings)
         self.timer.start(30000)
@@ -27,12 +30,36 @@ class MainWidget(QtWidgets.QWidget, Ui_MainWidgetDesign):
         # self.manual_pushButton.clicked.connect(self.start_btn)
         self.external_pushButton.clicked.connect(self.start_btn)
         # self.periodic_pushButton.clicked.connect(self.start_adc)
+        self.changeADC_pushButton.clicked.connect(self._openADC)
+        self.changeAmp_pushButton.clicked.connect(self._openAmp)
+        self.changeGSA_pushButton.clicked.connect(self._openGSA)
+        self.changeHard_pushButton.clicked.connect(self._openHard)
+        self.changeTok_pushButton.clicked.connect(self._openTok)
+        self.changeJour_pushButton.clicked.connect(self._openJour)
         self.manual_pushButton.hide()
         self.periodic_pushButton.hide()
         self.stop_pushButton.clicked.connect(self.stop_adc)
         self.request = packet_init(SystemStatus.SXR, self.address)
 
         self.periodic_pushButton.setDisabled(True)
+
+    def _openADC(self):
+        self.channelSettings.emit(SystemStatus.ADC)
+
+    def _openAmp(self):
+        self.channelSettings.emit(SystemStatus.AMP)
+
+    def _openGSA(self):
+        self.channelSettings.emit(SystemStatus.GSA)
+
+    def _openHard(self):
+        self.channelSettings.emit(SystemStatus.HARDWARE)
+
+    def _openTok(self):
+        self.channelSettings.emit(SystemStatus.TOKAMAK)
+
+    def _openJour(self):
+        self.channelSettings.emit(SystemStatus.JOURNAL)
 
     def start_adc(self):
         self.channelStart.emit()
@@ -52,6 +79,30 @@ class MainWidget(QtWidgets.QWidget, Ui_MainWidgetDesign):
         self.amp_mask_label.setText(tail)
         self.amp_gainA_label.setText(f'{self.AMPstatus.gainA:4.2f}')
         self.amp_gainB_label.setText(f'{self.AMPstatus.gainB:4.2f}')
+
+    def set_hardware(self):
+        self.hardware_foil_label.setText(self.HARDWAREstatus.foil)
+        self.hardware_diaph_label.setText(self.HARDWAREstatus.diaphragm)
+        self.hardware_angle_label.setText(f'{self.HARDWAREstatus.angle:3.1f}')
+        self.hardware_Hknife_label.setText(f'{self.HARDWAREstatus.hknife:4.2f}')
+        self.hardware_Vknife_label.setText(f'{self.HARDWAREstatus.vknife:4.2f}')
+
+    def set_tokamak(self):
+        self.current_label.setText(str(self.TOKAMAKstatus.current))
+        self.density_label.setText(str(self.TOKAMAKstatus.density))
+        self.power_label.setText(str(self.TOKAMAKstatus.power))
+        if self.TOKAMAKstatus.shotType == self.TOKAMAKstatus.OH:
+            self.mode_label.setText('OH')
+        elif self.TOKAMAKstatus.shotType == self.TOKAMAKstatus.RF:
+            self.mode_label.setText('RF')
+        elif self.TOKAMAKstatus.shotType == self.TOKAMAKstatus.GLOW:
+            self.mode_label.setText('Тлеющий')
+
+    def set_journal(self):
+        self.sxrNo_label.setText(str(self.JOURNALstatus.SXRshot))
+        self.tokamakNo_label.setText(str(self.JOURNALstatus.TOKAMAKshot))
+        self.fileName_label.setText(str(self.JOURNALstatus.filename))
+        self.comment_textBrowser.setText(self.JOURNALstatus.comment)
 
     def set_adc(self, connection=False):
         # if connection is True:
@@ -119,7 +170,22 @@ class MainWidget(QtWidgets.QWidget, Ui_MainWidgetDesign):
         if request.IsInitialized():
             self.channel0.emit(request.SerializeToString())
 
+        request = packet_init(SystemStatus.HARDWARE, self.address)
+        request.command = Commands.STATUS
+        if request.IsInitialized():
+            self.channel0.emit(request.SerializeToString())
+
         request = packet_init(SystemStatus.ADC, self.address)
+        request.command = Commands.STATUS
+        if request.IsInitialized():
+            self.channel0.emit(request.SerializeToString())
+
+        request = packet_init(SystemStatus.TOKAMAK, self.address)
+        request.command = Commands.STATUS
+        if request.IsInitialized():
+            self.channel0.emit(request.SerializeToString())
+
+        request = packet_init(SystemStatus.JOURNAL, self.address)
         request.command = Commands.STATUS
         if request.IsInitialized():
             self.channel0.emit(request.SerializeToString())
@@ -135,6 +201,21 @@ class MainWidget(QtWidgets.QWidget, Ui_MainWidgetDesign):
             if request.command in (Commands.STATUS ^ 0xFFFFFFFF, Commands.SET ^ 0xFFFFFFFF):
                 self.AMPstatus.ParseFromString(request.data)
                 self.set_amp()
+
+        elif request.sender == SystemStatus.HARDWARE:
+            if request.command in (Commands.STATUS ^ 0xFFFFFFFF, Commands.SET ^ 0xFFFFFFFF):
+                self.HARDWAREstatus.ParseFromString(request.data)
+                self.set_hardware()
+
+        elif request.sender == SystemStatus.TOKAMAK:
+            if request.command in (Commands.STATUS ^ 0xFFFFFFFF, Commands.SET ^ 0xFFFFFFFF):
+                self.TOKAMAKstatus.ParseFromString(request.data)
+                self.set_tokamak()
+
+        elif request.sender == SystemStatus.JOURNAL:
+            if request.command in (Commands.STATUS ^ 0xFFFFFFFF, Commands.SET ^ 0xFFFFFFFF):
+                self.JOURNALstatus.ParseFromString(request.data)
+                self.set_journal()
 
         elif request.sender == SystemStatus.ADC:
             if request.command in (Commands.STATUS ^ 0xFFFFFFFF, Commands.SET ^ 0xFFFFFFFF):

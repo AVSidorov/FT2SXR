@@ -20,6 +20,7 @@ from core.adc_logger import ADCLogger
 from ui.ADCLogUI import AdcLog
 from ui.PlotterUI import PlotterWidget
 from ui.ShotSettingsUI import ShotSettings
+from ui.TokamakUI import TokamakWidget
 
 
 class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
@@ -33,15 +34,16 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.address = 16
 
         self.actionADC.triggered.connect(self.action_adc_set)
-        self.actionPX_5.triggered.connect(self.action_px5_set)
+        # self.actionPX_5.triggered.connect(self.action_px5_set)
         self.actionGSA.triggered.connect(self.action_gsa_set)
         self.actionAmplifier.triggered.connect(self.action_amplifier_set)
-        self.actionCalibration_settings.triggered.connect(self.action_calibration_set)
-        self.actionMeasurement_settings.triggered.connect(self.action_measurement_set)
-        self.actionMini_X2.triggered.connect(self.action_minix2_set)
+        # self.actionCalibration_settings.triggered.connect(self.action_calibration_set)
+        # self.actionMeasurement_settings.triggered.connect(self.action_measurement_set)
+        # self.actionMini_X2.triggered.connect(self.action_minix2_set)
         self.actionShow_log.triggered.connect(self.action_adclog)
         self.actionHardware.triggered.connect(self.action_hardware_set)
         self.actionShot.triggered.connect(self.action_shot_set)
+        self.actionTokamak.triggered.connect(self.action_tokamak_set)
 
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose, True)
 
@@ -60,6 +62,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
         win_main = MainWidget(self.centralwidget)
         win_main.channel0.connect(self.channel0)
+        win_main.channelSettings.connect(self.settings_from_centralWidget)
         self.channel1.connect(win_main.channel0_slot)
         self.verticalLayout = QtWidgets.QVBoxLayout(self.centralwidget)
         self.verticalLayout.setObjectName("verticalLayout")
@@ -72,6 +75,21 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.current_plotter_win = None
 
         win_main.show()
+
+    @QtCore.pyqtSlot(int)
+    def settings_from_centralWidget(self, toOpen: int):
+        if toOpen == SystemStatus.ADC:
+            self.action_adc_set()
+        elif toOpen == SystemStatus.AMP:
+            self.action_amplifier_set()
+        elif toOpen == SystemStatus.GSA:
+            self.action_gsa_set()
+        elif toOpen == SystemStatus.TOKAMAK:
+            self.action_tokamak_set()
+        elif toOpen == SystemStatus.HARDWARE:
+            self.action_hardware_set()
+        elif toOpen == SystemStatus.JOURNAL:
+            self.action_shot_set()
 
     def action_adc_set(self):
         win = QtWidgets.QDialog(self)
@@ -179,6 +197,27 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         gc.collect()
 
         request = packet_init(SystemStatus.JOURNAL, shotSettings.address)
+        request.command = Commands.STATUS
+        if request.IsInitialized():
+            self.channel0.emit(request.SerializeToString())
+
+    def action_tokamak_set(self):
+        win = QtWidgets.QDialog(self)
+        win.setModal(True)
+        win.setWindowTitle('Параметры токамака')
+        win.setAttribute(QtCore.Qt.WA_DeleteOnClose, True)
+
+        tokamakSettings = TokamakWidget(win)
+        tokamakSettings.channel0.connect(self.channel0)
+        self.channel1.connect(tokamakSettings.channel0_slot)
+
+        win.verticalLayout = QtWidgets.QVBoxLayout(win)
+        win.verticalLayout.addWidget(tokamakSettings)
+
+        win.show()
+        gc.collect()
+
+        request = packet_init(SystemStatus.TOKAMAK, tokamakSettings.address)
         request.command = Commands.STATUS
         if request.IsInitialized():
             self.channel0.emit(request.SerializeToString())

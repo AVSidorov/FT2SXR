@@ -2,7 +2,7 @@ from ui.MainWindow import MainWindow
 from core.core import Core
 from core.logger import Logger
 from core.ft2sxr import Ft2SXR
-from PyQt5 import QtWidgets, QtCore
+from PyQt5 import QtWidgets
 import sys
 
 
