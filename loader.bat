@@ -1,5 +1,6 @@
 @echo off
 git pull origin work
+git pull origin master
 echo -------------------------------------------------------------------------------- >> errors.log
 echo %date% >> errors.log
 echo %time% >> errors.log
