@@ -1,9 +1,6 @@
 import gc
 import sys
-import os
-import csv
-from PyQt5 import QtWidgets
-from ui.ShotSettingsUIDesign import Ui_shotSettings
+from ui.JOURNAL.ShotSettingsUIDesign import Ui_shotSettings
 from core.sxr_protocol_pb2 import MainPacket, SystemStatus, Commands, JournalStatus
 from core.sxr_protocol import packet_init
 from PyQt5 import QtWidgets, QtCore, QtGui

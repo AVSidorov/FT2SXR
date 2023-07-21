@@ -1,5 +1,5 @@
 from PyQt5 import QtWidgets, QtCore
-from ui.ADCLogUIDesign import Ui_AdcStatusWin
+from ui.ADCLogger.ADCLogUIDesign import Ui_AdcStatusWin
 import sys
 from core.sxr_protocol import packet_init
 from core.sxr_protocol_pb2 import Commands, SystemStatus

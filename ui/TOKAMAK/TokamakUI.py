@@ -1,4 +1,4 @@
-from ui.TokamakWidgetUIDesign import Ui_tokamakWidget
+from ui.TOKAMAK.TokamakWidgetUIDesign import Ui_tokamakWidget
 from core.sxr_protocol_pb2 import MainPacket, TokamakStatus, SystemStatus, Commands
 from core.sxr_protocol import packet_init
 from PyQt5 import QtWidgets, QtCore, QtGui

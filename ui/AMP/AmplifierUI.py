@@ -2,7 +2,7 @@ import gc
 import sys
 import os
 import csv
-from ui.AmplifierUIDesign import Ui_AmplifierWidgetDesign
+from ui.AMP.AmplifierUIDesign import Ui_AmplifierWidgetDesign
 from core.sxr_protocol_pb2 import MainPacket, AmpStatus, SystemStatus, Commands
 from core.sxr_protocol import packet_init
 from PyQt5 import QtWidgets, QtCore, QtGui

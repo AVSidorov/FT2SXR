@@ -86,9 +86,9 @@ message AdcStatus{
 }
 
 message AmpStatus{
-  required float gainA = 1 [default = 0.0];
-  required float gainB= 2 [default = 0.0];
-  required uint32 tail = 3 [default = 6];
+  required float gainA = 1 [default = 0.0]; // wheel units
+  required float gainB= 2 [default = 0.0]; // wheel units
+  required uint32 tail = 3 [default = 6]; // ns
 
   enum ConnectorsIn{
     CON_IN = 0;
@@ -100,9 +100,9 @@ message AmpStatus{
 }
 
 message HardwareStatus{
-  required float angle = 1 [default = 0.0];
-  required float vknife = 2 [default = 0.0];
-  required float hknife = 3 [default = 0.0];
+  required float angle = 1 [default = 0.0]; // degrees
+  required float vknife = 2 [default = 0.0]; // mm
+  required float hknife = 3 [default = 0.0]; // mm
   required string foil = 4 [default = '?'];
   required string diaphragm = 5 [default = '?'];
 }
@@ -115,15 +115,21 @@ message JournalStatus{
 }
 
 message TokamakStatus{
-  optional float density = 1 [default = 0];
-  optional uint32 current = 2 [default = 0];
+  optional float density = 1 [default = 0]; // lines
+  optional uint32 current = 2 [default = 0]; // kA
   enum EnumShot{
     OH = 0;
     RF = 1;
     GLOW = 2;
   }
-  optional EnumShot shotType = 3 [default = OH];
-  optional uint32 power = 4 [default = 0];
+  optional EnumShot shotType = 3 [default = OH]; // mode
+  optional uint32 power = 4 [default = 0]; // kW
+}
+
+message GsaStatus{
+  optional float amplitude = 1 [default = 0]; // mV
+  optional float edge = 2 [default = 24]; // ns
+  optional float frequency = 3 [default = 626]; // Hz
 }
 
 message SystemStatus{

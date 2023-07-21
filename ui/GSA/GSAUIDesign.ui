@@ -59,13 +59,6 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="1">
-       <widget class="QLabel" name="edge_val_label">
-        <property name="text">
-         <string>0</string>
-        </property>
-       </widget>
-      </item>
       <item row="1" column="2">
        <widget class="QLabel" name="edge_type_label">
         <property name="text">
@@ -80,17 +73,27 @@
         </property>
        </widget>
       </item>
-      <item row="2" column="1">
-       <widget class="QLabel" name="freq_val_label">
-        <property name="text">
-         <string>0</string>
-        </property>
-       </widget>
-      </item>
       <item row="2" column="2">
        <widget class="QLabel" name="freq_type_label">
         <property name="text">
          <string>Hz</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QDoubleSpinBox" name="edge_doubleSpinBox">
+        <property name="decimals">
+         <number>1</number>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QDoubleSpinBox" name="frequency_doubleSpinBox">
+        <property name="decimals">
+         <number>1</number>
+        </property>
+        <property name="maximum">
+         <double>1000.000000000000000</double>
         </property>
        </widget>
       </item>

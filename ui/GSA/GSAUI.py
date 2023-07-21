@@ -1,6 +1,6 @@
 import sys
 from PyQt5 import QtWidgets
-from ui.GSAUIDesign import Ui_GSAWidgetDesign
+from ui.GSA.GSAUIDesign import Ui_GSAWidgetDesign
 
 
 class GSAWidget(QtWidgets.QWidget, Ui_GSAWidgetDesign):
@@ -9,7 +9,7 @@ class GSAWidget(QtWidgets.QWidget, Ui_GSAWidgetDesign):
         self.setupUi(self)
 
         # hardware
-        amp_list = (('22', '58', '78', '114', '134', '167', '187', '223'), 'mV')
+        amp_list = (('0', '22', '58', '78', '114', '134', '167', '187', '223'), 'mV')
         edge = ('24', 'ns')
         freq = ('626', 'Hz')
 

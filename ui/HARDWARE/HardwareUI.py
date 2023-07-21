@@ -1,9 +1,6 @@
 import gc
 import sys
-import os
-import csv
-from PyQt5 import QtWidgets
-from ui.HardwareUIDesign import Ui_HardwareWidgetDesign
+from ui.HARDWARE.HardwareUIDesign import Ui_HardwareWidgetDesign
 from core.sxr_protocol_pb2 import MainPacket, HardwareStatus, SystemStatus, Commands
 from core.sxr_protocol import packet_init
 from PyQt5 import QtWidgets, QtCore, QtGui
@@ -45,13 +42,13 @@ class HardwareWidget(QtWidgets.QWidget, Ui_HardwareWidgetDesign):
         gc.collect()
 
     def install_foils_comboBox(self):
-        with open('ui/foil.txt') as f:
+        with open('ui/HARDWARE/foil.txt') as f:
             foils = [name[:-1] for name in f]
             self.foils_list = foils
             self.foil_comboBox.addItems(foils)
 
     def install_diaph_comboBox(self):
-        with open('ui/diaphragm.txt') as f:
+        with open('ui/HARDWARE/diaphragm.txt') as f:
             diaphragms = [name[:-1] for name in f]
             self.diaphragms_list = diaphragms
             self.diaph_comboBox.addItems(diaphragms)

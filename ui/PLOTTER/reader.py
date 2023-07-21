@@ -47,12 +47,12 @@ class Reader(Core):
 
                 if path.splitext(data_file)[1] == '.h5':
                     try:
-                        conf_dict, measurements = self.parse_h5(data_file)
+                        conf_dict, self.data = self.parse_h5(data_file)
                     except KeyError:
                         return
 
                     n_ch = conf_dict['mask'].count("1")
-                    self.data = measurements
+                    # self.data = measurements
 
                     meta = []
                     str_mask = conf_dict['mask'][2:]
@@ -68,7 +68,9 @@ class Reader(Core):
                     self.meta = meta
 
     def clear(self):
+        del self.data
         self.data = None
+        del self.meta
         self.meta = None
 
     def parse_ini(self, ini_path=None):

@@ -1,15 +1,14 @@
 import sys
-import os
 import gc
-from ui.MainWindowUIDesign import Ui_MainWindow
-from ui.CentralWidgetUI import MainWidget
+from ui.MainWindow.MainWindowUIDesign import Ui_MainWindow
+from ui.ControlPanel.CentralWidgetUI import MainWidget
 from ui.ADC.ADCUI import ADCUIWidget
-from ui.GSAUI import GSAWidget
+from ui.GSA.GSAUI import GSAWidget
 # from ui.PX5UI import PX5Widget
 from ui.PX5_bigUI import PX5Widget
-from ui.AmplifierUI import AmplifierWidget
+from ui.AMP.AmplifierUI import AmplifierWidget
 from ui.MeasurementSettingsUI import MeasurementSettingsWidget
-from ui.HardwareUI import HardwareWidget
+from ui.HARDWARE.HardwareUI import HardwareWidget
 from ui.CalibrationSettingsUI import CalibrationSettingsWidget
 from ui.MiniX2UI import MiniX2Widget
 from PyQt5 import QtWidgets, QtCore
@@ -17,10 +16,10 @@ from core.sxr_protocol import packet_init
 from core.sxr_protocol_pb2 import MainPacket, SystemStatus, Commands
 from core.logger import Logger
 from core.adc_logger import ADCLogger
-from ui.ADCLogUI import AdcLog
-from ui.PlotterUI import PlotterWidget
-from ui.ShotSettingsUI import ShotSettings
-from ui.TokamakUI import TokamakWidget
+from ui.ADCLogger.ADCLogUI import AdcLog
+from ui.PLOTTER.PlotterUI import PlotterWidget
+from ui.JOURNAL.ShotSettingsUI import ShotSettings
+from ui.TOKAMAK.TokamakUI import TokamakWidget
 
 
 class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):

@@ -1,5 +1,5 @@
 from PyQt5 import QtWidgets, QtCore, QtGui
-from ui.CentralWidgetUIDesign import Ui_MainWidgetDesign
+from ui.ControlPanel.CentralWidgetUIDesign import Ui_MainWidgetDesign
 from core.sxr_protocol import packet_init
 from core.sxr_protocol_pb2 import MainPacket, SystemStatus, Commands, AmpStatus, AdcStatus, HardwareStatus, TokamakStatus, JournalStatus
 

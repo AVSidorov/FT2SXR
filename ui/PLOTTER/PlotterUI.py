@@ -1,13 +1,11 @@
 import sys
-import time
-
 from PyQt5 import QtWidgets, QtGui, QtCore
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg, NavigationToolbar2QT
 from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
 import numpy as np
-from ui.PlotterUIDesign import Ui_Plotter
-from ui.reader import Reader
+from ui.PLOTTER.PlotterUIDesign import Ui_Plotter
+from ui.PLOTTER.reader import Reader
 from os import path
 import gc
 from silx.math import medfilt1d

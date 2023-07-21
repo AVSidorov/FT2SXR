@@ -1,4 +1,4 @@
-from ui.MainWindow import MainWindow
+from ui.MainWindow.MainWindow import MainWindow
 from core.core import Core
 from core.logger import Logger
 from core.ft2sxr import Ft2SXR

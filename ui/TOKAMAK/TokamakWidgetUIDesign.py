@@ -14,7 +14,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_tokamakWidget(object):
     def setupUi(self, tokamakWidget):
         tokamakWidget.setObjectName("tokamakWidget")
-        tokamakWidget.resize(377, 207)
+        tokamakWidget.resize(448, 207)
         self.gridLayout = QtWidgets.QGridLayout(tokamakWidget)
         self.gridLayout.setObjectName("gridLayout")
         self.label = QtWidgets.QLabel(tokamakWidget)
