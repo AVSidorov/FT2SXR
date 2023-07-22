@@ -105,7 +105,7 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "SXR spectrometer on FT-2"))
         self.menuOpen_files.setTitle(_translate("MainWindow", "Open file"))
         self.menuInstall.setTitle(_translate("MainWindow", "Install"))
         self.menuADC_Log.setTitle(_translate("MainWindow", "ADC Log"))

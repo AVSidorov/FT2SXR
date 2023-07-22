@@ -1,9 +1,12 @@
 import sys
 import gc
+from time import time
+from multiprocessing import Process
 from ui.MainWindow.MainWindowUIDesign import Ui_MainWindow
 from ui.ControlPanel.CentralWidgetUI import MainWidget
 from ui.ADC.ADCUI import ADCUIWidget
 from ui.GSA.GSAUI import GSAWidget
+from ui.PLOTTER.PlotterUI import main as PlotterMain
 # from ui.PX5UI import PX5Widget
 from ui.PX5_bigUI import PX5Widget
 from ui.AMP.AmplifierUI import AmplifierWidget
@@ -46,6 +49,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose, True)
 
+        self.plotter_process = None
         self.actionOpen_SXR_file.triggered.connect(self.open_sxr)
 
         width = QtWidgets.QApplication.desktop().screenGeometry().width()
@@ -71,7 +75,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         logger = Logger(win_main.log_textBrowser, self)
         self.channel1.connect(logger.channel0_slot)
 
-        self.current_plotter_win = None
+        # self.current_plotter_win = None
 
         win_main.show()
 
@@ -271,11 +275,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
     def open_sxr(self, data_file=None):
         gc.collect(generation=2)
-        win = QtWidgets.QMainWindow(self)
-        win.setAttribute(QtCore.Qt.WA_DeleteOnClose, True)
-        # print(type(data_file))
-
-        # data_dir = QtWidgets.QFileDialog.getExistingDirectory(self, "Выбрать папку измерения", ".")
+        # win = QtWidgets.QMainWindow(self)
+        # win.setAttribute(QtCore.Qt.WA_DeleteOnClose, True)
 
         if data_file is None or data_file is False:
             data_file = QtWidgets.QFileDialog.getOpenFileName(self,
@@ -283,24 +284,34 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                                                               ".",
                                                               "SXR Files (*.h5 *.bin)")[0]
 
+        # if data_file != '':
+        #     try:
+        #         if self.current_plotter_win is not None:
+        #             self.current_plotter_win.close()
+        #     except:
+        #         pass
+        #
+        #     win.setWindowTitle('SXR Plotter')
+        #     win._main = QtWidgets.QWidget()
+        #     win.setCentralWidget(win._main)
+        #     layout = QtWidgets.QVBoxLayout(win._main)
+        #     self.current_plotter_win = win
+        #
+        #     sxr_pltSettings = PlotterWidget(data_file=data_file, x_unit='msec')
+        #     layout.addWidget(sxr_pltSettings)
+        #     win.show()
+
         if data_file != '':
             try:
-                if self.current_plotter_win is not None:
-                    self.current_plotter_win.close()
+                if self.plotter_process is not None:
+                    self.plotter_process.terminate()
             except:
                 pass
+            self.plotter_process = Process(target=PlotterMain, args=(data_file, 'ms'),
+                           daemon=True)
+            self.plotter_process.start()
 
-            win.setWindowTitle('SXR Plotter')
-            win._main = QtWidgets.QWidget()
-            win.setCentralWidget(win._main)
-            layout = QtWidgets.QVBoxLayout(win._main)
-            self.current_plotter_win = win
-
-            sxr_pltSettings = PlotterWidget(data_file=data_file, x_unit='msec')
-            layout.addWidget(sxr_pltSettings)
-
-            win.show()
-            gc.collect()
+            gc.collect(generation=2)
 
     @QtCore.pyqtSlot(bytes)
     def channel0_slot(self, data: bytes):

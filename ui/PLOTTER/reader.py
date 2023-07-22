@@ -3,6 +3,7 @@ from os import path, listdir
 from core.core import Core
 import configparser
 import h5py as h5
+from time import time
 
 
 class Reader(Core):
@@ -111,6 +112,7 @@ class Reader(Core):
                 channels.remove('config')
 
                 names = []
+
                 for i in channels:
                     globals()[i] = file['SXR']['ADC'][i][()]
                     names.append(file['SXR']['ADC'][i].attrs.get('name'))

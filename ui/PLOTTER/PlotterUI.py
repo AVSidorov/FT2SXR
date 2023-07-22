@@ -15,15 +15,16 @@ from numba import njit
 
 
 class PlotterWidget(QtWidgets.QMainWindow, Ui_Plotter):
-    def __init__(self, parent=None, data_file=None, x_unit='samples'):
+    def __init__(self, parent=None, data_file=None, x_unit='ms'):
         super().__init__(parent=parent)
         self.setupUi(self)
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose, True)
 
         gc.collect(generation=2)
+        self.setWindowTitle('SXR plotter')
         self.dir = data_file
         self.x_unit = x_unit
-        if self.x_unit not in ('samples', 'msec'):
+        if self.x_unit not in ('samples', 'ms'):
             self.x_unit = 'samples'
         self.reader = Reader()
 
@@ -40,15 +41,14 @@ class PlotterWidget(QtWidgets.QMainWindow, Ui_Plotter):
         Hlayout.addWidget(self.static_canvas)
         Hlayout.addWidget(self.shot_groupBox)
 
+        self.static_canvas.figure.dpi = 80.0
+        self.x_ax_comboBox.setCurrentText(x_unit)
+        self.make_plot(data_file=self.dir, x_unit=x_unit, new=True)
+
         self.x_ax_comboBox.currentIndexChanged.connect(self.change_ax)
         self.select_shot_pushButton.clicked.connect(self.select_shot)
         self.count_rate_pushButton.clicked.connect(self.count_rate)
         self.rms_pushButton.clicked.connect(self.rms)
-
-        self.static_canvas.figure.dpi = 80.0
-
-        self.make_plot(data_file=self.dir)
-        self.x_ax_comboBox.setCurrentIndex(1)
 
     def make_plot(self, data_file=None, x_unit='samples', new=True):
         self.static_canvas.figure.clear('all')
@@ -83,16 +83,19 @@ class PlotterWidget(QtWidgets.QMainWindow, Ui_Plotter):
                     eval(f'ax{i}').set_title(f'Graph №{self.reader.meta[i - 1][1]} ({self.reader.meta[i - 1][4]})')
                     if x_unit == 'samples':
                         eval(f'ax{i}').plot(self.reader.data[i - 1])
+                        eval(f'ax{i}').set_xlabel('Number of sample')
+                        eval(f'ax{i}').set_ylabel('Signal, bits')
                     elif x_unit == 'ms':
                         # samples = int(self.reader.meta[0][2])
                         rate = int(self.reader.meta[0][3])
                         eval(f'ax{i}').plot(np.linspace(0, len(self.reader.data[i - 1]) / rate * 1000,
                                                         len(self.reader.data[i - 1]), dtype=np.float32),
                                             self.reader.data[i - 1])
+                        eval(f'ax{i}').set_xlabel('Time, ms')
+                        eval(f'ax{i}').set_ylabel('Signal, bits')
 
                 self.static_canvas.draw()
                 self.statusbar.showMessage('Plotted', 10000)
-
             else:
                 self.statusbar.showMessage('Can\'t plot', 10000)
         else:
@@ -197,22 +200,22 @@ class PlotterWidget(QtWidgets.QMainWindow, Ui_Plotter):
                 plt.show()
                 gc.collect(generation=2)
 
-    def hideEvent(self, a0: QtGui.QHideEvent) -> None:
-        self.static_canvas.figure.clear('all')
-        gc.collect(generation=2)
-        self.close()
+    # def hideEvent(self, a0: QtGui.QHideEvent) -> None:
+    #     self.static_canvas.figure.clear('all')
+    #     gc.collect(generation=2)
+    #     self.close()
 
     def closeEvent(self, a0: QtGui.QCloseEvent) -> None:
         self.static_canvas.figure.clear('all')
         gc.collect(generation=2)
 
 
-def main():
+def main(data_file=None, x_unit='ms'):
     app = QtWidgets.QApplication(sys.argv)
-    mv = PlotterWidget()
-    mv.show()
+    mv = PlotterWidget(data_file=data_file, x_unit=x_unit)
+    mv.showMaximized()
     sys.exit(app.exec_())
 
 
 if __name__ == '__main__':
-    main()
+    main(data_file='')
