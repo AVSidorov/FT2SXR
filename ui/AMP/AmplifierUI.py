@@ -184,8 +184,6 @@ class AmplifierWidget(QtWidgets.QWidget, Ui_AmplifierWidgetDesign):
         gc.collect()
         self.close()
 
-    def closeEvent(self, a0: QtGui.QCloseEvent) -> None:
-        self.channelNext.emit()
 
 
 def main():

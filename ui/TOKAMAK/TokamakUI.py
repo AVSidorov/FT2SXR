@@ -21,6 +21,8 @@ class TokamakWidget(QtWidgets.QWidget, Ui_tokamakWidget):
         self.current_spinBox.valueChanged.connect(self.setcurrent)
         self.power_spinBox.valueChanged.connect(self.setpower)
         self.mode_comboBox.currentTextChanged.connect(self.setmode)
+        self.install_pushButton.clicked.connect(self.install_settings)
+        self.return_pushButton.clicked.connect(self.return_settings)
 
     def setcurrent(self):
         self.status.current = self.current_spinBox.value()
@@ -53,7 +55,7 @@ class TokamakWidget(QtWidgets.QWidget, Ui_tokamakWidget):
         self.blockSignals(True)
         self.current_spinBox.setValue(self.status.current)
         self.density_doubleSpinBox.setValue(self.status.density)
-        self.power_spinBox.setValue(self.status.density)
+        self.power_spinBox.setValue(self.status.power)
         if self.status.shotType == self.status.OH:
             self.mode_comboBox.setCurrentText('OH')
         elif self.status.shotType == self.status.RF:

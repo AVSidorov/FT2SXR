@@ -1,0 +1,4 @@
+Units (only for user, file is not used in program)
+gaina [wheel units]
+gainb [wheel units]
+switchstate [bit map for switches like 0b0110]

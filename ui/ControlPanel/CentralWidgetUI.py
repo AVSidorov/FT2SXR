@@ -89,7 +89,7 @@ class MainWidget(QtWidgets.QWidget, Ui_MainWidgetDesign):
 
     def set_tokamak(self):
         self.current_label.setText(str(self.TOKAMAKstatus.current))
-        self.density_label.setText(str(self.TOKAMAKstatus.density))
+        self.density_label.setText(f'{self.TOKAMAKstatus.density:3.1f}')
         self.power_label.setText(str(self.TOKAMAKstatus.power))
         if self.TOKAMAKstatus.shotType == self.TOKAMAKstatus.OH:
             self.mode_label.setText('OH')

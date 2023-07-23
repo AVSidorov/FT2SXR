@@ -10,18 +10,20 @@ class Amplifier(Dev):
     def __init__(self, parent=None):
         super().__init__(parent, SystemStatus.AMP, AmpStatus())
 
-        config = configparser.ConfigParser()
+        config = configparser.ConfigParser(inline_comment_prefixes=(';', '//', '#'))
         config.read(os.path.join(work_dir(), os.path.normpath('dev/tubl/amp_settings.ini')))
 
         self.state.gainA = float(config['amp']['gaina'])
         self.state.gainB = float(config['amp']['gainb'])
         self.state.tail = eval(config['amp']['switchstate'])
 
+        del config
+
         gc.collect(2)
 
     def set_settings(self, state: MainPacket = None, response: bool = False):
         super().set_settings(state, response)
-        config = configparser.ConfigParser()
+        config = configparser.ConfigParser(inline_comment_prefixes=(';', '//', '#'))
         config.read(os.path.join(work_dir(), os.path.normpath('dev/tubl/amp_settings.ini')))
 
         config['amp']['gaina'] = str(self.state.gainA)
@@ -30,6 +32,8 @@ class Amplifier(Dev):
 
         with open(os.path.join(work_dir(), os.path.normpath('dev/tubl/amp_settings.ini')), 'w') as configfile:
             config.write(configfile)
+
+        del config
 
         gc.collect(2)
 

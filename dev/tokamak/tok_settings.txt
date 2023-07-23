@@ -1,0 +1,5 @@
+Units (only for user, file is not used in program)
+density [lines]
+current [kA]
+shottype [0 - OH, 1 - RF, 2 - GLOW]
+power [kW]

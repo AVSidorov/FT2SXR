@@ -1,0 +1,6 @@
+Units (only for user, file is not used in program)
+angle [degrees, + LOS up, - LOS down]
+hknife [mm =]
+vknife [mm ||]
+foil [No;Be 50um;Be 100um;Be 150um;Be 200um;Be 250um;Pb]
+diaphragm [0.7 mm;1.0 mm;2.0 mm;3.0 mm;6.0 mm;Al 8mm]

@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>448</width>
+    <width>409</width>
     <height>207</height>
    </rect>
   </property>
@@ -28,6 +28,9 @@
      </property>
      <property name="decimals">
       <number>1</number>
+     </property>
+     <property name="singleStep">
+      <double>0.100000000000000</double>
      </property>
     </widget>
    </item>
@@ -95,7 +98,7 @@
     <widget class="QPushButton" name="return_pushButton">
      <property name="minimumSize">
       <size>
-       <width>0</width>
+       <width>190</width>
        <height>44</height>
       </size>
      </property>
@@ -116,7 +119,7 @@
     <widget class="QPushButton" name="install_pushButton">
      <property name="minimumSize">
       <size>
-       <width>0</width>
+       <width>190</width>
        <height>44</height>
       </size>
      </property>
