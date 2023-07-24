@@ -1,34 +1,95 @@
 import sys
-from PyQt5 import QtWidgets
+from PyQt5 import QtWidgets, QtCore, QtGui
+import gc
 from ui.GSA.GSAUIDesign import Ui_GSAWidgetDesign
+from core.sxr_protocol_pb2 import MainPacket, GsaStatus, SystemStatus, Commands
+from core.sxr_protocol import packet_init
 
 
 class GSAWidget(QtWidgets.QWidget, Ui_GSAWidgetDesign):
+    channel0 = QtCore.pyqtSignal(bytes)
+
     def __init__(self, parent=None):
         super().__init__(parent=parent)
         self.setupUi(self)
-
-        # hardware
-        amp_list = (('0', '22', '58', '78', '114', '134', '167', '187', '223'), 'mV')
-        edge = ('24', 'ns')
-        freq = ('626', 'Hz')
+        self.setAttribute(QtCore.Qt.WA_DeleteOnClose, True)
+        self.address = 23
 
         # GSA initial values
-        self.amplitude = None
+        self.amplitude = 0.0
+        self.edge = 0.0
+        self.frequency = 0.0
+        self.amplitudes_list = []
+        self.status = GsaStatus()
+
+        self.install_amplitudes_comboBox()
 
         # signals
         self.amp_comboBox.currentTextChanged.connect(self.setamplitude)
-
-        self.edge_val_label.setText(edge[0])
-        self.edge_type_label.setText(edge[1])
-        self.freq_val_label.setText(freq[0])
-        self.freq_type_label.setText(freq[1])
-        for i in amp_list[0]:
-            self.amp_comboBox.addItem(i)
-        self.amp_type_label.setText(amp_list[1])
+        self.edge_doubleSpinBox.valueChanged.connect(self.setedge)
+        self.frequency_doubleSpinBox.valueChanged.connect(self.setfrequency)
+        self.install_pushButton.clicked.connect(self.install_settings)
+        self.return_pushButton.clicked.connect(self.return_settings)
 
     def setamplitude(self):
-        self.amplitude = int(self.amp_comboBox.currentText())
+        self.amplitude = float(self.amp_comboBox.currentText())
+        self.status.amplitude = self.amplitude
+
+    def setedge(self):
+        self.edge = self.edge_doubleSpinBox.value()
+        self.status.edge = self.edge
+
+    def setfrequency(self):
+        self.frequency = self.frequency_doubleSpinBox.value()
+        self.status.frequency = self.frequency
+
+    def install_amplitudes_comboBox(self):
+        with open('ui/GSA/amplitudes.txt') as f:
+            amplitudes = [name[:-1] for name in f]
+            self.amplitudes_list = amplitudes
+            self.amp_comboBox.addItems(amplitudes)
+
+    def ui2status(self):
+        self.status.amplitude = self.amplitude
+        self.status.edge = self.edge
+        self.status.frequency = self.frequency
+
+    def status2ui(self):
+        self.edge_doubleSpinBox.setValue(self.status.edge)
+        self.frequency_doubleSpinBox.setValue(self.status.frequency)
+        self.amp_comboBox.setCurrentText(str(round(float(self.status.amplitude), 1)))
+
+        self.amplitude = self.status.amplitude
+        self.edge = self.status.edge
+        self.frequency = self.status.frequency
+
+    def install_settings(self):
+        request = packet_init(SystemStatus.GSA, self.address)
+        request.command = Commands.SET
+        if self.status.IsInitialized():
+            request.data = self.status.SerializeToString()
+        if request.IsInitialized():
+            self.channel0.emit(request.SerializeToString())
+
+    def return_settings(self):
+        request = packet_init(SystemStatus.GSA, self.address)
+        request.command = Commands.STATUS
+        self.channel0.emit(request.SerializeToString())
+
+    @QtCore.pyqtSlot(bytes)
+    def channel0_slot(self, data: bytes):
+        request = MainPacket()
+        request.ParseFromString(data)
+        if request.sender == SystemStatus.GSA and request.address == self.address:
+            if request.command in (Commands.STATUS ^ 0xFFFFFFFF, Commands.SET ^ 0xFFFFFFFF):
+                self.blockSignals(True)
+                self.status.ParseFromString(request.data)
+                self.status2ui()
+                self.blockSignals(False)
+
+    def hideEvent(self, a0: QtGui.QHideEvent) -> None:
+        gc.collect()
+        self.close()
 
 
 def main():

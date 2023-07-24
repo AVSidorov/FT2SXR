@@ -22,7 +22,6 @@ class HardwareWidget(QtWidgets.QWidget, Ui_HardwareWidgetDesign):
         self.diaphragm = ''
         self.angle = 0.0
         self.status = HardwareStatus()
-        self.address = 20
         self.foils_list = []
         self.diaphragms_list = []
 

@@ -10,7 +10,6 @@ from PyQt5 import QtWidgets, QtCore, QtGui
 
 class AmplifierWidget(QtWidgets.QWidget, Ui_AmplifierWidgetDesign):
     channel0 = QtCore.pyqtSignal(bytes)
-    channelNext = QtCore.pyqtSignal()
 
     def __init__(self, parent=None):
         super().__init__(parent=parent)

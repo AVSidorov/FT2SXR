@@ -52,3 +52,109 @@ Traceback (most recent call last):
   File "h5py\_objects.pyx", line 55, in h5py._objects.with_phil.wrapper
   File "h5py\h5d.pyx", line 135, in h5py.h5d.create
 ValueError: Unable to create dataset (name already exists)
+-------------------------------------------------------------------------------- 
+18.07.2023 
+19:00:40,68 
+-------------------------------------------------------------------------------- 
+18.07.2023 
+19:00:56,60 
+-------------------------------------------------------------------------------- 
+18.07.2023 
+21:31:30,38 
+-------------------------------------------------------------------------------- 
+18.07.2023 
+21:36:49,59 
+Traceback (most recent call last):
+  File "D:\home\projects\SXR\FT2SXR\ui\MainWindow\MainWindow.py", line 85, in settings_from_centralWidget
+    self.action_gsa_set()
+  File "D:\home\projects\SXR\FT2SXR\ui\MainWindow\MainWindow.py", line 133, in action_gsa_set
+    gsaSettings = GSAWidget(win)
+  File "D:\home\projects\SXR\FT2SXR\ui\GSA\GSAUI.py", line 22, in __init__
+    self.edge_val_label.setText(edge[0])
+AttributeError: 'GSAWidget' object has no attribute 'edge_val_label'
+-------------------------------------------------------------------------------- 
+18.07.2023 
+21:37:19,70 
+Traceback (most recent call last):
+  File "D:\home\projects\SXR\FT2SXR\core\ft2sxr.py", line 197, in channel0_slot
+    super().channel0_slot(data)
+  File "D:\home\projects\SXR\FT2SXR\core\core.py", line 216, in channel0_slot
+    self.snapshot(self.request, response=True)
+  File "D:\home\projects\SXR\FT2SXR\core\ft2sxr.py", line 166, in snapshot
+    dset = sxr.create_dataset('wiring', shape=wiring.shape, dtype=dt)
+  File "C:\Users\misha\AppData\Local\Programs\Python\Python39\lib\site-packages\h5py\_hl\group.py", line 183, in create_dataset
+    dsid = dataset.make_new_dset(group, shape, dtype, data, name, **kwds)
+  File "C:\Users\misha\AppData\Local\Programs\Python\Python39\lib\site-packages\h5py\_hl\dataset.py", line 165, in make_new_dset
+    dset_id = h5d.create(parent.id, name, tid, sid, dcpl=dcpl, dapl=dapl)
+  File "h5py\_objects.pyx", line 54, in h5py._objects.with_phil.wrapper
+  File "h5py\_objects.pyx", line 55, in h5py._objects.with_phil.wrapper
+  File "h5py\h5d.pyx", line 135, in h5py.h5d.create
+ValueError: Unable to create dataset (name already exists)
+-------------------------------------------------------------------------------- 
+18.07.2023 
+21:37:36,65 
+-------------------------------------------------------------------------------- 
+19.07.2023 
+20:04:38,47 
+-------------------------------------------------------------------------------- 
+21.07.2023 
+23:34:34,73 
+-------------------------------------------------------------------------------- 
+21.07.2023 
+23:34:49,52 
+-------------------------------------------------------------------------------- 
+21.07.2023 
+23:34:54,82 
+-------------------------------------------------------------------------------- 
+22.07.2023 
+19:59:20,15 
+5.7488789558410645
+8.66340160369873
+-------------------------------------------------------------------------------- 
+22.07.2023 
+20:12:12,79 
+Process Process-1:
+Traceback (most recent call last):
+  File "C:\Users\misha\AppData\Local\Programs\Python\Python39\lib\multiprocessing\process.py", line 315, in _bootstrap
+    self.run()
+  File "C:\Users\misha\AppData\Local\Programs\Python\Python39\lib\multiprocessing\process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+TypeError: main() takes 1 positional argument but 2 were given
+-------------------------------------------------------------------------------- 
+22.07.2023 
+20:19:26,11 
+-------------------------------------------------------------------------------- 
+22.07.2023 
+21:00:55,18 
+-------------------------------------------------------------------------------- 
+22.07.2023 
+21:17:02,37 
+-------------------------------------------------------------------------------- 
+22.07.2023 
+21:21:00,14 
+-------------------------------------------------------------------------------- 
+23.07.2023 
+13:54:40,10 
+-------------------------------------------------------------------------------- 
+23.07.2023 
+13:55:59,33 
+Traceback (most recent call last):
+  File "D:\home\projects\SXR\FT2SXR\ui\MainWindow\MainWindow.py", line 89, in settings_from_centralWidget
+    self.action_gsa_set()
+  File "D:\home\projects\SXR\FT2SXR\ui\MainWindow\MainWindow.py", line 137, in action_gsa_set
+    gsaSettings = GSAWidget(win)
+  File "D:\home\projects\SXR\FT2SXR\ui\GSA\GSAUI.py", line 22, in __init__
+    self.edge_val_label.setText(edge[0])
+AttributeError: 'GSAWidget' object has no attribute 'edge_val_label'
+-------------------------------------------------------------------------------- 
+23.07.2023 
+22:43:19,64 
+-------------------------------------------------------------------------------- 
+24.07.2023 
+20:02:13,29 
+-------------------------------------------------------------------------------- 
+24.07.2023 
+20:03:48,82 
+-------------------------------------------------------------------------------- 
+24.07.2023 
+20:04:17,08 

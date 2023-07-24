@@ -135,11 +135,19 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         win.setAttribute(QtCore.Qt.WA_DeleteOnClose, True)
 
         gsaSettings = GSAWidget(win)
+        gsaSettings.channel0.connect(self.channel0)
+        self.channel1.connect(gsaSettings.channel0_slot)
+
         win.verticalLayout = QtWidgets.QVBoxLayout(win)
         win.verticalLayout.addWidget(gsaSettings)
 
         win.show()
         gc.collect()
+
+        request = packet_init(SystemStatus.GSA, gsaSettings.address)
+        request.command = Commands.STATUS
+        if request.IsInitialized():
+            self.channel0.emit(request.SerializeToString())
 
     def action_amplifier_set(self):
         win = QtWidgets.QDialog(self)

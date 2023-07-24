@@ -1,0 +1,4 @@
+Units (only for user, file is not used in program)
+amplitude [mV]
+edge [ns]
+frequency [Hz]

@@ -8,6 +8,7 @@ from dev.tubl.amplifier import Amplifier
 from dev.hardware.table import Hardware
 from dev.journal.journal import Journal
 from dev.tokamak.tokamak import Tokamak
+from dev.tubl.GSA import Gsa
 from core.fileutils import today_dir
 import os
 import numpy as np
@@ -39,6 +40,7 @@ class Ft2SXR(Dev):
         self.hardware = Hardware(self)
         self.journal = Journal(self)
         self.tokamak = Tokamak(self)
+        self.gsa = Gsa(self)
 
         # connect devs to message system
         if core is not None:
@@ -64,12 +66,16 @@ class Ft2SXR(Dev):
             self.tokamak.channel0.connect(core.channel0)  # out Main Packets (commands)
             core.channel0.connect(self.tokamak.channel0_slot)  # in Main Packets (commands)
 
+            self.gsa.channel0.connect(core.channel0)  # out Main Packets (commands)
+            core.channel0.connect(self.gsa.channel0_slot)  # in Main Packets (commands)
+
         self.state.devs.append(SystemStatus.ADC)
         self.state.devs.append(SystemStatus.AMP)
         self.state.devs.append(SystemStatus.PX5)
         self.state.devs.append(SystemStatus.HARDWARE)
         self.state.devs.append(SystemStatus.JOURNAL)
         self.state.devs.append(SystemStatus.TOKAMAK)
+        self.state.devs.append(SystemStatus.GSA)
         
         # devices wiring
         self.state.binds.add()

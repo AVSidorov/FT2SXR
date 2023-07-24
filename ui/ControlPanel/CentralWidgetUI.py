@@ -1,7 +1,7 @@
 from PyQt5 import QtWidgets, QtCore, QtGui
 from ui.ControlPanel.CentralWidgetUIDesign import Ui_MainWidgetDesign
 from core.sxr_protocol import packet_init
-from core.sxr_protocol_pb2 import MainPacket, SystemStatus, Commands, AmpStatus, AdcStatus, HardwareStatus, TokamakStatus, JournalStatus
+from core.sxr_protocol_pb2 import MainPacket, SystemStatus, Commands, AmpStatus, AdcStatus, HardwareStatus, TokamakStatus, JournalStatus, GsaStatus
 
 
 class MainWidget(QtWidgets.QWidget, Ui_MainWidgetDesign):
@@ -20,6 +20,7 @@ class MainWidget(QtWidgets.QWidget, Ui_MainWidgetDesign):
         self.HARDWAREstatus = HardwareStatus()
         self.TOKAMAKstatus = TokamakStatus()
         self.JOURNALstatus = JournalStatus()
+        self.GSAstatus = GsaStatus()
         self.timer = QtCore.QTimer(self)
         self.timer.timeout.connect(self.get_settings)
         self.timer.start(30000)
@@ -103,6 +104,11 @@ class MainWidget(QtWidgets.QWidget, Ui_MainWidgetDesign):
         self.tokamakNo_label.setText(str(self.JOURNALstatus.TOKAMAKshot))
         self.fileName_label.setText(str(self.JOURNALstatus.filename))
         self.comment_textBrowser.setText(self.JOURNALstatus.comment)
+
+    def set_gsa(self):
+        self.gsa_ampl_label.setText(f'{self.GSAstatus.amplitude:4.1f}')
+        self.gsa_edge_label.setText(f'{self.GSAstatus.edge}')
+        self.gsa_freq_label.setText(f'{self.GSAstatus.frequency}')
 
     def set_adc(self, connection=False):
         # if connection is True:
@@ -190,6 +196,11 @@ class MainWidget(QtWidgets.QWidget, Ui_MainWidgetDesign):
         if request.IsInitialized():
             self.channel0.emit(request.SerializeToString())
 
+        request = packet_init(SystemStatus.GSA, self.address)
+        request.command = Commands.STATUS
+        if request.IsInitialized():
+            self.channel0.emit(request.SerializeToString())
+
     @QtCore.pyqtSlot(bytes)
     def channel0_slot(self, data: bytes):
         self.channel1.emit(data)
@@ -216,6 +227,11 @@ class MainWidget(QtWidgets.QWidget, Ui_MainWidgetDesign):
             if request.command in (Commands.STATUS ^ 0xFFFFFFFF, Commands.SET ^ 0xFFFFFFFF):
                 self.JOURNALstatus.ParseFromString(request.data)
                 self.set_journal()
+
+        elif request.sender == SystemStatus.GSA:
+            if request.command in (Commands.STATUS ^ 0xFFFFFFFF, Commands.SET ^ 0xFFFFFFFF):
+                self.GSAstatus.ParseFromString(request.data)
+                self.set_gsa()
 
         elif request.sender == SystemStatus.ADC:
             if request.command in (Commands.STATUS ^ 0xFFFFFFFF, Commands.SET ^ 0xFFFFFFFF):

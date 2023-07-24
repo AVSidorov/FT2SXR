@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>300</width>
-    <height>153</height>
+    <width>431</width>
+    <height>185</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -25,79 +25,91 @@
   <property name="windowTitle">
    <string>GSA</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
-   <property name="sizeConstraint">
-    <enum>QLayout::SetMaximumSize</enum>
-   </property>
-   <item>
-    <widget class="QGroupBox" name="groupBox">
-     <property name="title">
-      <string>ГСА</string>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="3" column="0" colspan="2">
+    <widget class="QPushButton" name="return_pushButton">
+     <property name="minimumSize">
+      <size>
+       <width>190</width>
+       <height>44</height>
+      </size>
      </property>
-     <layout class="QGridLayout" name="gridLayout">
-      <item row="0" column="0">
-       <widget class="QLabel" name="amplitude_label">
-        <property name="text">
-         <string>Амплитуда импульса</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="QComboBox" name="amp_comboBox"/>
-      </item>
-      <item row="0" column="2">
-       <widget class="QLabel" name="amp_type_label">
-        <property name="text">
-         <string>mV</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="edge_label">
-        <property name="text">
-         <string>Фронт</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="2">
-       <widget class="QLabel" name="edge_type_label">
-        <property name="text">
-         <string>ns</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="0">
-       <widget class="QLabel" name="freq_label">
-        <property name="text">
-         <string>Частота</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="2">
-       <widget class="QLabel" name="freq_type_label">
-        <property name="text">
-         <string>Hz</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1">
-       <widget class="QDoubleSpinBox" name="edge_doubleSpinBox">
-        <property name="decimals">
-         <number>1</number>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="1">
-       <widget class="QDoubleSpinBox" name="frequency_doubleSpinBox">
-        <property name="decimals">
-         <number>1</number>
-        </property>
-        <property name="maximum">
-         <double>1000.000000000000000</double>
-        </property>
-       </widget>
-      </item>
-     </layout>
+     <property name="font">
+      <font>
+       <pointsize>9</pointsize>
+      </font>
+     </property>
+     <property name="cursor">
+      <cursorShape>PointingHandCursor</cursorShape>
+     </property>
+     <property name="text">
+      <string>Вернуть настройки</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="2">
+    <widget class="QPushButton" name="install_pushButton">
+     <property name="minimumSize">
+      <size>
+       <width>190</width>
+       <height>44</height>
+      </size>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>9</pointsize>
+      </font>
+     </property>
+     <property name="cursor">
+      <cursorShape>PointingHandCursor</cursorShape>
+     </property>
+     <property name="text">
+      <string>Установить настройки</string>
+     </property>
+     <property name="default">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="2">
+    <widget class="QDoubleSpinBox" name="frequency_doubleSpinBox">
+     <property name="decimals">
+      <number>1</number>
+     </property>
+     <property name="maximum">
+      <double>1000.000000000000000</double>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0" colspan="2">
+    <widget class="QLabel" name="freq_label">
+     <property name="text">
+      <string>Частота, Hz</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="2">
+    <widget class="QDoubleSpinBox" name="edge_doubleSpinBox">
+     <property name="decimals">
+      <number>1</number>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0" colspan="2">
+    <widget class="QLabel" name="edge_label">
+     <property name="text">
+      <string>Фронт, ns</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="2">
+    <widget class="QComboBox" name="amp_comboBox"/>
+   </item>
+   <item row="0" column="0" colspan="2">
+    <widget class="QLabel" name="amplitude_label">
+     <property name="text">
+      <string>Амплитуда, mV</string>
+     </property>
     </widget>
    </item>
   </layout>

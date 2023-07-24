@@ -66,7 +66,8 @@ class ADC(Dev):
         self.ssh = None
         self.ssh_timeout = 0.5
         self.file_base = 'data_0'
-        self.wdir = os.path.abspath('./')
+        # self.wdir = os.path.abspath('./')
+        self.wdir = work_dir()
         self.scp = None
         self.config = None
         self.isAcqComplete = False
@@ -78,8 +79,8 @@ class ADC(Dev):
         config.optionxform = str
 
         # read config from directory of launch
-        if os.path.exists(os.path.join(self.wdir, 'adc.ini')):
-            config.read(os.path.join(self.wdir, 'adc.ini'), "utf-8")
+        if os.path.exists(os.path.join(self.wdir, 'dev/insys/adc.ini')):
+            config.read(os.path.join(self.wdir, 'dev/insys/adc.ini'), "utf-8")
             self.config = config
 
             mask = self.get_cfg_item('device0_fm814x250m0', 'ChannelMask')
@@ -100,7 +101,7 @@ class ADC(Dev):
 
         # make directory whit current date, to store adc memory dumps and  cfg.ini for sending
         if wdir is None:
-            self.wdir = today_dir()
+            self.wdir = work_dir()
 
         if connect:
             self.connection_watch = Thread(name='Thread-ADC_connection-watchdog', target=self.watchdog, daemon=True)
@@ -148,10 +149,10 @@ class ADC(Dev):
 
     def send_config(self):
         config = self.config
-        with open(os.path.join(self.wdir, 'cfg.ini'), 'w') as f:
+        with open(os.path.join(self.wdir, 'dev/insys/temp/adc.ini'), 'w') as f:
             config.write(f)
         if self.connected:
-            self.scp.put(os.path.join(self.wdir, 'cfg.ini'), '/home/embedded/examples/exam_adc.ini')
+            self.scp.put(os.path.join(self.wdir, 'dev/insys/temp/adc.ini'), '/home/embedded/examples/exam_adc.ini')
 
     def start(self, response: bool = False):
         # separate function for ability start ADC(thread) "manually", not only by command in packet
@@ -162,8 +163,8 @@ class ADC(Dev):
     def run(self, response: bool = False):
             self.started = True
             self.isAcqComplete = False
-            if os.path.exists(os.path.join(self.wdir, self.file_base+'.bin')):
-                os.remove(os.path.join(self.wdir, self.file_base+'.bin'))
+            if os.path.exists(os.path.join(self.wdir, 'dev/insys/temp/'+self.file_base+'.bin')):
+                os.remove(os.path.join(self.wdir, 'dev/insys/temp/'+self.file_base+'.bin'))
 
             #TODO remove using ssh shell. Use exec_command instead
 
@@ -176,7 +177,7 @@ class ADC(Dev):
 
             # wait for exam_adc ending or stopping by user
             while self.started:
-                pass
+                time.sleep(1)
 
             # if data acquired get adc memory dump file
             if self.isAcqComplete:
@@ -185,22 +186,25 @@ class ADC(Dev):
                     self.scp.get('/home/embedded/examples/data_0.bin', self.wdir)
 
                     # wait for file transfer completes
-                    while not(os.path.exists(os.path.join(self.wdir, self.file_base+'.bin'))):
-                        pass
+                    while not(os.path.exists(os.path.join(self.wdir, 'dev/insys/temp/'+self.file_base+'.bin'))):
+                        time.sleep(0.1)
                 else:
                     self.generate_data()
                 # read dump from disk (generated or loaded from adc)
-                dump = np.fromfile(os.path.join(self.wdir, self.file_base + '.bin'), dtype=np.int16)
+                dump = np.fromfile(os.path.join(self.wdir, 'dev/insys/temp/'+self.file_base + '.bin'), dtype=np.int16)
 
             else:
                 dump = np.ndarray((0,))
 
             dump = dump.reshape((-1, self.boards[0].n_active_ch)).T
-            cols = (_ for _ in dump)
+            # cols = (_ for _ in dump)
 
+            n = 0
             for ch in self.boards[0].channels:
                 if ch.on:
-                    ch.data = next(cols)
+                    # ch.data = next(cols)
+                    ch.data = dump[n]
+                    n += 1
                 else:
                     ch.data = np.ndarray((0,))
 
@@ -293,6 +297,10 @@ class ADC(Dev):
                 self.state.board_status.add()
             self.state.board_status[0].channel_mask = self.boards[0].channel_mask.to_bytes(1, 'big')
 
+        config = configparser.ConfigParser()
+        with open(os.path.join(self.wdir, 'dev/insys/adc_additional.ini'), 'r') as f:
+            config.read_file(f)
+
         for ch_n in range(len(self.boards[0].channels)):
             bias = self.get_cfg_item('device0_fm814x250m0', f'Bias{ch_n}')
             if len(self.state.board_status) < 1:
@@ -302,6 +310,10 @@ class ADC(Dev):
                     self.state.board_status[0].channel_status.add()
                 self.state.board_status[0].channel_status[ch_n].enabled = self.boards[0].channels[ch_n].on
                 self.state.board_status[0].channel_status[ch_n].bias = float(bias)
+                self.state.board_status[0].channel_status[ch_n].name = config['adc_additional'][f'name{ch_n+1}']
+                self.state.board_status[0].channel_status[ch_n].void = bool((int(config['adc_additional']['void_mask'], 2) >> (len(self.boards[0].channels) - ch_n - 1)) & 1)
+
+        del config
 
         self._response(response, self.state.SerializeToString())
 
@@ -358,6 +370,26 @@ class ADC(Dev):
             self.config['device0_fm814x250m0']['StartSource'] = '0'
             self.config['device0_fm814x250m0']['StartBaseSource'] = '7'
 
+        with open(os.path.join(self.wdir, 'dev/insys/adc.ini'), 'w') as f:
+            self.config.write(f)
+
+        config = configparser.ConfigParser()
+        with open(os.path.join(self.wdir, 'dev/insys/adc_additional.ini'), 'r') as f:
+            config.read_file(f)
+        void_mask = 0
+        if len(status.board_status) > 0:
+            n_ch = -1
+            for ch_status in status.board_status[0].channel_status:
+                n_ch += 1
+                if ch_status.void:
+                    void_mask += 1
+                void_mask = void_mask << 1
+                config['adc_additional'][f'name{n_ch+1}'] = ch_status.name
+            void_mask = void_mask >> 1
+            config['adc_additional']['void_mask'] = str(bin(void_mask))
+        with open(os.path.join(self.wdir, 'dev/insys/adc_additional.ini'), 'w') as f:
+            config.write(f)
+
         if response is not None:
             self.get_status(response)
 
@@ -377,7 +409,7 @@ class ADC(Dev):
                 col += 1
 
         dump = dump.reshape((-1, 1)).squeeze()
-        with open(os.path.join(self.wdir, self.file_base + '.bin'), 'w') as f:
+        with open(os.path.join(self.wdir, 'dev/insys/temp/'+self.file_base + '.bin'), 'w') as f:
             dump.tofile(f)
         return dump
 
