@@ -116,7 +116,7 @@ class Reader(Core):
                 for i in channels:
                     globals()[i] = file['SXR']['ADC'][i][()]
                     names.append(file['SXR']['ADC'][i].attrs.get('name'))
-                measurements = np.vstack([eval(i) for i in channels])
+                measurements = np.vstack([np.array(eval(i), dtype=np.int16) for i in channels])
 
                 return {'samples': samples,
                         'rate': rate,
