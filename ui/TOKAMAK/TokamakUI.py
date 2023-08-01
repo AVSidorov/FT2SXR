@@ -35,12 +35,28 @@ class TokamakWidget(QtWidgets.QWidget, Ui_tokamakWidget):
             self.status.shotType = self.status.OH
             self.power_spinBox.setValue(0)
             self.power_spinBox.setDisabled(True)
+            self.current_spinBox.setEnabled(True)
+            self.density_doubleSpinBox.setEnabled(True)
         elif self.mode_comboBox.currentText() == 'RF':
             self.status.shotType = self.status.RF
             self.power_spinBox.setEnabled(True)
+            self.current_spinBox.setEnabled(True)
+            self.density_doubleSpinBox.setEnabled(True)
         elif self.mode_comboBox.currentText() == 'Тлеющий':
             self.status.shotType = self.status.GLOW
+            self.density_doubleSpinBox.setValue(0.0)
+            self.current_spinBox.setValue(0)
             self.power_spinBox.setEnabled(True)
+            self.current_spinBox.setDisabled(True)
+            self.density_doubleSpinBox.setDisabled(True)
+        elif self.mode_comboBox.currentText() == 'OFF':
+            self.status.shotType = self.status.OFF
+            self.power_spinBox.setValue(0)
+            self.density_doubleSpinBox.setValue(0.0)
+            self.current_spinBox.setValue(0)
+            self.power_spinBox.setDisabled(True)
+            self.current_spinBox.setDisabled(True)
+            self.density_doubleSpinBox.setDisabled(True)
 
     def setpower(self):
         self.status.power = self.power_spinBox.value()
@@ -52,7 +68,6 @@ class TokamakWidget(QtWidgets.QWidget, Ui_tokamakWidget):
         self.setmode()
 
     def status2ui(self):
-        self.blockSignals(True)
         self.current_spinBox.setValue(self.status.current)
         self.density_doubleSpinBox.setValue(self.status.density)
         self.power_spinBox.setValue(self.status.power)
@@ -62,7 +77,8 @@ class TokamakWidget(QtWidgets.QWidget, Ui_tokamakWidget):
             self.mode_comboBox.setCurrentText('RF')
         elif self.status.shotType == self.status.GLOW:
             self.mode_comboBox.setCurrentText('Тлеющий')
-        self.blockSignals(False)
+        elif self.status.shotType == self.status.OFF:
+            self.mode_comboBox.setCurrentText('OFF')
 
     def install_settings(self):
         request = packet_init(SystemStatus.TOKAMAK, self.address)

@@ -25,7 +25,7 @@ class MainWidget(QtWidgets.QWidget, Ui_MainWidgetDesign):
         self.timer.timeout.connect(self.get_settings)
         self.timer.start(30000)
 
-        self.address = 12
+        self.address = 16
         self.isInPeriodic = False
 
         # self.manual_pushButton.clicked.connect(self.start_btn)
@@ -38,11 +38,13 @@ class MainWidget(QtWidgets.QWidget, Ui_MainWidgetDesign):
         self.changeTok_pushButton.clicked.connect(self._openTok)
         self.changeJour_pushButton.clicked.connect(self._openJour)
         self.manual_pushButton.hide()
-        self.periodic_pushButton.hide()
+        self.periodic_manual_pushButton.hide()
+        self.periodic_external_pushButton.hide()
         self.stop_pushButton.clicked.connect(self.stop_adc)
         self.request = packet_init(SystemStatus.SXR, self.address)
 
-        self.periodic_pushButton.setDisabled(True)
+        self.periodic_manual_pushButton.setDisabled(True)
+        self.periodic_external_pushButton.setDisabled(True)
 
     def _openADC(self):
         self.channelSettings.emit(SystemStatus.ADC)
@@ -98,6 +100,8 @@ class MainWidget(QtWidgets.QWidget, Ui_MainWidgetDesign):
             self.mode_label.setText('RF')
         elif self.TOKAMAKstatus.shotType == self.TOKAMAKstatus.GLOW:
             self.mode_label.setText('Тлеющий')
+        elif self.TOKAMAKstatus.shotType == self.TOKAMAKstatus.OFF:
+            self.mode_label.setText('OFF')
 
     def set_journal(self):
         self.sxrNo_label.setText(str(self.JOURNALstatus.SXRshot))

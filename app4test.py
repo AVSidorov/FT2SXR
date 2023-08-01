@@ -9,6 +9,7 @@ import sys
 def main():
 
     app = QtWidgets.QApplication(sys.argv)
+    app.setStyle('Fusion')
 
     core = Core(app)
 
