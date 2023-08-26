@@ -1,0 +1,11 @@
+numpy
+matplotlib
+pyqt5
+silx
+h5py
+paramiko
+protobuf
+scp
+configparser
+scipy
+numba
