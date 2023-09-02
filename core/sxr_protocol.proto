@@ -112,6 +112,7 @@ message JournalStatus{
   optional uint32 TOKAMAKshot = 2 [default = 0];
   required string filename = 3 [default = 'SXRspectrum'];
   optional string comment = 4 [default = ''];
+  optional string daycomment = 5 [default = ''];
 }
 
 message TokamakStatus{
@@ -121,6 +122,7 @@ message TokamakStatus{
     OH = 0;
     RF = 1;
     GLOW = 2;
+    OFF = 3;
   }
   optional EnumShot shotType = 3 [default = OH]; // mode
   optional uint32 power = 4 [default = 0]; // kW
@@ -201,6 +203,7 @@ enum Commands{
   CONNECT = 7;
   SNAPSHOT = 8;
   SHUTDOWN = 9;
+  DONE = 10;
 }
 
 message Source{

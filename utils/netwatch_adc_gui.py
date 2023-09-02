@@ -8,7 +8,7 @@ sys.path.append(os.path.dirname(SCRIPT_DIR))
 from PyQt5.QtWidgets import QApplication
 from core.adc_logger import ADCLogger
 from core.netmanager_simple import NetManagerSimple
-from ui.ADCLogUI import AdcLog
+from ui.ADCLogger.ADCLogUI import AdcLog
 
 
 def main():

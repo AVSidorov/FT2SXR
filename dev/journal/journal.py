@@ -28,6 +28,7 @@ class Journal(Dev):
             config['journal']['tokamakshot'] = str(self.state.TOKAMAKshot)
             config['journal']['filename'] = str(self.state.filename)
             config['journal']['comment'] = str(self.state.comment)
+            config['journal']['daycomment'] = str(self.state.daycomment)
 
             with open(os.path.join(work_dir(), os.path.normpath('dev/journal/jou_settings.ini')), 'w') as configfile:
                 config.write(configfile)
@@ -39,6 +40,10 @@ class Journal(Dev):
             self.state.TOKAMAKshot = int(config['journal']['tokamakshot'])
             self.state.filename = config['journal']['filename']
             self.state.comment = config['journal']['comment']
+            self.state.daycomment = config['journal']['daycomment']
+
+        with open(os.path.join(today_dir(), 'DayComment.txt'), 'w') as day_file:
+            day_file.write(self.state.daycomment)
 
     def set_settings(self, state: MainPacket = None, response: bool = False):
         super().set_settings(state, response)
@@ -49,9 +54,13 @@ class Journal(Dev):
         config['journal']['tokamakshot'] = str(self.state.TOKAMAKshot)
         config['journal']['filename'] = str(self.state.filename)
         config['journal']['comment'] = str(self.state.comment)
+        config['journal']['daycomment'] = str(self.state.daycomment)
 
         with open(os.path.join(work_dir(), os.path.normpath('dev/journal/jou_settings.ini')), 'w') as configfile:
             config.write(configfile)
+
+        with open(os.path.join(today_dir(), 'DayComment.txt'), 'w') as day_file:
+            day_file.write(self.state.daycomment)
 
         gc.collect(2)
 
@@ -86,6 +95,7 @@ class Journal(Dev):
         config['journal']['tokamakshot'] = str(self.state.TOKAMAKshot)
         config['journal']['filename'] = str(self.state.filename)
         config['journal']['comment'] = str(self.state.comment)
+        config['journal']['comment'] = str(self.state.daycomment)
 
         with open(os.path.join(work_dir(), os.path.normpath('dev/journal/jou_settings.ini')), 'w') as configfile:
             config.write(configfile)

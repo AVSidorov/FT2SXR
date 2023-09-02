@@ -6,18 +6,25 @@ import matplotlib.pyplot as plt
 import numpy as np
 from ui.PLOTTER.PlotterUIDesign import Ui_Plotter
 from ui.PLOTTER.reader import Reader
+# from PlotterUIDesign import Ui_Plotter
+# from reader import Reader
 from os import path
 import gc
 from silx.math import medfilt1d
 from silx.math.fit import savitsky_golay
 import scipy.signal as signal
 from numba import njit
+import os
+import time
 
 
 class PlotterWidget(QtWidgets.QMainWindow, Ui_Plotter):
     def __init__(self, parent=None, data_file=None, x_unit='ms'):
+        curdir = os.getcwd()
+        os.chdir(os.path.join(curdir, 'ui', 'PLOTTER'))
         super().__init__(parent=parent)
         self.setupUi(self)
+        os.chdir(curdir)
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose, True)
 
         gc.collect(generation=2)
@@ -71,6 +78,7 @@ class PlotterWidget(QtWidgets.QMainWindow, Ui_Plotter):
                     self.rate_val_label.setText(rate)
                     self.channels_val_label.setText(str(n_plots))
                     self.time_val_label.setText(time_ms)
+                    self.date_label.setText(time.ctime(self.reader.stat.st_ctime))
                     self.count_rate_comboBox.clear()
                     self.rms_comboBox.clear()
                     for i in range(n_plots - 1, -1, -1):
@@ -102,7 +110,6 @@ class PlotterWidget(QtWidgets.QMainWindow, Ui_Plotter):
             self.statusbar.showMessage('Can\'t plot', 10000)
 
     def change_ax(self):
-
         self.x_unit = self.x_ax_comboBox.currentText().lower().strip()
         self.make_plot(x_unit=self.x_unit, new=False)
 
@@ -115,7 +122,6 @@ class PlotterWidget(QtWidgets.QMainWindow, Ui_Plotter):
             if path.isabs(data_file):
                 self.dir = data_file
                 self.make_plot(data_file=self.dir)
-                self.change_ax()
 
     def rms(self):
         if not (isinstance(self.reader.meta, type(None)) or isinstance(self.reader.data, type(None))):
@@ -211,8 +217,18 @@ class PlotterWidget(QtWidgets.QMainWindow, Ui_Plotter):
 
 
 def main(data_file=None, x_unit='ms'):
+    try:
+        # Включите в блок try/except, если вы также нацелены на Mac/Linux
+        from PyQt5.QtWinExtras import QtWin  # !!!
+        myappid = 'FT2SXRPLOTTER'  # !!!
+        QtWin.setCurrentProcessExplicitAppUserModelID(myappid)  # !!!
+    except ImportError:
+        pass
+
     app = QtWidgets.QApplication(sys.argv)
+    app.setWindowIcon(QtGui.QIcon(os.path.join(os.getcwd(), 'style', 'icons', 'icons8-quadrant-light-48.png')))
     mv = PlotterWidget(data_file=data_file, x_unit=x_unit)
+    mv.setWindowIcon(QtGui.QIcon(os.path.join(os.getcwd(), 'style', 'icons', 'icons8-quadrant-light-48.png')))
     mv.showMaximized()
     sys.exit(app.exec_())
 

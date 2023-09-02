@@ -158,3 +158,181 @@ AttributeError: 'GSAWidget' object has no attribute 'edge_val_label'
 -------------------------------------------------------------------------------- 
 24.07.2023 
 20:04:17,08 
+-------------------------------------------------------------------------------- 
+25.07.2023 
+18:59:41,46 
+-------------------------------------------------------------------------------- 
+25.07.2023 
+19:21:30,34 
+-------------------------------------------------------------------------------- 
+25.07.2023 
+20:06:17,49 
+-------------------------------------------------------------------------------- 
+25.08.2023 
+18:24:31,11 
+-------------------------------------------------------------------------------- 
+25.08.2023 
+21:38:20,34 
+QCoreApplication::exec: The event loop is already running
+-------------------------------------------------------------------------------- 
+25.08.2023 
+22:07:03,32 
+SLF4J: Class path contains multiple SLF4J providers.
+SLF4J: Found provider [org.slf4j.simple.SimpleServiceProvider@1b083826]
+SLF4J: Found provider [org.slf4j.nop.NOPServiceProvider@105fece7]
+SLF4J: See https://www.slf4j.org/codes.html#multiple_bindings for an explanation.
+SLF4J: Actual provider is of type [org.slf4j.simple.SimpleServiceProvider@1b083826]
+[main] INFO hdf.hdf5lib.H5 - HDF5 library: hdf5_java
+[main] INFO hdf.hdf5lib.H5 -  successfully loaded from java.library.path
+[main] INFO hdf.view.HDFView - Current directory is D:\home\projects\SXR\FT2SXR
+[main] INFO hdf.view.HDFView - Menubar created
+[main] INFO hdf.view.HDFView - Toolbar created
+[main] INFO hdf.view.HDFView - URL Toolbar created
+[main] INFO hdf.view.HDFView - Content Area created
+[main] INFO hdf.view.HDFView - Main Window created
+[main] INFO hdf.view.HDFView - CurrentDir is D:\home\projects\SXR\FT2SXR\230720
+-------------------------------------------------------------------------------- 
+28.08.2023 
+19:19:52,74 
+-------------------------------------------------------------------------------- 
+28.08.2023 
+21:10:50,80 
+-------------------------------------------------------------------------------- 
+29.08.2023 
+13:45:11,90 
+-------------------------------------------------------------------------------- 
+29.08.2023 
+13:49:53,43 
+-------------------------------------------------------------------------------- 
+29.08.2023 
+13:55:13,27 
+-------------------------------------------------------------------------------- 
+29.08.2023 
+13:58:39,72 
+-------------------------------------------------------------------------------- 
+30.08.2023 
+12:56:48,17 
+-------------------------------------------------------------------------------- 
+30.08.2023 
+13:48:14,01 
+-------------------------------------------------------------------------------- 
+30.08.2023 
+17:51:47,07 
+-------------------------------------------------------------------------------- 
+30.08.2023 
+17:55:09,56 
+-------------------------------------------------------------------------------- 
+30.08.2023 
+17:58:51,31 
+-------------------------------------------------------------------------------- 
+30.08.2023 
+18:07:13,60 
+-------------------------------------------------------------------------------- 
+30.08.2023 
+18:30:35,16 
+-------------------------------------------------------------------------------- 
+30.08.2023 
+18:32:47,24 
+-------------------------------------------------------------------------------- 
+30.08.2023 
+19:16:02,46 
+-------------------------------------------------------------------------------- 
+30.08.2023 
+19:18:28,51 
+-------------------------------------------------------------------------------- 
+30.08.2023 
+19:22:09,59 
+-------------------------------------------------------------------------------- 
+30.08.2023 
+19:37:11,91 
+Traceback (most recent call last):
+  File "D:\home\projects\SXR\FT2SXR\ui\ControlPanel\CentralWidgetUI.py", line 213, in start_btn
+    self.start_adc()
+  File "D:\home\projects\SXR\FT2SXR\ui\ControlPanel\CentralWidgetUI.py", line 129, in start_adc
+    self._set_system_working()
+  File "D:\home\projects\SXR\FT2SXR\ui\ControlPanel\CentralWidgetUI.py", line 274, in _set_system_working
+    self.external_pushButton.setDisabled()
+TypeError: setDisabled(self, a0: bool): not enough arguments
+-------------------------------------------------------------------------------- 
+30.08.2023 
+19:38:49,39 
+-------------------------------------------------------------------------------- 
+30.08.2023 
+20:18:54,27 
+-------------------------------------------------------------------------------- 
+30.08.2023 
+20:46:22,06 
+Traceback (most recent call last):
+  File "D:\home\projects\SXR\FT2SXR\ui\MainWindow\MainWindow.py", line 91, in settings_from_centralWidget
+    self.action_adc_set()
+  File "D:\home\projects\SXR\FT2SXR\ui\MainWindow\MainWindow.py", line 109, in action_adc_set
+    adcSettings = ADCUIWidget(win)
+  File "D:\home\projects\SXR\FT2SXR\ui\ADC\ADCUI.py", line 27, in __init__
+    if config['adc']['mode'] == 'periodic':
+  File "C:\Users\misha\AppData\Local\Programs\Python\Python39\lib\configparser.py", line 960, in __getitem__
+    raise KeyError(key)
+KeyError: 'adc'
+-------------------------------------------------------------------------------- 
+30.08.2023 
+20:50:24,75 
+Traceback (most recent call last):
+  File "D:\home\projects\SXR\FT2SXR\ui\ADC\ADCUI.py", line 239, in ui2status
+    self._set_adc_mode('single')
+  File "D:\home\projects\SXR\FT2SXR\ui\ADC\ADCUI.py", line 275, in _set_adc_mode
+    config.read(file)
+TypeError: read() missing 1 required positional argument: 'filenames'
+-------------------------------------------------------------------------------- 
+31.08.2023 
+18:47:33,85 
+-------------------------------------------------------------------------------- 
+31.08.2023 
+18:54:51,09 
+-------------------------------------------------------------------------------- 
+31.08.2023 
+19:23:18,91 
+-------------------------------------------------------------------------------- 
+31.08.2023 
+19:45:06,37 
+-------------------------------------------------------------------------------- 
+31.08.2023 
+19:47:51,90 
+-------------------------------------------------------------------------------- 
+31.08.2023 
+19:58:14,71 
+Traceback (most recent call last):
+  File "D:\home\projects\SXR\FT2SXR\ui\ControlPanel\CentralWidgetUI.py", line 424, in channel0_slot
+    str_data = request.data.decode()
+UnicodeDecodeError: 'utf-8' codec can't decode byte 0x80 in position 15: invalid start byte
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\home\projects\SXR\FT2SXR\ui\ControlPanel\CentralWidgetUI.py", line 429, in channel0_slot
+    self.set_adc(connection=True)
+  File "D:\home\projects\SXR\FT2SXR\ui\ControlPanel\CentralWidgetUI.py", line 198, in set_adc
+    self.adc_status_label.setStyle('color: rgb(255, 0, 0);')
+TypeError: setStyle(self, a0: QStyle): argument 1 has unexpected type 'str'
+-------------------------------------------------------------------------------- 
+31.08.2023 
+20:01:26,14 
+-------------------------------------------------------------------------------- 
+31.08.2023 
+20:07:28,72 
+-------------------------------------------------------------------------------- 
+31.08.2023 
+20:42:35,70 
+-------------------------------------------------------------------------------- 
+31.08.2023 
+20:44:01,14 
+-------------------------------------------------------------------------------- 
+31.08.2023 
+20:50:30,75 
+-------------------------------------------------------------------------------- 
+31.08.2023 
+21:18:15,76 
+-------------------------------------------------------------------------------- 
+31.08.2023 
+21:20:49,28 
+-------------------------------------------------------------------------------- 
+31.08.2023 
+21:23:03,28 

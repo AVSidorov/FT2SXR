@@ -5,6 +5,7 @@ from math import trunc
 from ui.ADC.ADCUIDesign import Ui_ADCWidgetDesign
 from core.sxr_protocol_pb2 import MainPacket, AdcStatus, SystemStatus, Commands
 from core.sxr_protocol import packet_init
+from core.fileutils import work_dir
 
 
 class ADCUIWidget (QtWidgets.QWidget, Ui_ADCWidgetDesign):
@@ -17,7 +18,15 @@ class ADCUIWidget (QtWidgets.QWidget, Ui_ADCWidgetDesign):
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose, True)
 
         self.address = 11
-        self.isInPeriodic = False
+        # self.isInPeriodic = False
+        # file = os.path.join(work_dir(), 'ui', 'ADC', 'mode.ini')
+        # config = configparser.ConfigParser()
+        # config.read(file)
+        # if config['adc']['mode'] == 'periodic':
+        #     self.isInPeriodic = True
+        # elif config['adc']['mode'] == 'single':
+        #     self.isInPeriodic = False
+        # del config
 
         self.status = AdcStatus()  # Object - message for storage ADC state
         self.status.board_status.add()
@@ -130,12 +139,14 @@ class ADCUIWidget (QtWidgets.QWidget, Ui_ADCWidgetDesign):
         self.statusbar.show()
 
         self.ch_comboBox.blockSignals(True)
-        if status.start == status.SOFTSTART:
+        if status.start == status.SOFTSTART and not status.is_in_periodic:
             self.source_comboBox.setCurrentIndex(0)
-        elif status.start == status.EXTSTART and not self.isInPeriodic:
+        elif status.start == status.EXTSTART and not status.is_in_periodic:
             self.source_comboBox.setCurrentIndex(1)
-        elif status.start == status.EXTSTART and self.isInPeriodic:
+        elif status.start == status.SOFTSTART and status.is_in_periodic:
             self.source_comboBox.setCurrentIndex(2)
+        elif status.start == status.EXTSTART and status.is_in_periodic:
+            self.source_comboBox.setCurrentIndex(3)
         self.ch_comboBox.blockSignals(False)
 
         self.interval_spinBox.blockSignals(True)
@@ -223,13 +234,20 @@ class ADCUIWidget (QtWidgets.QWidget, Ui_ADCWidgetDesign):
 
         if self.source_comboBox.currentIndex() == 0:
             self.status.start = self.status.SOFTSTART
-            self.isInPeriodic = False
+            # self._set_adc_mode('single')
+            self.status.is_in_periodic = False
         elif self.source_comboBox.currentIndex() == 1:
             self.status.start = self.status.EXTSTART
-            self.isInPeriodic = False
+            # self._set_adc_mode('single')
+            self.status.is_in_periodic = False
         elif self.source_comboBox.currentIndex() == 2:
+            self.status.start = self.status.SOFTSTART
+            # self._set_adc_mode('periodic')
+            self.status.is_in_periodic = True
+        elif self.source_comboBox.currentIndex() == 3:
             self.status.start = self.status.EXTSTART
-            self.isInPeriodic = True
+            # self._set_adc_mode('periodic')
+            self.status.is_in_periodic = True
 
         self.status.samples = int(self.interval_spinBox.value()/1e3 * self.status.sampling_rate)
 
@@ -252,6 +270,20 @@ class ADCUIWidget (QtWidgets.QWidget, Ui_ADCWidgetDesign):
         #     request.data = self.status.SerializeToString()
         # if request.IsInitialized():
         #     self.channel0.emit(request.SerializeToString())
+
+    # def _set_adc_mode(self, mode):
+    #     file = os.path.join(work_dir(), 'ui', 'ADC', 'mode.ini')
+    #     config = configparser.ConfigParser()
+    #     config.read(file)
+    #     if mode == 'single':
+    #         self.isInPeriodic = False
+    #         config['adc']['mode'] = 'single'
+    #     elif mode == 'periodic':
+    #         self.isInPeriodic = True
+    #         config['adc']['mode'] = 'periodic'
+    #     with open(file) as f:
+    #         config.write(f)
+    #     del config
 
     def send_status(self):
         request = packet_init(SystemStatus.ADC, self.address)

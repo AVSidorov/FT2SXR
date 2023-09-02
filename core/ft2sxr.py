@@ -26,6 +26,9 @@ class Ft2SXR(Dev):
             self.wdir = wdir
 
         self.request_to_sys = MainPacket()
+        self.request_to_gui = MainPacket()
+        self.request_to_gui.sender = self.address
+        self.request_to_gui.address = 16
         self.request_to_dev = MainPacket()
         self.request_to_dev.sender = self.address
         self.request_to_dev.command = Commands.INFO
@@ -209,6 +212,10 @@ class Ft2SXR(Dev):
                 # Command que have two "params" devs in que and command should be sent.
                 # If response from one device coincide with current command in que (in self.request_to_dev packet)
                 # next request (command to next device) will be sent
+            elif self.request.command == Commands.DONE:
+                self.request_to_gui.command = Commands.DONE
+                if self.request_to_gui.IsInitialized():
+                    self.channel0.emit(self.request_to_gui.SerializeToString())
 
     def shutdown(self, response: bool = False):
         if self.parent() is not None:

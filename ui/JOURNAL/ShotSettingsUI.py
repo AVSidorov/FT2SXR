@@ -1,11 +1,13 @@
 import gc
 import sys
+import os
 from ui.JOURNAL.ShotSettingsUIDesign import Ui_shotSettings
 from core.sxr_protocol_pb2 import MainPacket, SystemStatus, Commands, JournalStatus
 from core.sxr_protocol import packet_init
 from PyQt5 import QtWidgets, QtCore, QtGui
 import datetime
 import time
+from core.fileutils import today_dir
 
 
 class ShotSettings(QtWidgets.QWidget, Ui_shotSettings):
@@ -23,11 +25,14 @@ class ShotSettings(QtWidgets.QWidget, Ui_shotSettings):
         self.file_name_lineEdit.textChanged.connect(self.set_file_name)
         self.shot_number_spinBox.valueChanged.connect(self.set_shot)
         self.comment_textEdit.textChanged.connect(self.set_comment)
+        self.day_textEdit.textChanged.connect(self.set_daycomment)
         self.install_pushButton.clicked.connect(self.install_settings)
         self.return_pushButton.clicked.connect(self.return_settings)
 
-        self.sxr_number_spinBox.setValue(0)
-        self.ui2status()
+        self.notification_label.hide()
+
+        # self.sxr_number_spinBox.setValue(0)
+        # self.ui2status()
 
     def set_number(self):
         self.status.SXRshot = self.sxr_number_spinBox.value()
@@ -38,7 +43,16 @@ class ShotSettings(QtWidgets.QWidget, Ui_shotSettings):
         self.file_name_lineEdit.setText(file)
 
     def set_file_name(self):
-        self.status.filename = self.file_name_lineEdit.text()
+        name = self.file_name_lineEdit.text()
+        if name + '.h5' in os.listdir(today_dir()):
+            self.file_name_lineEdit.setStyleSheet('color: rgb(255, 0, 0)')
+            self.notification_label.show()
+            self.install_pushButton.setDisabled(True)
+        else:
+            self.file_name_lineEdit.setStyleSheet('color: rgb(0, 0, 0)')
+            self.notification_label.hide()
+            self.install_pushButton.setEnabled(True)
+        self.status.filename = name
 
     def set_shot(self):
         self.status.TOKAMAKshot = self.shot_number_spinBox.value()
@@ -46,11 +60,15 @@ class ShotSettings(QtWidgets.QWidget, Ui_shotSettings):
     def set_comment(self):
         self.status.comment = self.comment_textEdit.toPlainText()
 
+    def set_daycomment(self):
+        self.status.daycomment = self.day_textEdit.toPlainText()
+
     def ui2status(self):
         self.set_number()
         self.set_shot()
         self.set_file_name()
         self.set_comment()
+        self.set_daycomment()
 
     def status2ui(self):
         self.sxr_number_spinBox.blockSignals(True)
@@ -60,6 +78,7 @@ class ShotSettings(QtWidgets.QWidget, Ui_shotSettings):
         self.file_name_lineEdit.setText(self.status.filename)
         self.shot_number_spinBox.setValue(self.status.TOKAMAKshot)
         self.comment_textEdit.setText(self.status.comment)
+        self.day_textEdit.setText(self.status.daycomment)
 
     def install_settings(self):
         request = packet_init(SystemStatus.JOURNAL, self.address)

@@ -70,6 +70,7 @@ class ADC(Dev):
         self.wdir = work_dir()
         self.scp = None
         self.config = None
+        self.additional_config = None
         self.isAcqComplete = False
         self.started = False
 
@@ -79,8 +80,8 @@ class ADC(Dev):
         config.optionxform = str
 
         # read config from directory of launch
-        if os.path.exists(os.path.join(self.wdir, 'dev/insys/adc.ini')):
-            config.read(os.path.join(self.wdir, 'dev/insys/adc.ini'), "utf-8")
+        if os.path.exists(os.path.join(self.wdir, 'dev', 'insys', 'adc.ini')):
+            config.read(os.path.join(self.wdir, 'dev', 'insys', 'adc.ini'), "utf-8")
             self.config = config
 
             mask = self.get_cfg_item('device0_fm814x250m0', 'ChannelMask')
@@ -95,6 +96,11 @@ class ADC(Dev):
                 bias = self.get_cfg_item('device0_fm814x250m0', f'Bias{ch_n}')
                 if bias is not None:
                     self.boards[0].channels[ch_n].bias = float(bias)
+
+        if os.path.exists(os.path.join(self.wdir, 'dev', 'insys', 'adc_additional.ini')):
+            config.read(os.path.join(self.wdir, 'dev', 'insys', 'adc_additional.ini'), "utf-8")
+            self.additional_config = config
+
 
         self.status = AdcStatus()
         self.get_status()
@@ -218,7 +224,7 @@ class ADC(Dev):
 
             self.request.address = SystemStatus.SXR
             self.request.sender = self.address
-            self.request.command = Commands.SNAPSHOT
+            self.request.command = Commands.DONE
             if self.request.IsInitialized():
                 self.channel0.emit(self.request.SerializeToString())
 
@@ -263,6 +269,7 @@ class ADC(Dev):
             elif int(start) == 3:
                 self.state.start = AdcStatus.SOFTSTART
 
+        # TODO зачем 2 раза?
         stop = self.get_cfg_item('device0_fm814x250m0', 'StopSource')
         if stop is not None:
             if int(stop) == 0:
@@ -300,6 +307,8 @@ class ADC(Dev):
         config = configparser.ConfigParser()
         with open(os.path.join(self.wdir, 'dev/insys/adc_additional.ini'), 'r') as f:
             config.read_file(f)
+
+        self.state.is_in_periodic = eval(config['adc_additional']['is_in_periodic'])
 
         for ch_n in range(len(self.boards[0].channels)):
             bias = self.get_cfg_item('device0_fm814x250m0', f'Bias{ch_n}')
@@ -376,6 +385,7 @@ class ADC(Dev):
         config = configparser.ConfigParser()
         with open(os.path.join(self.wdir, 'dev/insys/adc_additional.ini'), 'r') as f:
             config.read_file(f)
+        config['adc_additional']['is_in_periodic'] = str(status.is_in_periodic)
         void_mask = 0
         if len(status.board_status) > 0:
             n_ch = -1
@@ -388,6 +398,8 @@ class ADC(Dev):
             void_mask = void_mask >> 1
             config['adc_additional']['void_mask'] = str(bin(void_mask))
         with open(os.path.join(self.wdir, 'dev/insys/adc_additional.ini'), 'w') as f:
+            config.write(f)
+        with open(os.path.join(self.wdir, 'dev', 'insys', 'temp', 'adc_additional.ini'), 'w') as f:
             config.write(f)
 
         if response is not None:

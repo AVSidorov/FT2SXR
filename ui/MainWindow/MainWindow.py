@@ -1,7 +1,9 @@
+import os
 import sys
 import gc
 from time import time
 from multiprocessing import Process
+import subprocess
 from ui.MainWindow.MainWindowUIDesign import Ui_MainWindow
 from ui.ControlPanel.CentralWidgetUI import MainWidget
 from ui.ADC.ADCUI import ADCUIWidget
@@ -19,6 +21,7 @@ from core.sxr_protocol import packet_init
 from core.sxr_protocol_pb2 import MainPacket, SystemStatus, Commands
 from core.logger import Logger
 from core.adc_logger import ADCLogger
+from core.fileutils import work_dir
 from ui.ADCLogger.ADCLogUI import AdcLog
 from ui.PLOTTER.PlotterUI import PlotterWidget
 from ui.JOURNAL.ShotSettingsUI import ShotSettings
@@ -51,6 +54,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
         self.plotter_process = None
         self.actionOpen_SXR_file.triggered.connect(self.open_sxr)
+        self.actionOpen_HDF5_file.triggered.connect(self.open_hdf5)
 
         width = QtWidgets.QApplication.desktop().screenGeometry().width()
         height = QtWidgets.QApplication.desktop().screenGeometry().height()
@@ -66,11 +70,13 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         win_main = MainWidget(self.centralwidget)
         win_main.channel0.connect(self.channel0)
         win_main.channelSettings.connect(self.settings_from_centralWidget)
+        win_main.channelSnapshot.connect(self.channelSnapshot_slot)
         self.channel1.connect(win_main.channel0_slot)
+        win_main.channelStart.connect(self.channelStart_slot)
         self.verticalLayout = QtWidgets.QVBoxLayout(self.centralwidget)
         self.verticalLayout.setObjectName("verticalLayout")
         self.verticalLayout.addWidget(win_main)
-        win_main.channelStart.connect(self.channelStart_slot)
+
 
         logger = Logger(win_main.log_textBrowser, self)
         self.channel1.connect(logger.channel0_slot)
@@ -321,6 +327,18 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
             gc.collect(generation=2)
 
+    def open_hdf5(self, data_file=None):
+        if data_file is None or data_file is False:
+            data_file = QtWidgets.QFileDialog.getOpenFileName(self,
+                                                              "Select one or more files to open",
+                                                              ".",
+                                                              "HDF5 files (*.h5)")[0]
+        if data_file != '':
+            # os.system(f"{os.path.join(os.getcwd(), 'hdfview', 'HDFview', 'HDFView.exe')} -root "
+            #           f"{os.path.split(data_file)[0]} {data_file}")
+            subprocess.Popen(f"{os.path.join(os.getcwd(), 'hdfview', 'HDFview', 'HDFView.exe')} -root "
+                      f"{os.path.split(data_file)[0]} {data_file}")
+
     @QtCore.pyqtSlot(bytes)
     def channel0_slot(self, data: bytes):
         self.channel1.emit(data)
@@ -335,6 +353,9 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                     #     'data_0.bin')
                     data_file = request.data.decode('utf-8')
                     self.open_sxr(data_file=data_file)
+        elif request.sender == SystemStatus.SXR:
+            if request.command == Commands.DONE:
+                self.open_sxr(data_file=os.path.join(work_dir(), 'dev', 'insys', 'temp', 'data_0.bin'))
 
     @QtCore.pyqtSlot()
     def channelStart_slot(self):
@@ -343,6 +364,12 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         if request.IsInitialized():
             self.channel0.emit(request.SerializeToString())
 
+    @QtCore.pyqtSlot()
+    def channelSnapshot_slot(self):
+        request = packet_init(SystemStatus.SXR, self.address)
+        request.command = Commands.SNAPSHOT
+        if request.IsInitialized():
+            self.channel0.emit(request.SerializeToString())
 
 def main():
     app = QtWidgets.QApplication(sys.argv)

@@ -14,7 +14,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(798, 627)
+        MainWindow.resize(1050, 680)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
@@ -25,7 +25,7 @@ class Ui_MainWindow(object):
         self.centralwidget.setObjectName("centralwidget")
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 798, 26))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 1050, 26))
         self.menubar.setObjectName("menubar")
         self.menuOpen_files = QtWidgets.QMenu(self.menubar)
         self.menuOpen_files.setObjectName("menuOpen_files")
@@ -88,7 +88,10 @@ class Ui_MainWindow(object):
         self.actionShot.setObjectName("actionShot")
         self.actionTokamak = QtWidgets.QAction(MainWindow)
         self.actionTokamak.setObjectName("actionTokamak")
+        self.actionOpen_HDF5_file = QtWidgets.QAction(MainWindow)
+        self.actionOpen_HDF5_file.setObjectName("actionOpen_HDF5_file")
         self.menuOpen_files.addAction(self.actionOpen_SXR_file)
+        self.menuOpen_files.addAction(self.actionOpen_HDF5_file)
         self.menuInstall.addAction(self.actionShot)
         self.menuInstall.addAction(self.actionHardware)
         self.menuInstall.addAction(self.actionTokamak)
@@ -105,7 +108,7 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "SXR spectrometer on FT-2"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "Control Panel of SXR spectrometer on FT-2 tokamak"))
         self.menuOpen_files.setTitle(_translate("MainWindow", "Open file"))
         self.menuInstall.setTitle(_translate("MainWindow", "Install"))
         self.menuADC_Log.setTitle(_translate("MainWindow", "ADC Log"))
@@ -114,7 +117,7 @@ class Ui_MainWindow(object):
         self.actionSave_BKG_file.setText(_translate("MainWindow", "Save BKG file"))
         self.actionSave_GSA_file.setText(_translate("MainWindow", "Save GSA file"))
         self.actionSave_MCA_file.setText(_translate("MainWindow", "Save MCA file"))
-        self.actionOpen_SXR_file.setText(_translate("MainWindow", "Open SXR file"))
+        self.actionOpen_SXR_file.setText(_translate("MainWindow", "Open as SXR file"))
         self.actionOpen_CLB_file.setText(_translate("MainWindow", "Open CLB file"))
         self.actionOpen_BKG_file.setText(_translate("MainWindow", "Open BKG file"))
         self.actionOpen_GSA_file.setText(_translate("MainWindow", "Open GSA file"))
@@ -136,3 +139,4 @@ class Ui_MainWindow(object):
         self.actionHardware.setText(_translate("MainWindow", "Hardware"))
         self.actionShot.setText(_translate("MainWindow", "Shot"))
         self.actionTokamak.setText(_translate("MainWindow", "Tokamak"))
+        self.actionOpen_HDF5_file.setText(_translate("MainWindow", "Open as HDF5 file"))

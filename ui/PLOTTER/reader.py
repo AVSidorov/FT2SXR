@@ -1,5 +1,5 @@
 import numpy as np
-from os import path, listdir
+from os import path, listdir, stat
 from core.core import Core
 import configparser
 import h5py as h5
@@ -7,30 +7,45 @@ from time import time
 
 
 class Reader(Core):
+# class Reader:
     def __init__(self, parent=None, data_file=None):
         super().__init__(parent=parent)
+        super().__init__()
+
 
         self.data = None
         self.meta = None
+        self.stat = None
 
     def read(self, data_file=None):
         # print(type(data_file))
         if isinstance(data_file, str) and path.isabs(data_file):
             if path.isdir(data_file):
-                print('not a file')
+                return
 
             elif path.isfile(data_file):
 
                 if path.splitext(data_file)[1] == '.bin':
-                    if 'cfg.ini' and 'data_0.bin' in listdir(path.dirname(data_file)):
+                    if 'adc.ini' and 'data_0.bin' in listdir(path.dirname(data_file)):
                         try:
-                            conf_dict = self.parse_ini(path.join(path.dirname(data_file), 'cfg.ini'))
+                            if 'adc_additional.ini' in listdir(path.dirname(data_file)):
+                                conf_dict = self.parse_ini(ini_path=path.join(path.dirname(data_file), 'adc.ini'),
+                                                           additional=path.join(path.dirname(data_file), 'adc_additional.ini'))
+                            else:
+                                conf_dict = self.parse_ini(ini_path=path.join(path.dirname(data_file), 'adc.ini'))
                         except KeyError:
                             return
 
                         n_ch = conf_dict['mask'].count("1")
                         measurements = np.fromfile(data_file, dtype=np.int16)
                         self.data = measurements.reshape((-1, n_ch)).T
+                        if conf_dict['void_mask'] is not None:
+                            str_mask = conf_dict['void_mask'][2:]
+                            for i in range(1, len(str_mask) + 1):
+                                if str_mask[-i] == '1':
+                                    self.data = np.delete(self.data, i-1)
+                            conf_dict['mask'] = bin(eval(conf_dict['mask']) ^ eval(conf_dict['void_mask']))
+                            n_ch = conf_dict['mask'].count("1")
 
                         meta = []
                         str_mask = conf_dict['mask'][2:]
@@ -41,10 +56,14 @@ class Reader(Core):
                                 meta.append(i)
                                 meta.append(conf_dict['samples'])
                                 meta.append(conf_dict['rate'])
-                                meta.append(i)
+                                if conf_dict['void_mask'] is not None:
+                                    meta.append(conf_dict['names'][i - 1])
+                                else:
+                                    meta.append(i)
                         meta = np.array(meta)
                         meta = meta.reshape((n_ch, -1))
                         self.meta = meta
+                        self.stat = stat(data_file)
 
                 if path.splitext(data_file)[1] == '.h5':
                     try:
@@ -67,14 +86,17 @@ class Reader(Core):
                     meta = np.array(meta)
                     meta = meta.reshape((n_ch, -1))
                     self.meta = meta
+                    self.stat = stat(data_file)
 
     def clear(self):
         del self.data
         self.data = None
         del self.meta
         self.meta = None
+        del self.stat
+        self.stat = None
 
-    def parse_ini(self, ini_path=None):
+    def parse_ini(self, ini_path=None, additional=None):
         if path.isabs(ini_path):
             config = configparser.ConfigParser()
             config.read(ini_path)
@@ -88,10 +110,24 @@ class Reader(Core):
             rate = int(config[device_section]['SamplingRate'])
             mask = bin(eval(config[device_section]['ChannelMask']))
 
+            void_mask = None
+            names = None
+            if additional is not None:
+                config.read(additional)
+                names = []
+                void_mask = bin(eval(config['adc_additional']['void_mask']))
+                real_mask = bin(eval(mask) ^ eval(void_mask))
+                str_mask = real_mask[2:]
+                for i in range(1, len(str_mask) + 1):
+                    if str_mask[-i] == '1':
+                        names.append(config['adc_additional'][f'name{i}'])
+
+
             return {'samples': samples,
                     'rate': rate,
                     'mask': mask,
-                    'names': None}
+                    'names': names,
+                    'void_mask': void_mask}
         else:
             return None
 

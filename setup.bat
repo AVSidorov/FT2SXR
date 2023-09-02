@@ -10,4 +10,5 @@ pip install scp
 pip install configparser
 pip install scipy
 pip install numba
+pip install psutil
 git remote add origin 'https://github.com/AVSidorov/FT2SXR.git'

@@ -273,7 +273,12 @@
           </item>
           <item>
            <property name="text">
-            <string>Периодический</string>
+            <string>Периодический ручной</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Периодический триггер</string>
            </property>
           </item>
          </widget>

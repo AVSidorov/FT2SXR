@@ -1,25 +1,18 @@
-import subprocess
 from matplotlib import pyplot as plt
+import plotly.graph_objects as go
 import h5py
+import numpy as np
 
 
-def show_count_rate(path):
+def show_signal(path):
     f = h5py.File(path, 'r')
-    if 'processed_data' in list(f['SXR'].keys()):
-        plt.plot(list(f['SXR']['processed_data']['count_rate']['channel00']['times']),
-                 list(f['SXR']['processed_data']['count_rate']['channel00']['counts']))
-        plt.show()
-        f.close()
-    else:
-        f.close()
-        subprocess.call([r"D:\home\projects\SXR\FT2SXR\matlab\pulse_count\MakePulseCount\for_testing\MakePulseCount.exe", path])
-        f = h5py.File(path, 'r')
-        plt.plot(list(f['SXR']['processed_data']['count_rate']['channel00']['times']),
-                 list(f['SXR']['processed_data']['count_rate']['channel00']['counts']))
-        plt.show()
-        f.close()
+    # plt.plot(np.array(f['SXR']['ADC']['channel00'], dtype=np.int16))
+    # plt.show()
+    fig = go.Figure()
+    fig.add_trace(go.Scatter(y=np.array(f['SXR']['ADC']['channel00'], dtype=np.int16)))
+    fig.show()
+    f.close()
 
 
 if __name__ == '__main__':
-    path = input()
-    show_count_rate(path)
+    show_signal(r'D:\home\projects\SXR\FT2SXR\230720\SXR230720_005.h5')

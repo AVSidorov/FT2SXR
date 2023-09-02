@@ -2,4 +2,5 @@ Units (only for user, file is not used in program)
 sxrshot [number of spectrometer shot]
 tokamakshot [number of tokamak shot]
 filename [file name to save data]
-comment [any comment]
+comment [any comment about shot]
+daycomment [any comment about all experimental day]
