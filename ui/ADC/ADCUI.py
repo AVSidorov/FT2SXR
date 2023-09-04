@@ -1,5 +1,6 @@
 import sys
 import gc
+import os
 from PyQt5 import QtWidgets, QtCore, QtGui
 from math import trunc
 from ui.ADC.ADCUIDesign import Ui_ADCWidgetDesign
@@ -12,12 +13,16 @@ class ADCUIWidget (QtWidgets.QWidget, Ui_ADCWidgetDesign):
     channel0 = QtCore.pyqtSignal(bytes)
     channelNext = QtCore.pyqtSignal()
 
-    def __init__(self, parent=None):
+    def __init__(self, win=None, parent=None):
+        curdir = os.getcwd()
+        os.chdir(os.path.join(curdir, 'ui', 'ADC'))
         super().__init__(parent=parent)
         self.setupUi(self)
+        os.chdir(curdir)
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose, True)
 
         self.address = 11
+        self.win = win
         # self.isInPeriodic = False
         # file = os.path.join(work_dir(), 'ui', 'ADC', 'mode.ini')
         # config = configparser.ConfigParser()
@@ -47,6 +52,7 @@ class ADCUIWidget (QtWidgets.QWidget, Ui_ADCWidgetDesign):
         self.bias_doubleSpinBox.valueChanged.connect(self.ui2status)
         self.install_pushButton.clicked.connect(self.send_status)
         self.return_pushButton.clicked.connect(self.status_from_adc)
+        self.saveclose_pushButton.clicked.connect(self.saveclose)
 
         self.ch_comboBox.currentTextChanged.connect(self.show_channel)
 
@@ -316,6 +322,13 @@ class ADCUIWidget (QtWidgets.QWidget, Ui_ADCWidgetDesign):
             self.bias_doubleSpinBox.blockSignals(True)
             self.bias_doubleSpinBox.setValue(self.status.board_status[0].channel_status[int(self.ch_comboBox.currentText())-1].bias)
             self.bias_doubleSpinBox.blockSignals(False)
+
+    def saveclose(self):
+        self.send_status()
+        if self.win is not None:
+            self.win.close()
+        else:
+            self.hide()
 
     def hideEvent(self, a0: QtGui.QHideEvent) -> None:
         gc.collect()

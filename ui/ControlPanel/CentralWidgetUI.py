@@ -1,6 +1,6 @@
 import os
 import time
-
+import psutil
 from PyQt5 import QtWidgets, QtCore, QtGui
 from ui.ControlPanel.CentralWidgetUIDesign import Ui_MainWidgetDesign
 from core.sxr_protocol import packet_init
@@ -61,7 +61,7 @@ class MainWidget(QtWidgets.QWidget, Ui_MainWidgetDesign):
         self.amp_groupBox.toggled.connect(self._check_modules)
         self.tokamak_groupBox.toggled.connect(self._check_modules)
         self.gsa_groupBox.toggled.connect(self._check_modules)
-        self.nas_groupBox.toggled.connect(self._check_modules)
+        # self.nas_groupBox.toggled.connect(self._check_modules)
         self.manual_pushButton.hide()
         self.periodic_manual_pushButton.hide()
         self.periodic_external_pushButton.hide()
@@ -261,15 +261,13 @@ class MainWidget(QtWidgets.QWidget, Ui_MainWidgetDesign):
     def _check_modules(self):
         if all([self.journal_groupBox.isChecked(), self.adc_groupBox.isChecked(),
                 self.tokamak_groupBox.isChecked(), self.hardware_groupBox.isChecked(),
-                self.amp_groupBox.isChecked(), self.gsa_groupBox.isChecked(),
-                self.nas_groupBox.isChecked()]):
+                self.amp_groupBox.isChecked(), self.gsa_groupBox.isChecked()]):
             self._set_system_ready()
             self.journal_groupBox.setCheckable(False)
             self.adc_groupBox.setCheckable(False)
             self.tokamak_groupBox.setCheckable(False)
             self.hardware_groupBox.setCheckable(False)
             self.amp_groupBox.setCheckable(False)
-            self.nas_groupBox.setCheckable(False)
             self.gsa_groupBox.setCheckable(False)
 
     def _save_file(self):
@@ -400,13 +398,19 @@ class MainWidget(QtWidgets.QWidget, Ui_MainWidgetDesign):
             self.channel0.emit(request.SerializeToString())
 
         # self._check_nas()
-        # self._check_pc()
+        self._check_pc()
 
     def _check_nas(self):
         pass
 
     def _check_pc(self):
-        pass
+        print(psutil.cpu_percent())
+        mem = psutil.virtual_memory()
+        print(round(mem.total/1024/1024/1024, 1))
+        print(round(mem.available/1024/1024/1024, 1))
+        disk = psutil.disk_usage(work_dir())
+        print(round(disk.total/1024/1024/1024, 1))
+        print(round(disk.free/1024/1024/1024, 1))
 
     @QtCore.pyqtSlot(bytes)
     def channel0_slot(self, data: bytes):

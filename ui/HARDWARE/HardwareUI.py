@@ -1,5 +1,6 @@
 import gc
 import sys
+import os
 from ui.HARDWARE.HardwareUIDesign import Ui_HardwareWidgetDesign
 from core.sxr_protocol_pb2 import MainPacket, HardwareStatus, SystemStatus, Commands
 from core.sxr_protocol import packet_init
@@ -9,9 +10,14 @@ from PyQt5 import QtWidgets, QtCore, QtGui
 class HardwareWidget(QtWidgets.QWidget, Ui_HardwareWidgetDesign):
     channel0 = QtCore.pyqtSignal(bytes)
 
-    def __init__(self, parent=None):
+    def __init__(self, win=None, parent=None):
+        curdir = os.getcwd()
+        os.chdir(os.path.join(curdir, 'ui', 'ControlPanel'))
         super().__init__(parent=parent)
         self.setupUi(self)
+        os.chdir(curdir)
+
+        self.win = win
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose, True)
         self.address = 22
 
@@ -35,6 +41,7 @@ class HardwareWidget(QtWidgets.QWidget, Ui_HardwareWidgetDesign):
         self.angle_doubleSpinBox.valueChanged.connect(self.ui2status)
         self.install_pushButton.clicked.connect(self.install_settings)
         self.return_pushButton.clicked.connect(self.return_settings)
+        self.saveclose_pushButton.clicked.connect(self.saveclose)
 
         self.ui2status()
         self.status2ui()
@@ -88,6 +95,13 @@ class HardwareWidget(QtWidgets.QWidget, Ui_HardwareWidgetDesign):
         request = packet_init(SystemStatus.HARDWARE, self.address)
         request.command = Commands.STATUS
         self.channel0.emit(request.SerializeToString())
+
+    def saveclose(self):
+        self.install_settings()
+        if self.win is not None:
+            self.win.close()
+        else:
+            self.hide()
 
     @QtCore.pyqtSlot(bytes)
     def channel0_slot(self, data: bytes):

@@ -1,6 +1,7 @@
 from PyQt5 import QtWidgets, QtCore
 from ui.ADCLogger.ADCLogUIDesign import Ui_AdcStatusWin
 import sys
+import os
 from core.sxr_protocol import packet_init
 from core.sxr_protocol_pb2 import Commands, SystemStatus
 
@@ -9,8 +10,13 @@ class AdcLog (QtWidgets.QWidget, Ui_AdcStatusWin):
     channel0 = QtCore.pyqtSignal(bytes)  # For uplink
 
     def __init__(self, parent=None):
+        curdir = os.getcwd()
+        os.chdir(os.path.join(curdir, 'ui', 'ADCLogger'))
         super().__init__(parent=parent)
         self.setupUi(self)
+        os.chdir(curdir)
+
+
         AdcLog.setFixedSize(self, 1000, 300)
         self.textBrowser.setFontFamily('Courier')
         self.reboot_pushButton.clicked.connect(self.reboot)

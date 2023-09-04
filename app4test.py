@@ -34,7 +34,7 @@ def main():
 
     logger = Logger('log.txt', core)
 
-    mw.show()
+    mw.showMaximized()
     sys.exit(app.exec_())
 
 

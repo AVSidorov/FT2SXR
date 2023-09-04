@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>505</width>
-    <height>295</height>
+    <width>807</width>
+    <height>299</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -21,12 +21,42 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="QTextBrowser" name="textBrowser"/>
+    <widget class="QTextBrowser" name="textBrowser">
+     <property name="frameShape">
+      <enum>QFrame::Box</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Plain</enum>
+     </property>
+    </widget>
    </item>
    <item>
     <widget class="QPushButton" name="reboot_pushButton">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>40</height>
+      </size>
+     </property>
+     <property name="font">
+      <font>
+       <family>MS Shell Dlg 2</family>
+       <pointsize>9</pointsize>
+      </font>
+     </property>
      <property name="text">
-      <string>reboot</string>
+      <string>Reboot</string>
+     </property>
+     <property name="icon">
+      <iconset>
+       <normalon>../../style/icons/icons8-update-left-rotation-48 (1).png</normalon>
+      </iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>30</width>
+       <height>30</height>
+      </size>
      </property>
     </widget>
    </item>

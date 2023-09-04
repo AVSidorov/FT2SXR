@@ -3,16 +3,21 @@ from core.sxr_protocol_pb2 import MainPacket, TokamakStatus, SystemStatus, Comma
 from core.sxr_protocol import packet_init
 from PyQt5 import QtWidgets, QtCore, QtGui
 import gc
+import os
 
 
 class TokamakWidget(QtWidgets.QWidget, Ui_tokamakWidget):
     channel0 = QtCore.pyqtSignal(bytes)
 
-    def __init__(self, parent=None):
+    def __init__(self, win=None, parent=None):
+        curdir = os.getcwd()
+        os.chdir(os.path.join(curdir, 'ui', 'ControlPanel'))
         super().__init__(parent=parent)
         self.setupUi(self)
+        os.chdir(curdir)
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose, True)
 
+        self.win = win
         self.address = 24
         self.status = TokamakStatus()
 
@@ -23,6 +28,7 @@ class TokamakWidget(QtWidgets.QWidget, Ui_tokamakWidget):
         self.mode_comboBox.currentTextChanged.connect(self.setmode)
         self.install_pushButton.clicked.connect(self.install_settings)
         self.return_pushButton.clicked.connect(self.return_settings)
+        self.saveclose_pushButton.clicked.connect(self.saveclose)
 
     def setcurrent(self):
         self.status.current = self.current_spinBox.value()
@@ -92,6 +98,13 @@ class TokamakWidget(QtWidgets.QWidget, Ui_tokamakWidget):
         request = packet_init(SystemStatus.TOKAMAK, self.address)
         request.command = Commands.STATUS
         self.channel0.emit(request.SerializeToString())
+
+    def saveclose(self):
+        self.install_settings()
+        if self.win is not None:
+            self.win.close()
+        else:
+            self.hide()
 
     @QtCore.pyqtSlot(bytes)
     def channel0_slot(self, data: bytes):

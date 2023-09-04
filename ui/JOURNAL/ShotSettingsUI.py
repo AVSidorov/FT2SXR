@@ -13,9 +13,14 @@ from core.fileutils import today_dir
 class ShotSettings(QtWidgets.QWidget, Ui_shotSettings):
     channel0 = QtCore.pyqtSignal(bytes)
 
-    def __init__(self, parent=None):
+    def __init__(self, win=None, parent=None):
+        curdir = os.getcwd()
+        os.chdir(os.path.join(curdir, 'ui', 'ControlPanel'))
         super().__init__(parent=parent)
         self.setupUi(self)
+        os.chdir(curdir)
+
+        self.win = win
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose, True)
 
         self.address = 23
@@ -28,6 +33,7 @@ class ShotSettings(QtWidgets.QWidget, Ui_shotSettings):
         self.day_textEdit.textChanged.connect(self.set_daycomment)
         self.install_pushButton.clicked.connect(self.install_settings)
         self.return_pushButton.clicked.connect(self.return_settings)
+        self.saveclose_pushButton.clicked.connect(self.saveclose)
 
         self.notification_label.hide()
 
@@ -98,6 +104,13 @@ class ShotSettings(QtWidgets.QWidget, Ui_shotSettings):
         self.sxr_number_spinBox.setValue(self.sxr_number_spinBox.value() + 1)
         self.comment_textEdit.setText('')
         self.install_settings()
+
+    def saveclose(self):
+        self.install_settings()
+        if self.win is not None:
+            self.win.close()
+        else:
+            self.hide()
 
     @QtCore.pyqtSlot(bytes)
     def channel0_slot(self, data: bytes):

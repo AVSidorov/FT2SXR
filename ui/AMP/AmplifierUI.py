@@ -11,10 +11,14 @@ from PyQt5 import QtWidgets, QtCore, QtGui
 class AmplifierWidget(QtWidgets.QWidget, Ui_AmplifierWidgetDesign):
     channel0 = QtCore.pyqtSignal(bytes)
 
-    def __init__(self, parent=None):
+    def __init__(self, win=None, parent=None):
+        curdir = os.getcwd()
+        os.chdir(os.path.join(curdir, 'ui', 'AMP'))
         super().__init__(parent=parent)
         self.setupUi(self)
+        os.chdir(curdir)
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose, True)
+        self.win = win
 
         # Amplifier initial values
         self.gainA = 0.0
@@ -33,6 +37,7 @@ class AmplifierWidget(QtWidgets.QWidget, Ui_AmplifierWidgetDesign):
         self.time17_checkBox.stateChanged.connect(self.setdecay)
         self.install_pushButton.clicked.connect(self.install_settings)
         self.return_pushButton.clicked.connect(self.return_settings)
+        self.saveclose_pushButton.clicked.connect(self.saveclose)
 
         cal_file = []
         with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'amp_cal.csv'), newline='') as file:
@@ -167,6 +172,12 @@ class AmplifierWidget(QtWidgets.QWidget, Ui_AmplifierWidgetDesign):
         request.command = Commands.STATUS
         self.channel0.emit(request.SerializeToString())
 
+    def saveclose(self):
+        self.install_settings()
+        if self.win is not None:
+            self.win.close()
+        else:
+            self.hide()
 
     @QtCore.pyqtSlot(bytes)
     def channel0_slot(self, data: bytes):

@@ -1,6 +1,7 @@
 import sys
 from PyQt5 import QtWidgets, QtCore, QtGui
 import gc
+import os
 from ui.GSA.GSAUIDesign import Ui_GSAWidgetDesign
 from core.sxr_protocol_pb2 import MainPacket, GsaStatus, SystemStatus, Commands
 from core.sxr_protocol import packet_init
@@ -9,9 +10,14 @@ from core.sxr_protocol import packet_init
 class GSAWidget(QtWidgets.QWidget, Ui_GSAWidgetDesign):
     channel0 = QtCore.pyqtSignal(bytes)
 
-    def __init__(self, parent=None):
+    def __init__(self, win=None, parent=None):
+        curdir = os.getcwd()
+        os.chdir(os.path.join(curdir, 'ui', 'ControlPanel'))
         super().__init__(parent=parent)
         self.setupUi(self)
+        os.chdir(curdir)
+
+        self.win = win
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose, True)
         self.address = 23
 
@@ -30,6 +36,7 @@ class GSAWidget(QtWidgets.QWidget, Ui_GSAWidgetDesign):
         self.frequency_doubleSpinBox.valueChanged.connect(self.setfrequency)
         self.install_pushButton.clicked.connect(self.install_settings)
         self.return_pushButton.clicked.connect(self.return_settings)
+        self.saveclose_pushButton.clicked.connect(self.saveclose)
 
     def setamplitude(self):
         self.amplitude = float(self.amp_comboBox.currentText())
@@ -75,6 +82,13 @@ class GSAWidget(QtWidgets.QWidget, Ui_GSAWidgetDesign):
         request = packet_init(SystemStatus.GSA, self.address)
         request.command = Commands.STATUS
         self.channel0.emit(request.SerializeToString())
+
+    def saveclose(self):
+        self.install_settings()
+        if self.win is not None:
+            self.win.close()
+        else:
+            self.hide()
 
     @QtCore.pyqtSlot(bytes)
     def channel0_slot(self, data: bytes):
