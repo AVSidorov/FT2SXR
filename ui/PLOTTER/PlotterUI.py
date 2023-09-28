@@ -1,5 +1,9 @@
 import matplotlib
-matplotlib.use('QtAgg')
+matplotlib.use('Qt5Agg')
+matplotlib.rcParams['path.simplify'] = True
+matplotlib.rcParams['path.simplify_threshold'] = 1.0
+matplotlib.rcParams['agg.path.chunksize'] = 50000
+matplotlib.rcParams["legend.loc"] = 'upper right'
 import sys
 from PyQt5 import QtWidgets, QtGui, QtCore
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg, NavigationToolbar2QT
