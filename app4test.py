@@ -5,7 +5,6 @@ from core.ft2sxr import Ft2SXR
 from PyQt5 import QtWidgets, QtGui
 import sys
 import os
-# from pathlib import Path
 
 
 def main():

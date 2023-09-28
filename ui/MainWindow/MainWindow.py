@@ -9,6 +9,7 @@ from ui.ControlPanel.CentralWidgetUI import MainWidget
 from ui.ADC.ADCUI import ADCUIWidget
 from ui.GSA.GSAUI import GSAWidget
 from ui.PLOTTER.PlotterUI import main as PlotterMain
+from ui.NAS.nasWidget import main as NasMain
 # from ui.PX5UI import PX5Widget
 from ui.PX5_bigUI import PX5Widget
 from ui.AMP.AmplifierUI import AmplifierWidget
@@ -53,6 +54,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose, True)
 
         self.plotter_process = None
+        self.nas_process = None
         self.actionOpen_SXR_file.triggered.connect(self.open_sxr)
         self.actionOpen_HDF5_file.triggered.connect(self.open_hdf5)
 
@@ -71,6 +73,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         win_main.channel0.connect(self.channel0)
         win_main.channelSettings.connect(self.settings_from_centralWidget)
         win_main.channelSnapshot.connect(self.channelSnapshot_slot)
+        win_main.channelNas.connect(self.open_nas)
         self.channel1.connect(win_main.channel0_slot)
         win_main.channelStart.connect(self.channelStart_slot)
         self.verticalLayout = QtWidgets.QVBoxLayout(self.centralwidget)
@@ -338,6 +341,17 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             #           f"{os.path.split(data_file)[0]} {data_file}")
             subprocess.Popen(f"{os.path.join(os.getcwd(), 'hdfview', 'HDFview', 'HDFView.exe')} -root "
                       f"{os.path.split(data_file)[0]} {data_file}")
+
+    @QtCore.pyqtSlot()
+    def open_nas(self):
+        try:
+            if self.nas_process is not None:
+                self.nas_process.terminate()
+        except:
+            pass
+        self.nas_process = Process(target=NasMain, daemon=True)
+        self.nas_process.start()
+        gc.collect(generation=2)
 
     @QtCore.pyqtSlot(bytes)
     def channel0_slot(self, data: bytes):

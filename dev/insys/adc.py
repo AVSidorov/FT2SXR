@@ -189,7 +189,7 @@ class ADC(Dev):
             if self.isAcqComplete:
                 if self.connected:
                     # if connected copy from adc
-                    self.scp.get('/home/embedded/examples/data_0.bin', self.wdir)
+                    self.scp.get('/home/embedded/examples/data_0.bin', os.path.join(self.wdir, 'dev', 'insys', 'temp'))
 
                     # wait for file transfer completes
                     while not(os.path.exists(os.path.join(self.wdir, 'dev/insys/temp/'+self.file_base+'.bin'))):

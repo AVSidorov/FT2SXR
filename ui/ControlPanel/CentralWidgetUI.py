@@ -1,3 +1,4 @@
+import configparser
 import os
 import time
 import psutil
@@ -15,6 +16,7 @@ class MainWidget(QtWidgets.QWidget, Ui_MainWidgetDesign):
     channelSettings = QtCore.pyqtSignal(int)  # To open settings windows
     channelStart = QtCore.pyqtSignal()  # Uplink to start system
     channelSnapshot = QtCore.pyqtSignal()  # Uplink to make snapshot
+    channelNas = QtCore.pyqtSignal()  # to activate NAS widget
 
     def __init__(self, parent=None):
         curdir = os.getcwd()
@@ -33,7 +35,7 @@ class MainWidget(QtWidgets.QWidget, Ui_MainWidgetDesign):
         self.GSAstatus = GsaStatus()
         self.timer = QtCore.QTimer(self)
         self.timer.timeout.connect(self.get_settings)
-        self.timer.start(30000)
+        self.timer.start(10000)
 
         self.start_time = time.time()
         self.working_time_timer = QtCore.QTimer(self)
@@ -61,17 +63,19 @@ class MainWidget(QtWidgets.QWidget, Ui_MainWidgetDesign):
         self.amp_groupBox.toggled.connect(self._check_modules)
         self.tokamak_groupBox.toggled.connect(self._check_modules)
         self.gsa_groupBox.toggled.connect(self._check_modules)
+        self.nas_pushButton.clicked.connect(self._openNas)
+
         # self.nas_groupBox.toggled.connect(self._check_modules)
-        self.manual_pushButton.hide()
-        self.periodic_manual_pushButton.hide()
-        self.periodic_external_pushButton.hide()
+        # self.manual_pushButton.hide()
+        # self.periodic_manual_pushButton.hide()
+        # self.periodic_external_pushButton.hide()
         self.save_pushButton.clicked.connect(self._save_file)
         self.remove_pushButton.clicked.connect(self._remove_file)
         self.stop_pushButton.clicked.connect(self.stop_adc)
         self.request = packet_init(SystemStatus.SXR, self.address)
 
-        self.periodic_manual_pushButton.setDisabled(True)
-        self.periodic_external_pushButton.setDisabled(True)
+        # self.periodic_manual_pushButton.setDisabled(True)
+        # self.periodic_external_pushButton.setDisabled(True)
         self.external_pushButton.setDisabled(True)
 
         self._set_system_check()
@@ -93,6 +97,9 @@ class MainWidget(QtWidgets.QWidget, Ui_MainWidgetDesign):
 
     def _openJour(self):
         self.channelSettings.emit(SystemStatus.JOURNAL)
+
+    def _openNas(self):
+        self.channelNas.emit()
 
     def _set_working_time(self):
         delta = time.time() - self.start_time
@@ -197,9 +204,11 @@ class MainWidget(QtWidgets.QWidget, Ui_MainWidgetDesign):
         if self.ADCstatus.connected:
             self.adc_status_label.setText('Connected')
             self.adc_status_label.setStyleSheet('color: rgb(0, 170, 0)')
+            self.adc_status_label.setFont(self.label.font())
         else:
             self.adc_status_label.setText('Disconnected')
             self.adc_status_label.setStyleSheet('color: rgb(255, 0, 0)')
+            self.adc_status_label.setFont(self.label.font())
 
         if self.ADCstatus.start == AdcStatus.INTSTART and not self.ADCstatus.is_in_periodic:
             self.start_label.setText('Ручной')
@@ -238,7 +247,7 @@ class MainWidget(QtWidgets.QWidget, Ui_MainWidgetDesign):
             elif ADCstatus_start == AdcStatus.EXTSTART and not AdcStatus_is_in_periodic:
                 self.external_pushButton.setText('External\nstart')
                 self.external_pushButton.setIcon(QtGui.QIcon(os.path.join(work_dir(), 'style', 'icons',
-                                                                          'icons8-play-48.png')))
+                                                                          'icons8-play-48 (1).png')))
             elif ADCstatus_start == AdcStatus.INTSTART and AdcStatus_is_in_periodic:
                 self.external_pushButton.setText('Manual\nperiodic\nstart')
                 self.external_pushButton.setIcon(QtGui.QIcon(os.path.join(work_dir(), 'style', 'icons',
@@ -246,7 +255,7 @@ class MainWidget(QtWidgets.QWidget, Ui_MainWidgetDesign):
             elif ADCstatus_start == AdcStatus.EXTSTART and AdcStatus_is_in_periodic:
                 self.external_pushButton.setText('External\nperiodic\nstart')
                 self.external_pushButton.setIcon(QtGui.QIcon(os.path.join(work_dir(), 'style', 'icons',
-                                                                          'icons8-fast-forward-48.png')))
+                                                                          'icons8-fast-forward-48 (1).png')))
 
         # if command is not None:
         #     if command == Commands.START:
@@ -397,20 +406,71 @@ class MainWidget(QtWidgets.QWidget, Ui_MainWidgetDesign):
         if request.IsInitialized():
             self.channel0.emit(request.SerializeToString())
 
-        # self._check_nas()
+        self._check_nas()
         self._check_pc()
 
     def _check_nas(self):
-        pass
+        font = self.label_66.font()
+        try:
+            file = os.path.join(work_dir(), 'ui', 'NAS', 'settings.ini')
+            config = configparser.ConfigParser()
+            config.read(file)
+            if os.path.exists(config['nas']['nas_path']):
+                self.nas_state_label.setText('Connected')
+                self.nas_state_label.setStyleSheet('color: green')
+                self.nas_state_label.setFont(font)
+
+                disk = psutil.disk_usage(config['nas']['nas_path'])
+                total = round(disk.total / 1024 / 1024 / 1024, 1)
+                available = round(disk.free / 1024 / 1024 / 1024, 1)
+                usage = round((1 - available / total) * 100, 1)
+                self.nas_disk_label.setText(f'{usage}% \n(доступно {available}Gb)')
+                if usage >= 90:
+                    self.nas_disk_label.setStyleSheet('color : red')
+                else:
+                    self.nas_disk_label.setStyleSheet('color : black')
+                self.nas_disk_label.setFont(font)
+            else:
+                raise FileNotFoundError
+        except FileNotFoundError:
+            self.nas_state_label.setText('Disconnected')
+            self.nas_state_label.setStyleSheet('color: red')
+            self.nas_state_label.setFont(font)
+            self.nas_disk_label.setText('???\n')
+        del config
 
     def _check_pc(self):
-        print(psutil.cpu_percent())
+        font = self.label_62.font()
+
+        usage = psutil.cpu_percent()
+        self.CPU_label.setText(f'{usage}%')
+        if usage >= 90:
+            self.CPU_label.setStyleSheet('color : red')
+        else:
+            self.CPU_label.setStyleSheet('color : black')
+        self.CPU_label.setFont(font)
+
         mem = psutil.virtual_memory()
-        print(round(mem.total/1024/1024/1024, 1))
-        print(round(mem.available/1024/1024/1024, 1))
+        total = round(mem.total/1024/1024/1024, 1)
+        available = round(mem.available/1024/1024/1024, 1)
+        usage = round((1-available/total)*100, 1)
+        self.RAM_label.setText(f'{usage}% \n(доступно {available}Gb)')
+        if usage >= 90:
+            self.RAM_label.setStyleSheet('color : red')
+        else:
+            self.RAM_label.setStyleSheet('color : black')
+        self.RAM_label.setFont(font)
+
         disk = psutil.disk_usage(work_dir())
-        print(round(disk.total/1024/1024/1024, 1))
-        print(round(disk.free/1024/1024/1024, 1))
+        total = round(disk.total/1024/1024/1024, 1)
+        available = round(disk.free/1024/1024/1024, 1)
+        usage = round((1 - available / total) * 100, 1)
+        self.disk_label.setText(f'{usage}% \n(доступно {available}Gb)')
+        if usage >= 90:
+            self.disk_label.setStyleSheet('color : red')
+        else:
+            self.disk_label.setStyleSheet('color : black')
+        self.disk_label.setFont(font)
 
     @QtCore.pyqtSlot(bytes)
     def channel0_slot(self, data: bytes):
