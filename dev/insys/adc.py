@@ -486,7 +486,7 @@ class ADC(Dev):
         adc.attrs['num_active_ch'] = self.boards[0].n_active_ch
         for ch in self.boards[0].channels:
             if ch.on and not ch.void:
-                dset = adc.create_dataset(f'channel{self.boards[0].channels.index(ch):02d}', shape=ch.data.shape,  compression="gzip", compression_opts=1, data=ch.data)
+                dset = adc.create_dataset(f'channel{self.boards[0].channels.index(ch):02d}', shape=ch.data.shape, data=ch.data)
                 dset.attrs['units'] = 'adc counts'
                 dset.attrs['name'] = ch.name
 
