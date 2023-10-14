@@ -20,7 +20,7 @@ from ui.MiniX2UI import MiniX2Widget
 from PyQt5 import QtWidgets, QtCore
 from core.sxr_protocol import packet_init
 from core.sxr_protocol_pb2 import MainPacket, SystemStatus, Commands
-from core.logger import Logger
+from ui.MainWindow.uilogger import Logger
 from core.adc_logger import ADCLogger
 from core.fileutils import work_dir
 from ui.ADCLogger.ADCLogUI import AdcLog
@@ -79,7 +79,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.verticalLayout = QtWidgets.QVBoxLayout(self.centralwidget)
         self.verticalLayout.setObjectName("verticalLayout")
         self.verticalLayout.addWidget(win_main)
-
 
         logger = Logger(win_main.log_textBrowser, self)
         self.channel1.connect(logger.channel0_slot)
