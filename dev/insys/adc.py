@@ -97,9 +97,10 @@ class ADC(Dev):
                 if bias is not None:
                     self.boards[0].channels[ch_n].bias = float(bias)
 
+        config_add = configparser.ConfigParser(inline_comment_prefixes=(';', '//'))
         if os.path.exists(os.path.join(self.wdir, 'dev', 'insys', 'adc_additional.ini')):
-            config.read(os.path.join(self.wdir, 'dev', 'insys', 'adc_additional.ini'), "utf-8")
-            self.additional_config = config
+            config_add.read(os.path.join(self.wdir, 'dev', 'insys', 'adc_additional.ini'), "utf-8")
+            self.additional_config = config_add
 
 
         self.status = AdcStatus()
@@ -126,8 +127,9 @@ class ADC(Dev):
             self.connected = True
             ssh = client.invoke_shell()
             self.ssh = ssh
+            print('cd')
             ssh.send('cd /home/embedded/examples\n')
-            self.ssh_output(0.5)
+            self.ssh_output(1)
 
             scp = SCPClient(client.get_transport())
             self.scp = scp
@@ -137,8 +139,10 @@ class ADC(Dev):
             if self.response.IsInitialized() and self.parent is not None:
                 self.channel0.emit(self.response.SerializeToString())
             self.reset_packets()
+            print('Done connection')
         except:
             self.connected = False
+            print('connection error')
 
     def ssh_output(self, timeout=None):
         if timeout is None:
@@ -158,7 +162,9 @@ class ADC(Dev):
         with open(os.path.join(self.wdir, 'dev/insys/temp/adc.ini'), 'w') as f:
             config.write(f)
         if self.connected:
-            self.scp.put(os.path.join(self.wdir, 'dev/insys/temp/adc.ini'), '/home/embedded/examples/exam_adc.ini')
+            print(f"config from {os.path.join(self.wdir, 'dev', 'insys', 'adc.ini')}")
+            self.scp.put(os.path.join(self.wdir, 'dev', 'insys', 'adc.ini'), '/home/embedded/examples/exam_adc.ini')
+            print('Done config')
 
     def start(self, response: bool = False):
         # separate function for ability start ADC(thread) "manually", not only by command in packet
@@ -176,15 +182,19 @@ class ADC(Dev):
 
             # if connected run exam_adc
             if self.connected:
+                print('exam')
                 self.ssh.send('/home/embedded/examples/exam_adc\n')
+                print('exam send')
             else:
                 self.started = False
                 self.isAcqComplete = True
 
             # wait for exam_adc ending or stopping by user
             while self.started:
-                time.sleep(1)
+                time.sleep(0.1)
+                print('waiting')
 
+            print('Done measurement')
             # if data acquired get adc memory dump file
             if self.isAcqComplete:
                 if self.connected:
@@ -194,6 +204,7 @@ class ADC(Dev):
                     # wait for file transfer completes
                     while not(os.path.exists(os.path.join(self.wdir, 'dev/insys/temp/'+self.file_base+'.bin'))):
                         time.sleep(0.1)
+                    print('Got files')
                 else:
                     self.generate_data()
                 # read dump from disk (generated or loaded from adc)
@@ -269,7 +280,6 @@ class ADC(Dev):
             elif int(start) == 3:
                 self.state.start = AdcStatus.SOFTSTART
 
-        # TODO зачем 2 раза?
         stop = self.get_cfg_item('device0_fm814x250m0', 'StopSource')
         if stop is not None:
             if int(stop) == 0:
@@ -456,6 +466,7 @@ class ADC(Dev):
                     self.connected = transp.is_alive()
                     time.sleep(timeout)
 
+            print('Error watchdog')
             self.response.data = 'ADC disconnected'.encode()
             if self.response.IsInitialized() and self.parent is not None:
                 self.channel0.emit(self.response.SerializeToString())
