@@ -22,6 +22,7 @@ import scipy.signal as signal
 from numba import njit
 import os
 import time
+import configparser
 
 
 class PlotterWidget(QtWidgets.QMainWindow, Ui_Plotter):
@@ -30,6 +31,13 @@ class PlotterWidget(QtWidgets.QMainWindow, Ui_Plotter):
         os.chdir(os.path.join(curdir, 'ui', 'PLOTTER'))
         super().__init__(parent=parent)
         self.setupUi(self)
+        config = configparser.ConfigParser()
+        config.read('settings.ini')
+        width = QtWidgets.QApplication.desktop().screenGeometry().width()
+        height = QtWidgets.QApplication.desktop().screenGeometry().height()
+        # if int(config['plotter']['position_x']) < width and int(config['plotter']['position_y']) < height:
+        self.move(int(config['plotter']['position_x']), int(config['plotter']['position_y']))
+        del config
         os.chdir(curdir)
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose, True)
 
@@ -62,6 +70,8 @@ class PlotterWidget(QtWidgets.QMainWindow, Ui_Plotter):
         self.select_shot_pushButton.clicked.connect(self.select_shot)
         self.count_rate_pushButton.clicked.connect(self.count_rate)
         self.rms_pushButton.clicked.connect(self.rms)
+
+        gc.collect(generation=2)
 
     def make_plot(self, data_file=None, x_unit='samples', new=True):
         self.static_canvas.figure.clear('all')
@@ -219,6 +229,15 @@ class PlotterWidget(QtWidgets.QMainWindow, Ui_Plotter):
     #     self.close()
 
     def closeEvent(self, a0: QtGui.QCloseEvent) -> None:
+        curdir = os.getcwd()
+        os.chdir(os.path.join(curdir, 'ui', 'PLOTTER'))
+        config = configparser.ConfigParser()
+        config.read('settings.ini')
+        config['plotter']['position_x'] = str(self.x())
+        config['plotter']['position_y'] = str(self.y())
+        with open('settings.ini', 'w') as f:
+            config.write(f)
+        os.chdir(curdir)
         self.static_canvas.figure.clear('all')
         gc.collect(generation=2)
 

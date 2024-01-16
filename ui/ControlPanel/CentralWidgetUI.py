@@ -1,8 +1,11 @@
 import configparser
+import gc
 import os
 import time
 import psutil
 from PyQt5 import QtWidgets, QtCore, QtGui
+from threading import Thread
+import winsound
 from ui.ControlPanel.CentralWidgetUIDesign import Ui_MainWidgetDesign
 from core.sxr_protocol import packet_init
 from core.sxr_protocol_pb2 import MainPacket, SystemStatus, Commands, AmpStatus, AdcStatus, HardwareStatus, TokamakStatus, JournalStatus, GsaStatus
@@ -278,13 +281,32 @@ class MainWidget(QtWidgets.QWidget, Ui_MainWidgetDesign):
             self.hardware_groupBox.setCheckable(False)
             self.amp_groupBox.setCheckable(False)
             self.gsa_groupBox.setCheckable(False)
+            try:
+                th = Thread(target=lambda: winsound.PlaySound('SystemHand', winsound.SND_ALIAS))
+                th.start()
+            except Exception:
+                pass
 
     def _save_file(self):
+        try:
+            th = Thread(target=lambda: winsound.PlaySound('SystemHand', winsound.SND_ALIAS))
+            th.start()
+        except Exception:
+            pass
         self.channelSnapshot.emit()
         self._set_system_ready()
 
+        gc.collect(generation=2)
+
     def _remove_file(self):
         self._set_system_ready()
+        try:
+            th = Thread(target=lambda: winsound.PlaySound('SystemExclamation', winsound.SND_ALIAS))
+            th.start()
+        except Exception:
+            pass
+
+        gc.collect(generation=2)
 
     def _set_system_working(self):
         self.state_label.setText('В работе. Ожидаю запуск АЦП...')
@@ -305,6 +327,13 @@ class MainWidget(QtWidgets.QWidget, Ui_MainWidgetDesign):
         im2.start()
         self.state_icon_label_2.setMovie(im1)
         self.external_pushButton.setDisabled(True)
+        try:
+            th = Thread(target=lambda: winsound.PlaySound('SystemQuestion', winsound.SND_ALIAS))
+            th.start()
+        except Exception:
+            pass
+
+        gc.collect(generation=2)
 
     def _set_system_saving(self):
         # TODO saving notification
@@ -339,6 +368,11 @@ class MainWidget(QtWidgets.QWidget, Ui_MainWidgetDesign):
         self.remove_pushButton.hide()
         self.remove_pushButton.setDisabled(True)
         self.external_pushButton.setDisabled(True)
+        try:
+            th = Thread(target=lambda: winsound.PlaySound('SystemHand', winsound.SND_ALIAS))
+            th.start()
+        except Exception:
+            pass
 
     def _set_system_ready(self):
         self.state_label.setText('Система готова к работе.')
@@ -369,6 +403,11 @@ class MainWidget(QtWidgets.QWidget, Ui_MainWidgetDesign):
         self.save_pushButton.setEnabled(True)
         self.remove_pushButton.show()
         self.remove_pushButton.setEnabled(True)
+        try:
+            th = Thread(target=lambda: winsound.PlaySound('SystemQuestion', winsound.SND_ALIAS))
+            th.start()
+        except Exception:
+            pass
 
     def get_settings(self):
         request = packet_init(SystemStatus.SXR, self.address)
