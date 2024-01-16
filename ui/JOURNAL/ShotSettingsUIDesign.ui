@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>477</width>
+    <width>482</width>
     <height>694</height>
    </rect>
   </property>
@@ -58,16 +58,6 @@
          <bool>true</bool>
         </property>
         <layout class="QFormLayout" name="formLayout">
-         <item row="1" column="0">
-          <widget class="QLabel" name="label">
-           <property name="text">
-            <string>Измерение SXR:</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="1">
-          <widget class="QSpinBox" name="sxr_number_spinBox"/>
-         </item>
          <item row="0" column="0">
           <widget class="QLabel" name="label_2">
            <property name="text">
@@ -77,6 +67,16 @@
          </item>
          <item row="0" column="1">
           <widget class="QSpinBox" name="shot_number_spinBox"/>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="label">
+           <property name="text">
+            <string>Измерение SXR:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QSpinBox" name="sxr_number_spinBox"/>
          </item>
          <item row="2" column="0">
           <widget class="QLabel" name="label_3">
@@ -103,6 +103,39 @@
            </property>
           </widget>
          </item>
+         <item row="7" column="0">
+          <widget class="QLabel" name="label_5">
+           <property name="text">
+            <string>Тип измерений:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="8" column="0">
+          <widget class="QLabel" name="label_6">
+           <property name="text">
+            <string>Источник согнала:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="7" column="1">
+          <widget class="QComboBox" name="mode_comboBox">
+           <item>
+            <property name="text">
+             <string>Эксперимент</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Калибровка</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Тест</string>
+            </property>
+           </item>
+          </widget>
+         </item>
          <item row="5" column="0">
           <widget class="QLabel" name="label_4">
            <property name="text">
@@ -112,6 +145,40 @@
          </item>
          <item row="6" column="0" colspan="2">
           <widget class="QTextEdit" name="comment_textEdit"/>
+         </item>
+         <item row="8" column="1">
+          <widget class="QComboBox" name="source_comboBox">
+           <item>
+            <property name="text">
+             <string>Плазма</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Плазма + Fe55</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Fe55</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Mini-X2</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Fe55 + Mini-X2</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Нет</string>
+            </property>
+           </item>
+          </widget>
          </item>
         </layout>
        </widget>

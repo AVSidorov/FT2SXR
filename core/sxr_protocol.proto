@@ -105,6 +105,7 @@ message HardwareStatus{
   required float hknife = 3 [default = 0.0]; // mm
   required string foil = 4 [default = '?'];
   required string diaphragm = 5 [default = '?'];
+  optional bool shiber = 6 [default = false];
 }
 
 message JournalStatus{
@@ -113,6 +114,8 @@ message JournalStatus{
   required string filename = 3 [default = 'SXRspectrum'];
   optional string comment = 4 [default = ''];
   optional string daycomment = 5 [default = ''];
+  optional string signal_source = 6 [default = ''];
+  optional string work_type = 7 [default = ''];
 }
 
 message TokamakStatus{

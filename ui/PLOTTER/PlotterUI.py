@@ -111,9 +111,9 @@ class PlotterWidget(QtWidgets.QMainWindow, Ui_Plotter):
                 self.static_canvas.draw()
                 self.statusbar.showMessage('Plotted', 10000)
             else:
-                self.statusbar.showMessage('Can\'t plot', 10000)
+                self.statusbar.showMessage('Can\'t plot read data', 10000)
         else:
-            self.statusbar.showMessage('Can\'t plot', 10000)
+            self.statusbar.showMessage('Can\'t read the file', 10000)
 
     def change_ax(self):
         self.x_unit = self.x_ax_comboBox.currentText().lower().strip()
@@ -169,9 +169,10 @@ class PlotterWidget(QtWidgets.QMainWindow, Ui_Plotter):
                 count_time_ms = self.count_rate_window_doubleSpinBox.value()
                 count_time_smpls = int(count_time_ms * rate / 1e3)
 
-                sig = medfilt1d(self.reader.data[signal_index], kernel_size=5)
-                sig = savitsky_golay(sig, npoints=40)
-                maxs = signal.find_peaks(sig, distance=10)[0]
+                # sig = medfilt1d(self.reader.data[signal_index], kernel_size=3)
+                sig = self.reader.data[signal_index]
+                sig = savitsky_golay(sig, npoints=30)
+                maxs = signal.find_peaks(sig, distance=5)[0]
                 prominences, mins, _ = signal.peak_prominences(sig, maxs)
 
                 threshold = self.threshold_spinBox.value()

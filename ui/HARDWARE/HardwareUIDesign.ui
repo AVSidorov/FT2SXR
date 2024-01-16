@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>670</width>
-    <height>317</height>
+    <height>339</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -67,7 +67,7 @@
          <property name="bottomMargin">
           <number>5</number>
          </property>
-         <item row="3" column="1">
+         <item row="4" column="1">
           <widget class="QDoubleSpinBox" name="vknife_doubleSpinBox">
            <property name="wrapping">
             <bool>false</bool>
@@ -83,7 +83,24 @@
            </property>
           </widget>
          </item>
-         <item row="0" column="0">
+         <item row="2" column="1">
+          <widget class="QComboBox" name="diaph_comboBox"/>
+         </item>
+         <item row="1" column="2">
+          <widget class="QLabel" name="foil_comment_label">
+           <property name="text">
+            <string>, длина винта: мм</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="0">
+          <widget class="QLabel" name="label_3">
+           <property name="text">
+            <string>Нож высота (=): </string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
           <widget class="QLabel" name="label">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
@@ -96,7 +113,7 @@
            </property>
           </widget>
          </item>
-         <item row="0" column="1">
+         <item row="1" column="1">
           <widget class="QComboBox" name="foil_comboBox">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -106,38 +123,21 @@
            </property>
           </widget>
          </item>
-         <item row="0" column="2">
-          <widget class="QLabel" name="foil_comment_label">
-           <property name="text">
-            <string>, длина винта: мм</string>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="0">
-          <widget class="QLabel" name="label_3">
-           <property name="text">
-            <string>Нож высота (=): </string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="2">
+         <item row="2" column="2">
           <widget class="QLabel" name="diaph_comment_label">
            <property name="text">
             <string>, длина винта: мм</string>
            </property>
           </widget>
          </item>
-         <item row="1" column="1">
-          <widget class="QComboBox" name="diaph_comboBox"/>
-         </item>
-         <item row="1" column="0">
+         <item row="2" column="0">
           <widget class="QLabel" name="label_2">
            <property name="text">
             <string>Диафрагма:</string>
            </property>
           </widget>
          </item>
-         <item row="2" column="1">
+         <item row="3" column="1">
           <widget class="QDoubleSpinBox" name="hknife_doubleSpinBox">
            <property name="wrapping">
             <bool>false</bool>
@@ -153,35 +153,28 @@
            </property>
           </widget>
          </item>
-         <item row="4" column="2">
-          <widget class="QLabel" name="label_6">
-           <property name="text">
-            <string>градусов (&quot;+&quot; - луч зрения вверх, &quot;-&quot; - вниз)</string>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="2">
+         <item row="3" column="2">
           <widget class="QLabel" name="label_8">
            <property name="text">
             <string>мм (1 оборот = 1 мм, ноль = 10+0.03 дел.)</string>
            </property>
           </widget>
          </item>
-         <item row="3" column="0">
-          <widget class="QLabel" name="label_4">
+         <item row="5" column="2">
+          <widget class="QLabel" name="label_6">
            <property name="text">
-            <string>Нож ширина (||):</string>
+            <string>градусов (&quot;+&quot; - луч зрения вверх, &quot;-&quot; - вниз)</string>
            </property>
           </widget>
          </item>
-         <item row="3" column="2">
-          <widget class="QLabel" name="label_7">
+         <item row="5" column="0">
+          <widget class="QLabel" name="label_5">
            <property name="text">
-            <string>мм (1 оборот = 1 мм, ноль = 10+0.12 дел.)</string>
+            <string>Наклон стола:</string>
            </property>
           </widget>
          </item>
-         <item row="4" column="1">
+         <item row="5" column="1">
           <widget class="QDoubleSpinBox" name="angle_doubleSpinBox">
            <property name="decimals">
             <number>1</number>
@@ -197,11 +190,39 @@
            </property>
           </widget>
          </item>
-         <item row="4" column="0">
-          <widget class="QLabel" name="label_5">
+         <item row="4" column="2">
+          <widget class="QLabel" name="label_7">
            <property name="text">
-            <string>Наклон стола:</string>
+            <string>мм (1 оборот = 1 мм, ноль = 10+0.12 дел.)</string>
            </property>
+          </widget>
+         </item>
+         <item row="4" column="0">
+          <widget class="QLabel" name="label_4">
+           <property name="text">
+            <string>Нож ширина (||):</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="0">
+          <widget class="QLabel" name="label_9">
+           <property name="text">
+            <string>Шибер</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QComboBox" name="shiber_comboBox">
+           <item>
+            <property name="text">
+             <string>Закрыт</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Открыт</string>
+            </property>
+           </item>
           </widget>
          </item>
         </layout>

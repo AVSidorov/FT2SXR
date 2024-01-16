@@ -1,17 +1,17 @@
 import numpy as np
 from os import path, listdir, stat
-from core.core import Core
+# from core.core import Core
 import configparser
 import h5py as h5
-from time import time
+import re
+# from time import time
 
 
-class Reader(Core):
-# class Reader:
-    def __init__(self, parent=None, data_file=None):
-        super().__init__(parent=parent)
+# class Reader(Core):
+class Reader:
+    def __init__(self):
+        # super().__init__(parent=parent)
         super().__init__()
-
 
         self.data = None
         self.meta = None
@@ -38,7 +38,8 @@ class Reader(Core):
 
                         n_ch = conf_dict['mask'].count("1")
                         measurements = np.fromfile(data_file, dtype=np.int16)
-                        self.data = measurements.reshape((-1, n_ch)).T
+                        # self.data = measurements.reshape((-1, n_ch)).T
+                        self.data = np.transpose(np.reshape(measurements, (-1, n_ch)))
                         if conf_dict['void_mask'] is not None:
                             str_mask = conf_dict['void_mask'][2:]
                             for i in range(1, len(str_mask) + 1):
@@ -65,7 +66,7 @@ class Reader(Core):
                         self.meta = meta
                         self.stat = stat(data_file)
 
-                if path.splitext(data_file)[1] == '.h5':
+                elif path.splitext(data_file)[1] == '.h5':
                     try:
                         conf_dict, self.data = self.parse_h5(data_file)
                     except KeyError:
@@ -122,7 +123,6 @@ class Reader(Core):
                     if str_mask[-i] == '1':
                         names.append(config['adc_additional'][f'name{i}'])
 
-
             return {'samples': samples,
                     'rate': rate,
                     'mask': mask,
@@ -137,10 +137,14 @@ class Reader(Core):
                 config = file['SXR']['ADC']['config']
                 samples = eval(config['Option']['MemSamplesPerChan'][()])
                 device_section = list(config.keys())
-                device_section.remove('Option')
-                if 'DEFAULT' in device_section:
-                    device_section.remove('DEFAULT')
-                device_section = device_section[0]
+                # device_section.remove('Option')
+                # if 'DEFAULT' in device_section:
+                #     device_section.remove('DEFAULT')
+                for section in device_section:
+                    if re.match(r'device', section):
+                        device_section = section
+                        break
+                # device_section = device_section[0]
                 rate = eval(config[device_section]['SamplingRate'][()])
                 mask = bin(eval(config[device_section]['ChannelMask'][()]))
 
@@ -153,7 +157,6 @@ class Reader(Core):
                     globals()[i] = file['SXR']['ADC'][i][()]
                     names.append(file['SXR']['ADC'][i].attrs.get('name'))
                 measurements = np.vstack([np.array(eval(i), dtype=np.int16) for i in channels])
-
                 return {'samples': samples,
                         'rate': rate,
                         'mask': mask,
