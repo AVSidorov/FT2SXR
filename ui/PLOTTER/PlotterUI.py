@@ -70,6 +70,7 @@ class PlotterWidget(QtWidgets.QMainWindow, Ui_Plotter):
         self.select_shot_pushButton.clicked.connect(self.select_shot)
         self.count_rate_pushButton.clicked.connect(self.count_rate)
         self.rms_pushButton.clicked.connect(self.rms)
+        self.spectrum_pushButton.clicked.connect(self.make_spectrum)
 
         gc.collect(generation=2)
 
@@ -97,10 +98,13 @@ class PlotterWidget(QtWidgets.QMainWindow, Ui_Plotter):
                     self.date_label.setText(time.ctime(self.reader.stat.st_ctime))
                     self.count_rate_comboBox.clear()
                     self.rms_comboBox.clear()
+                    self.spectrum_comboBox.clear()
                     for i in range(n_plots - 1, -1, -1):
                         self.count_rate_comboBox.addItem(
                             f'Graph №{self.reader.meta[i - 1][1]} ({self.reader.meta[i - 1][4]})')
                         self.rms_comboBox.addItem(f'Graph №{self.reader.meta[i - 1][1]} ({self.reader.meta[i - 1][4]})')
+                        self.spectrum_comboBox.addItem(
+                            f'Graph №{self.reader.meta[i - 1][1]} ({self.reader.meta[i - 1][4]})')
 
                 for i in range(1, n_plots + 1):
                     globals()[f"ax{i}"] = self.static_canvas.figure.add_subplot(n_plots, 1, i)
@@ -179,9 +183,9 @@ class PlotterWidget(QtWidgets.QMainWindow, Ui_Plotter):
                 count_time_ms = self.count_rate_window_doubleSpinBox.value()
                 count_time_smpls = int(count_time_ms * rate / 1e3)
 
-                # sig = medfilt1d(self.reader.data[signal_index], kernel_size=3)
-                sig = self.reader.data[signal_index]
-                sig = savitsky_golay(sig, npoints=30)
+                sig = medfilt1d(self.reader.data[signal_index], kernel_size=15)
+                #sig = self.reader.data[signal_index]
+                sig = savitsky_golay(sig, npoints=70)
                 maxs = signal.find_peaks(sig, distance=5)[0]
                 prominences, mins, _ = signal.peak_prominences(sig, maxs)
 
@@ -220,8 +224,71 @@ class PlotterWidget(QtWidgets.QMainWindow, Ui_Plotter):
                 plt.xlabel('Time, ms')
                 plt.grid()
                 plt.plot(times, counts)
+                plt.tight_layout()
                 plt.show()
                 gc.collect(generation=2)
+
+    def make_spectrum(self):
+        if not (isinstance(self.reader.meta, type(None)) or isinstance(self.reader.data, type(None))):
+            if len(self.reader.meta) == len(self.reader.data):
+                lable = str(self.reader.meta[0][0])
+                signal_index = self.count_rate_comboBox.currentIndex()
+                rate = int(self.reader.meta[0][3])
+
+                sig = self.reader.data[signal_index]
+                sig = medfilt1d(sig, kernel_size=15)
+                sig = savitsky_golay(sig, npoints=70)
+                maxs = signal.find_peaks(sig, distance=5)[0]
+                prominences = signal.peak_prominences(sig, maxs)[0]
+                threshold_l = self.low_threshold_spinBox.value()
+                threshold_h = self.high_threshold_spinBox.value()
+                window = self.spectrum_wondow_doubleSpinBox.value()
+                window_smpls = int(window / 1000 * rate)
+
+                def _make_spectrum(maxs: np.array, prominences: np.array, threshold_l: int, threshold_h: int,
+                                   window_smpls: int) -> (
+                        list, list):
+                    n = 0.0
+                    pulses = []
+                    out_points = []
+                    out_counts = []
+                    for i in range(len(maxs)):
+                        if threshold_l < prominences[i] < threshold_h:
+                            if maxs[i] // window_smpls == n:
+                                pulses.append(prominences[i])
+                            else:
+                                counts, bins = np.histogram(pulses, bins=int(np.sqrt(len(pulses))))
+                                points = [(bins[i] + bins[i + 1]) * 0.5 for i in range(len(bins) - 1)]
+                                counts = counts / (points[1] - points[0])
+                                out_points.append(points)
+                                out_counts.append(counts)
+                                n = maxs[i] // window_smpls
+                                pulses = [prominences[i]]
+                    else:
+                        counts, bins = np.histogram(pulses, bins=int(np.sqrt(len(pulses))))
+                        points = [(bins[i] + bins[i + 1]) * 0.5 for i in range(len(bins) - 1)]
+                        counts = counts / (points[1] - points[0])
+                        out_points.append(points)
+                        out_counts.append(counts)
+                    return out_points, out_counts
+
+                points, counts = _make_spectrum(maxs, prominences, threshold_l=threshold_l, threshold_h=threshold_h,
+                                                window_smpls=window_smpls)
+
+                plt.close()
+                plt.title(f'Spectrum in {self.reader.meta[signal_index][4]} (file {lable})')
+                plt.ylabel('Counts / $\\Delta$E')
+                plt.xlabel('Energy, a.u.')
+                plt.grid()
+                for i in range(len(points)):
+                    plt.plot(points[i], counts[i], label=f'{window * i}-{window * (i + 1)} s')
+                plt.legend()
+                if self.log_radioButton.isChecked():
+                    plt.semilogy()
+                plt.tight_layout()
+                plt.show()
+                gc.collect(generation=2)
+
 
     # def hideEvent(self, a0: QtGui.QHideEvent) -> None:
     #     self.static_canvas.figure.clear('all')
